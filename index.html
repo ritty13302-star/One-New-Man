@@ -160,9 +160,9 @@ const starterGoals = [
  {id:6,name:'週週禱研背講',category:'學習',target:52,current:0}
 ];
 const starterBooks = Array.from({length:10},(_,i)=>({id:i+1,name:'',chapters:0,read:0,done:false}));
+const emptyTabRecords = () => ({service:[],church:[],truth:[]});
 const freshState = () => ({goals:starterGoals.map(g=>({...g})),books:starterBooks.map(b=>({...b})),weekNote:'',nextWeek:'',tabRecords:emptyTabRecords()});
 let state=freshState(), auth, db, currentUser=null, stopListening=null, saveTimer=null, applyingRemote=false, lastSerialized='';
-const emptyTabRecords = () => ({service:[],church:[],truth:[]});
 const serialize = value => JSON.stringify({goals:value.goals,books:value.books,weekNote:value.weekNote||'',nextWeek:value.nextWeek||'',tabRecords:value.tabRecords||emptyTabRecords()});
 function normalizeState(raw){
  const base=raw && typeof raw==='object'?raw:{};
