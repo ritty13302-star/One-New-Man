@@ -65,6 +65,11 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 .service-section .record-form{margin:8px 0 14px}
 @media(max-width:620px){.service-section{padding:13px;border-radius:15px}.service-section-heading{align-items:flex-start}.service-section-title{gap:8px}.service-section-icon{width:36px;height:36px;flex-basis:36px}.service-section-title h3{font-size:16px}.service-section-title p{max-width:190px;line-height:1.4}.service-section-hint{margin-left:44px}.service-section-heading>.btn{padding:9px 10px;font-size:12px;white-space:nowrap}.service-section-actions{gap:5px}.service-section-actions .btn{padding:9px 10px;font-size:12px}}
 
+
+/* 每週時間表 */
+.schedule-page{display:grid;gap:14px}.schedule-hero{padding:18px;border:1px solid var(--line);border-radius:18px;background:var(--card)}.schedule-month{font-size:12px;color:var(--muted);font-weight:700}.schedule-title{font-size:23px;font-weight:800;margin:3px 0 5px}.schedule-subtitle{font-size:13px;color:var(--muted)}.schedule-week-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}.schedule-week-actions .mini{min-width:42px;font-size:20px}.schedule-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:14px}.schedule-day{border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--muted);padding:8px 2px;min-width:0;cursor:pointer}.schedule-day strong,.schedule-day span{display:block}.schedule-day strong{font-size:13px;color:var(--ink)}.schedule-day span{font-size:11px}.schedule-day.active{background:var(--pale);border-color:var(--green);color:var(--ink)}.schedule-day.today{outline:1px solid var(--green);outline-offset:1px}.schedule-progress{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);margin-top:12px}.schedule-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px}.schedule-card h3{font-size:16px;margin:0}.schedule-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.schedule-note-form{display:flex;gap:7px;margin-bottom:10px}.schedule-note-form input{min-width:0;flex:1;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink)}.schedule-notes{display:grid;gap:7px}.schedule-note{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--bg);font-size:13px}.schedule-note input{width:18px;height:18px;accent-color:var(--green);flex:0 0 auto}.schedule-note.done span{text-decoration:line-through;color:var(--muted)}.schedule-grid-head{display:grid;grid-template-columns:62px 1fr 1fr 34px;gap:7px;padding:0 8px 7px;color:var(--muted);font-size:11px;font-weight:700}.schedule-slots{display:grid;gap:7px}.schedule-slot{display:grid;grid-template-columns:62px 1fr 1fr 34px;gap:7px;align-items:stretch;padding:7px;border:1px solid var(--line);border-radius:11px;background:var(--card)}.schedule-time{font-size:12px;font-weight:750;display:flex;align-items:center;color:var(--green)}.schedule-cell{min-width:0;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;padding:7px;border-radius:8px;background:var(--bg);min-height:34px}.schedule-cell.empty{color:var(--muted);opacity:.7}.schedule-add{border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--green);font-size:20px;cursor:pointer;min-height:34px}.schedule-entry{display:flex;align-items:flex-start;gap:5px}.schedule-entry input{width:15px;height:15px;accent-color:var(--green);flex:0 0 auto;margin:2px 0}.schedule-entry.done{opacity:.6;text-decoration:line-through}.schedule-entry-actions{display:flex;gap:4px;margin-top:5px}.schedule-entry-actions button{border:0;background:transparent;color:var(--muted);font-size:11px;padding:2px 4px;cursor:pointer}.schedule-note-empty{font-size:12px;color:var(--muted);padding:6px 2px}.schedule-modal .dialog{max-width:460px}.schedule-modal textarea{width:100%;min-height:74px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink);resize:vertical}.schedule-modal label{display:block;margin:10px 0 5px;font-size:13px;color:var(--muted)}.schedule-modal[hidden]{display:none!important}
+@media(max-width:520px){.schedule-day{padding:7px 1px}.schedule-day strong{font-size:12px}.schedule-day span{font-size:10px}.schedule-grid-head,.schedule-slot{grid-template-columns:48px minmax(0,1fr) minmax(0,1fr) 30px;gap:4px}.schedule-slot{padding:5px}.schedule-cell{padding:6px 5px;font-size:11px}.schedule-time{font-size:11px}.schedule-add{font-size:18px}}
+
 </style>
 </head>
 <body>
@@ -76,6 +81,7 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
  <div class="menu-head"><div class="menu-title">👤 個人選單</div><button class="mini" id="menuClose" type="button" aria-label="關閉選單">✕</button></div>
  <div class="avatar-upload-row"><button class="avatar-action" id="changeAvatarBtn" type="button">更換頭貼</button><button class="avatar-action" id="resetAvatarBtn" type="button">恢復預設</button><input id="avatarFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden></div><div class="avatar-note" id="avatarStatus">登入 Google 後可將頭貼儲存至雲端</div>
  <button class="menu-item" id="menuHome" type="button"><span>🏠</span>主頁</button>
+ <button class="menu-item" id="menuSchedule" type="button"><span>🗓️</span>時間表</button>
  <div class="menu-divider"></div>
  <button class="menu-item" id="settingsToggle" type="button" aria-expanded="true"><span>⚙️</span><span style="flex:1">設定</span><span id="settingsChevron">⌄</span></button>
  <div id="settingsPanel">
@@ -103,7 +109,7 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 <section class="auth-panel" aria-live="polite"><div class="auth-info"><div class="auth-avatar" id="authAvatar">☁️</div><div class="auth-copy"><strong id="authTitle">登入以同步你的年度紀錄</strong><div class="muted" id="authSubtitle">使用 Google 帳號，在不同裝置繼續記錄</div></div></div><div class="auth-actions"><button class="google-btn" id="googleSignIn"><span class="google-mark">G</span> 使用 Google 登入</button><button class="btn secondary auth-hidden" id="signOutBtn">登出</button></div></section>
 <div class="status" id="authStatus" role="status">尚未登入</div>
 <div id="appContent" class="auth-hidden">
-<nav class="nav-tabs" aria-label="主要分頁" role="tablist"><button class="nav-tab active" type="button" data-page="target" role="tab" aria-selected="true">🎯 目標</button><button class="nav-tab" type="button" data-page="service" role="tab" aria-selected="false">🤝 事奉</button><button class="nav-tab" type="button" data-page="church" role="tab" aria-selected="false">🌿 召會</button><button class="nav-tab" type="button" data-page="truth" role="tab" aria-selected="false">📖 真理</button></nav>
+<nav class="nav-tabs" id="mainNavTabs" aria-label="主要分頁" role="tablist"><button class="nav-tab active" type="button" data-page="target" role="tab" aria-selected="true">🎯 目標</button><button class="nav-tab" type="button" data-page="service" role="tab" aria-selected="false">🤝 事奉</button><button class="nav-tab" type="button" data-page="church" role="tab" aria-selected="false">🌿 召會</button><button class="nav-tab" type="button" data-page="truth" role="tab" aria-selected="false">📖 真理</button></nav>
 <section id="page-target" class="page-panel" role="tabpanel">
 <section class="hero" data-block-id="target-hero"><small>我的年度旅程</small><h2>今天也向前一步。</h2><div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:8px;font-size:13px"><span>年度目標完成率</span><strong id="totalText">0%</strong></div><div class="progressline"><span id="totalBar"></span></div></section>
 <section class="stats" data-block-id="target-stats"><div class="stat"><div class="ico">🎯</div><strong id="activeCount">0</strong><div class="muted">進行中目標</div></div><div class="stat"><div class="ico">🌿</div><strong id="doneCount">0</strong><div class="muted">已完成目標</div></div><div class="stat"><div class="ico">📚</div><strong id="bookCount">0/0</strong><div class="muted">完成書報</div></div></section>
@@ -134,9 +140,30 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
  </div>
 </div>
 <div class="panel" data-block-id="truth-records"><div class="sectionhead"><h2>📖 真理紀錄</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn" type="button" data-add-record="truth">＋ 新增紀錄</button></div></div><p class="subpage-intro">收集真理追求、經節、讀經心得與信息摘要。真理紀錄獨立保存、編輯。</p><form class="record-form" id="form-truth" hidden><input name="title" maxlength="120" placeholder="紀錄標題，例如：羅馬書第八章" required><textarea name="body" maxlength="5000" placeholder="記錄經節、亮光、心得或追求進度（選填）"></textarea><div class="dialog-actions"><button class="btn secondary" type="button" data-cancel-record="truth">取消</button><button class="btn" type="submit">儲存紀錄</button></div></form><div class="record-list" id="records-truth"></div></div></section>
+<section id="page-schedule" class="page-panel subpage schedule-page" role="tabpanel" hidden>
+ <div class="schedule-hero">
+  <div class="schedule-month" id="scheduleMonth">2026 · 10月</div>
+  <div class="schedule-title" id="scheduleRange">本週時間表</div>
+  <div class="schedule-subtitle">安排每一段時間，也記下每一步完成。</div>
+  <div class="schedule-week-actions"><button class="mini" type="button" id="schedulePrev" aria-label="上一週">‹</button><button class="btn secondary" type="button" id="scheduleToday">回到本週</button><button class="mini" type="button" id="scheduleNext" aria-label="下一週">›</button></div>
+  <div class="schedule-progress"><span id="scheduleDoneCount">0 已完成</span><span id="schedulePlannedCount">0 本週安排</span></div>
+  <div class="schedule-days" id="scheduleDays"></div>
+ </div>
+ <div class="schedule-card">
+  <div class="schedule-card-head"><div><h3>📝 當天臨時事項</h3><div class="muted" id="scheduleNoteCount">0/0</div></div><button class="mini" type="button" id="scheduleNotesToggle">收起</button></div>
+  <form class="schedule-note-form" id="scheduleNoteForm"><input id="scheduleNoteInput" maxlength="180" placeholder="輸入當天臨時事項" required><button class="btn" type="submit">＋</button></form>
+  <div class="schedule-notes" id="scheduleNotes"></div>
+ </div>
+ <div class="schedule-card">
+  <div class="schedule-card-head"><div><h3 id="scheduleDayHeading">今天的安排</h3><div class="muted">時間以每 30 分鐘為一格</div></div></div>
+  <div class="schedule-grid-head"><span>時間</span><span>時間計畫</span><span>結果</span><span></span></div>
+  <div class="schedule-slots" id="scheduleSlots"></div>
+ </div>
+</section>
 <div class="cloud-state" id="cloudStatus">登入後開始同步</div></div></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="dialog"><h2 id="modalTitle">新增年度目標</h2><label for="goalName">目標名稱</label><input id="goalName" maxlength="100" placeholder="例如：每週禱研背講"><label for="goalCategory">分類</label><select id="goalCategory"><option>生活</option><option>閱讀</option><option>學習</option><option>服事</option><option>健康</option><option>其他</option></select><label for="goalTarget">目標數量（沒有數量目標可填 1）</label><input id="goalTarget" type="number" min="1" max="100000" value="1"><div class="dialog-actions"><button class="btn secondary" id="cancelBtn">取消</button><button class="btn" id="createBtn">新增</button></div><div class="notice">例如「讀完十本書報」可設定數量 10，之後用 +1 記錄進度。</div></div></div>
 <div class="modal" id="countdownModal" role="dialog" aria-modal="true" aria-labelledby="countdownModalTitle"><div class="dialog"><h2 id="countdownModalTitle">編輯倒數項目</h2><p class="muted">可以自訂首頁顯示的名稱，也可以設定或更改倒數日期。</p><label for="countdownNameInput">自訂名稱</label><input id="countdownNameInput" type="text" maxlength="24" placeholder="例如：年度目標、受浸目標、活動倒數" required><label for="countdownDateInput">倒數目標日期</label><input id="countdownDateInput" type="date" min="2026-01-01"><div class="dialog-actions"><button class="btn secondary" id="countdownCancelBtn" type="button">取消</button><button class="btn" id="countdownSaveBtn" type="button">儲存日期</button></div><div class="notice">日期可以隨時重新設定；儲存後會同步至你的雲端紀錄。</div></div></div>
+<div class="modal schedule-modal" id="scheduleEntryModal" role="dialog" aria-modal="true" aria-labelledby="scheduleEntryTitle" hidden><div class="dialog"><h2 id="scheduleEntryTitle">新增時間安排</h2><p class="muted" id="scheduleEntryMeta"></p><label for="schedulePlanInput">時間計畫</label><textarea id="schedulePlanInput" maxlength="500" placeholder="例如：晨興、讀書、學生接觸"></textarea><label for="scheduleResultInput">結果／備註</label><textarea id="scheduleResultInput" maxlength="500" placeholder="完成情形或補充紀錄（可稍後填寫）"></textarea><div class="dialog-actions"><button class="btn secondary" id="scheduleEntryCancel" type="button">取消</button><button class="btn" id="scheduleEntrySave" type="button">儲存</button></div></div></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
@@ -177,7 +204,8 @@ const freshState=()=>({
   baptizedPeople:[],
   countdownDate:'',
   countdownName:'倒數天數',
-  pageBlockOrder:{}
+  pageBlockOrder:{},
+  weeklySchedule:{}
 });
 let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='';
 const serialize=value=>JSON.stringify({
@@ -191,7 +219,8 @@ const serialize=value=>JSON.stringify({
   baptizedPeople:value.baptizedPeople||[],
   countdownDate:value.countdownDate||'',
   countdownName:value.countdownName||'倒數天數',
-  pageBlockOrder:value.pageBlockOrder||{}
+  pageBlockOrder:value.pageBlockOrder||{},
+  weeklySchedule:value.weeklySchedule||{}
 });
 function normalizeState(raw){
  const base=raw&&typeof raw==='object'?raw:{};
@@ -210,7 +239,8 @@ function normalizeState(raw){
   baptizedPeople:Array.isArray(base.baptizedPeople)?base.baptizedPeople.map((p,i)=>({id:p.id??Date.now()+i,name:String(p.name||''),date:String(p.date||''),department:String(p.department||''),shepherd:String(p.shepherd||''),expanded:!!p.expanded})): [],
   countdownDate:/^\d{4}-\d{2}-\d{2}$/.test(String(base.countdownDate||''))?String(base.countdownDate):'',
   countdownName:String(base.countdownName||'倒數天數').slice(0,24),
-  pageBlockOrder:base.pageBlockOrder&&typeof base.pageBlockOrder==='object'?base.pageBlockOrder:{}
+  pageBlockOrder:base.pageBlockOrder&&typeof base.pageBlockOrder==='object'?base.pageBlockOrder:{},
+  weeklySchedule:base.weeklySchedule&&typeof base.weeklySchedule==='object'?base.weeklySchedule:{}
  };
 }
 function persist(){
@@ -347,6 +377,32 @@ function renderWeeklyPrayerStudy(){
  $('weeklyPrayerHistoryChevron').textContent=weeklyPrayerHistoryExpanded?'⌃':'⌄';
 }
 function renderAllTabRecords(){['service','church','truth'].forEach(renderTabRecords);renderBaptizedList();renderWeeklyPrayerStudy()}
+let scheduleWeekStart=getMonday(new Date()),scheduleSelectedDate=dateKey(new Date()),scheduleNotesExpanded=true,scheduleEditing=null;
+function dateKey(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
+function parseDateKey(key){const [y,m,d]=String(key).split('-').map(Number);return new Date(y,m-1,d)}
+function getMonday(date){const d=new Date(date.getFullYear(),date.getMonth(),date.getDate());d.setDate(d.getDate()-((d.getDay()+6)%7));return d}
+function scheduleDayData(key){if(!state.weeklySchedule)state.weeklySchedule={};if(!state.weeklySchedule[key])state.weeklySchedule[key]={slots:{},notes:[]};const day=state.weeklySchedule[key];if(!day.slots||typeof day.slots!=='object')day.slots={};if(!Array.isArray(day.notes))day.notes=[];return day}
+function scheduleTimeList(){const out=[];for(let mins=5*60+30;mins<=23*60;mins+=30)out.push(`${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`);return out}
+function renderSchedule(){
+ const start=getMonday(scheduleWeekStart),end=new Date(start);end.setDate(end.getDate()+6);scheduleWeekStart=start;
+ $('scheduleMonth').textContent=`${start.getFullYear()} · ${start.getMonth()+1}月`;
+ $('scheduleRange').textContent=`${start.getMonth()+1}/${start.getDate()} — ${end.getMonth()+1}/${end.getDate()}`;
+ const today=dateKey(new Date());let total=0,done=0;
+ for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);const key=dateKey(d),data=state.weeklySchedule?.[key];Object.values(data?.slots||{}).forEach(list=>(Array.isArray(list)?list:[]).forEach(x=>{total++;if(x.done)done++}))}
+ $('scheduleDoneCount').textContent=`${done} 已完成`;$('schedulePlannedCount').textContent=`${total} 本週安排`;
+ $('scheduleDays').innerHTML=Array.from({length:7},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);const key=dateKey(d),names=['週一','週二','週三','週四','週五','週六','週日'];return `<button class="schedule-day ${key===scheduleSelectedDate?'active':''} ${key===today?'today':''}" type="button" data-schedule-day="${key}"><span>${names[i]}</span><strong>${d.getMonth()+1}/${d.getDate()}</strong></button>`}).join('');
+ const selected=parseDateKey(scheduleSelectedDate),dayData=scheduleDayData(scheduleSelectedDate);
+ $('scheduleDayHeading').textContent=`${['週日','週一','週二','週三','週四','週五','週六'][selected.getDay()]} ${selected.getMonth()+1}/${selected.getDate()} 的安排`;
+ const notes=dayData.notes;$('scheduleNoteCount').textContent=`${notes.filter(n=>n.done).length}/${notes.length}`;$('scheduleNotesToggle').textContent=scheduleNotesExpanded?'收起':'展開';$('scheduleNoteForm').hidden=!scheduleNotesExpanded;$('scheduleNotes').hidden=!scheduleNotesExpanded;
+ $('scheduleNotes').innerHTML=notes.length?notes.map(n=>`<div class="schedule-note ${n.done?'done':''}"><input type="checkbox" data-schedule-note-done="${n.id}" ${n.done?'checked':''}><span>${esc(n.text)}</span><button type="button" class="mini" data-schedule-note-delete="${n.id}" aria-label="刪除事項">×</button></div>`).join(''):'<div class="schedule-note-empty">當天尚無臨時事項</div>';
+ const slots=dayData.slots;
+ $('scheduleSlots').innerHTML=scheduleTimeList().map(time=>{const entries=Array.isArray(slots[time])?slots[time]:[];const plan=entries.map(x=>`<div><div class="schedule-entry ${x.done?'done':''}"><input type="checkbox" data-schedule-entry-done="${x.id}" ${x.done?'checked':''} aria-label="完成"><span>${esc(x.plan||'')}</span></div><div class="schedule-entry-actions"><button type="button" data-schedule-entry-edit="${x.id}" data-schedule-time="${time}">編輯</button><button type="button" data-schedule-entry-delete="${x.id}" data-schedule-time="${time}">刪除</button></div></div>`).join('');const result=entries.map(x=>`<div class="schedule-cell ${x.result?'':'empty'}">${esc(x.result||'尚未填寫')}</div>`).join('');return `<div class="schedule-slot"><div class="schedule-time">${time}</div><div class="schedule-cell ${entries.length?'':'empty'}">${plan||'—'}</div><div>${result||'<div class="schedule-cell empty">—</div>'}</div><button class="schedule-add" type="button" data-schedule-add="${time}" aria-label="新增 ${time} 安排">＋</button></div>`}).join('');
+}
+function openScheduleEntry(time,id=null){const day=scheduleDayData(scheduleSelectedDate),entry=id?Object.values(day.slots).flat().find(x=>String(x.id)===String(id)):null;scheduleEditing={time,id};$('scheduleEntryTitle').textContent=entry?'編輯時間安排':'新增時間安排';$('scheduleEntryMeta').textContent=`${scheduleSelectedDate} · ${time}`;$('schedulePlanInput').value=entry?.plan||'';$('scheduleResultInput').value=entry?.result||'';$('scheduleEntryModal').hidden=false;$('scheduleEntryModal').classList.add('open');$('schedulePlanInput').focus()}
+function closeScheduleEntry(){$('scheduleEntryModal').classList.remove('open');$('scheduleEntryModal').hidden=true;scheduleEditing=null}
+function saveScheduleEntry(){if(!scheduleEditing)return;const plan=$('schedulePlanInput').value.trim(),result=$('scheduleResultInput').value.trim();if(!plan&&!result){alert('請至少填寫時間計畫或結果。');return}const day=scheduleDayData(scheduleSelectedDate),list=day.slots[scheduleEditing.time]||(day.slots[scheduleEditing.time]=[]);let entry=scheduleEditing.id?list.find(x=>String(x.id)===String(scheduleEditing.id)):null;if(!entry){entry={id:Date.now(),done:false};list.push(entry)}entry.plan=plan;entry.result=result;persist();closeScheduleEntry();renderSchedule()}
+function handleScheduleClick(e){const dayBtn=e.target.closest('[data-schedule-day]');if(dayBtn){scheduleSelectedDate=dayBtn.dataset.scheduleDay;renderSchedule();return}const add=e.target.closest('[data-schedule-add]');if(add){openScheduleEntry(add.dataset.scheduleAdd);return}const edit=e.target.closest('[data-schedule-entry-edit]');if(edit){openScheduleEntry(edit.dataset.scheduleTime,edit.dataset.scheduleEntryEdit);return}const del=e.target.closest('[data-schedule-entry-delete]');if(del){const day=scheduleDayData(scheduleSelectedDate),time=del.dataset.scheduleTime;day.slots[time]=(day.slots[time]||[]).filter(x=>String(x.id)!==String(del.dataset.scheduleEntryDelete));if(!day.slots[time].length)delete day.slots[time];persist();renderSchedule();return}const noteDel=e.target.closest('[data-schedule-note-delete]');if(noteDel){const day=scheduleDayData(scheduleSelectedDate);day.notes=day.notes.filter(n=>String(n.id)!==String(noteDel.dataset.scheduleNoteDelete));persist();renderSchedule();return}}
+function handleScheduleChange(e){const entry=e.target.closest('[data-schedule-entry-done]');if(entry){const day=scheduleDayData(scheduleSelectedDate),item=Object.values(day.slots).flat().find(x=>String(x.id)===String(entry.dataset.scheduleEntryDone));if(item){item.done=entry.checked;persist();renderSchedule()}return}const note=e.target.closest('[data-schedule-note-done]');if(note){const item=scheduleDayData(scheduleSelectedDate).notes.find(x=>String(x.id)===String(note.dataset.scheduleNoteDone));if(item){item.done=note.checked;persist();renderSchedule()}}}
 function renderCountdown(){
  const value=$('countdownValue');
  $('countdownLabel').textContent=state.countdownName||'倒數天數';
@@ -399,7 +455,7 @@ function refreshPageBlockEditControls(){
   });
  });
 }
-function render(){renderCountdown();renderBooks();renderGoals();renderAllTabRecords();$('weekNote').value=state.weekNote||'';$('nextWeek').value=state.nextWeek||'';applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()}
+function render(){renderCountdown();renderBooks();renderGoals();renderAllTabRecords();renderSchedule();$('weekNote').value=state.weekNote||'';$('nextWeek').value=state.nextWeek||'';applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()}
 function friendlyError(error){const map={'auth/unauthorized-domain':'此網站網域尚未加入 Firebase 授權網域。','auth/popup-closed-by-user':'你已關閉 Google 登入視窗。','auth/popup-blocked':'瀏覽器封鎖了登入視窗，請允許彈出視窗後重試。','permission-denied':'Firebase 權限規則未允許此操作。','storage/unauthorized':'Firebase Storage 權限規則未允許上傳，請確認 Storage Rules。','storage/bucket-not-found':'找不到 Firebase Storage 儲存空間，請先在 Firebase Console 啟用 Storage。','unavailable':'目前無法連線雲端，請稍後再試。'};return map[error?.code]||error?.message||'未知錯誤'}
 function renderHeaderAvatar(url=''){avatarUrl=url||'';$('headerAvatarImage').hidden=!avatarUrl;$('headerAvatarFallback').hidden=!!avatarUrl;if(avatarUrl)$('headerAvatarImage').src=avatarUrl;else $('headerAvatarImage').removeAttribute('src')}
 async function loadCloudAvatar(user){try{const snap=await getDoc(doc(db,'users',user.uid,'profile','avatar'));if(!currentUser||currentUser.uid!==user.uid)return;const data=snap.exists()?snap.data():{};avatarUrl=String(data.avatarUrl||'');avatarStoragePath=String(data.storagePath||'');renderHeaderAvatar(avatarUrl);$('avatarStatus').textContent=avatarUrl?'頭貼已同步至雲端 ✓':'尚未設定頭貼'}catch(error){console.error(error);$('avatarStatus').textContent='讀取頭貼失敗：'+friendlyError(error)}}
@@ -423,7 +479,7 @@ function showApp(user){
   setCloudStatus('已同步至雲端 ✓');
  },error=>{console.error(error);setStatus('讀取雲端失敗：'+friendlyError(error),true);setCloudStatus('同步失敗')});
 }
-function clearUser(){if(stopListening){stopListening();stopListening=null}clearTimeout(saveTimer);currentUser=null;avatarStoragePath='';renderHeaderAvatar('');$('avatarStatus').textContent='登入 Google 後可將頭貼儲存至雲端';state=freshState();lastSerialized='';document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{const active=t.dataset.page==='target';t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('#appContent > .page-panel').forEach(p=>p.hidden=p.id!=='page-target');renderAllTabRecords();applyPageBlockOrder();refreshPageBlockEditControls();$('appContent').classList.add('auth-hidden');$('pageEditToolbar').classList.add('auth-hidden');$('googleSignIn').classList.remove('auth-hidden');$('signOutBtn').classList.add('auth-hidden');$('authAvatar').textContent='☁️';$('authTitle').textContent='登入以同步你的年度紀錄';$('authSubtitle').textContent='使用 Google 帳號，在不同裝置繼續記錄';setStatus('尚未登入');setCloudStatus('登入後開始同步')}
+function clearUser(){if(stopListening){stopListening();stopListening=null}clearTimeout(saveTimer);currentUser=null;avatarStoragePath='';renderHeaderAvatar('');$('avatarStatus').textContent='登入 Google 後可將頭貼儲存至雲端';state=freshState();lastSerialized='';document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{const active=t.dataset.page==='target';t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('#appContent > .page-panel').forEach(p=>p.hidden=p.id!=='page-target');renderAllTabRecords();applyPageBlockOrder();refreshPageBlockEditControls();$('appContent').classList.add('auth-hidden');$('pageEditToolbar').classList.add('auth-hidden');$('pageEditToolbar').hidden=false;$('googleSignIn').classList.remove('auth-hidden');$('signOutBtn').classList.add('auth-hidden');$('authAvatar').textContent='☁️';$('authTitle').textContent='登入以同步你的年度紀錄';$('authSubtitle').textContent='使用 Google 帳號，在不同裝置繼續記錄';setStatus('尚未登入');setCloudStatus('登入後開始同步')}
 $('googleSignIn').addEventListener('click',async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(error){console.error(error);if(error.code==='auth/popup-blocked'){try{await signInWithRedirect(auth,new GoogleAuthProvider());return}catch(redirectError){setStatus(friendlyError(redirectError),true);return}}setStatus(friendlyError(error),true)}});
 $('signOutBtn').addEventListener('click',async()=>{try{await signOut(auth);clearUser()}catch(error){setStatus('登出失敗：'+friendlyError(error),true)}});
 $('goalList').addEventListener('click',e=>{
@@ -500,8 +556,17 @@ function applyTheme(name,save=true){const t=themeMap[name]||themeMap.green;const
 function applyFont(name,save=true){const scale={small:.9,normal:1,large:1.12}[name]||1;document.documentElement.style.setProperty('--ui-zoom',scale);document.querySelectorAll('[data-font]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.font===name)));if(save)localStorage.setItem('yearGoalFont',name)}
 const openMenu=()=>{$('sideMenu').hidden=false;$('menuBackdrop').hidden=false;$('menuToggle').setAttribute('aria-expanded','true')};
 const closeMenu=()=>{$('sideMenu').hidden=true;$('menuBackdrop').hidden=true;$('menuToggle').setAttribute('aria-expanded','false')};
+$('schedulePrev').addEventListener('click',()=>{scheduleWeekStart.setDate(scheduleWeekStart.getDate()-7);scheduleSelectedDate=dateKey(scheduleWeekStart);renderSchedule()});
+$('scheduleNext').addEventListener('click',()=>{scheduleWeekStart.setDate(scheduleWeekStart.getDate()+7);scheduleSelectedDate=dateKey(scheduleWeekStart);renderSchedule()});
+$('scheduleToday').addEventListener('click',()=>{scheduleWeekStart=getMonday(new Date());scheduleSelectedDate=dateKey(new Date());renderSchedule()});
+$('scheduleDays').addEventListener('click',handleScheduleClick);$('scheduleSlots').addEventListener('click',handleScheduleClick);$('scheduleNotes').addEventListener('click',handleScheduleClick);
+$('scheduleSlots').addEventListener('change',handleScheduleChange);$('scheduleNotes').addEventListener('change',handleScheduleChange);
+$('scheduleNoteForm').addEventListener('submit',e=>{e.preventDefault();const input=$('scheduleNoteInput'),text=input.value.trim();if(!text)return;scheduleDayData(scheduleSelectedDate).notes.push({id:Date.now(),text,done:false});input.value='';persist();renderSchedule()});
+$('scheduleNotesToggle').addEventListener('click',()=>{scheduleNotesExpanded=!scheduleNotesExpanded;renderSchedule()});
+$('scheduleEntryCancel').addEventListener('click',closeScheduleEntry);$('scheduleEntrySave').addEventListener('click',saveScheduleEntry);$('scheduleEntryModal').addEventListener('click',e=>{if(e.target===$('scheduleEntryModal'))closeScheduleEntry()});
 $('menuToggle').addEventListener('click',()=>{$('sideMenu').hidden?openMenu():closeMenu()});$('menuClose').addEventListener('click',closeMenu);$('menuBackdrop').addEventListener('click',closeMenu);
-$('menuHome').addEventListener('click',()=>{const targetTab=document.querySelector('.nav-tab[data-page="target"]');if(targetTab)targetTab.click();closeMenu();window.scrollTo({top:0,behavior:'smooth'})});
+$('menuHome').addEventListener('click',()=>{const targetTab=document.querySelector('.nav-tab[data-page="target"]');$('mainNavTabs').hidden=false;if(targetTab)targetTab.click();$('pageEditToolbar').hidden=false;closeMenu();window.scrollTo({top:0,behavior:'smooth'})});
+$('menuSchedule').addEventListener('click',()=>{document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-schedule');document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false')});$('mainNavTabs').hidden=true;$('pageEditToolbar').hidden=true;closeMenu();renderSchedule();window.scrollTo({top:0,behavior:'smooth'})});
 $('settingsToggle').addEventListener('click',()=>{const panel=$('settingsPanel');panel.hidden=!panel.hidden;$('settingsToggle').setAttribute('aria-expanded',String(!panel.hidden));$('settingsChevron').textContent=panel.hidden?'›':'⌄'});
 document.querySelectorAll('[data-theme]').forEach(b=>b.addEventListener('click',()=>applyTheme(b.dataset.theme)));
 document.querySelectorAll('[data-font]').forEach(b=>b.addEventListener('click',()=>applyFont(b.dataset.font)));
