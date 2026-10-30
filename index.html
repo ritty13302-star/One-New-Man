@@ -104,8 +104,25 @@ const freshState=()=>({
   baptizedPeople:[]
 });
 let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='';
-const serialize=value=>JSON.stringify({goals:value.goals,books:value.books,weekNote:value.weekNote||'',nextWeek:value.nextWeek||'',tabRecords:value.tabRecords||emptyTabRecords(),shepherds:value.shepherds||[]});
-function normalizeState(raw){
+const serialize=value=>JSON.stringify({
+  goals:value.goals,
+  books:value.books,
+  weekNote:value.weekNote||'',
+  nextWeek:value.nextWeek||'',
+  tabRecords:value.tabRecords||emptyTabRecords(),
+  shepherds:value.shepherds||[],
+  baptizedPeople:value.baptizedPeople||[]
+});
+function normalizeState(baptizedPeople:Array.isArray(base.baptizedPeople)
+  ?base.baptizedPeople.map((p,i)=>({
+    id:p.id??Date.now()+i,
+    name:String(p.name||''),
+    date:String(p.date||''),
+    department:String(p.department||''),
+    shepherd:String(p.shepherd||''),
+    expanded:!!p.expanded
+  }))
+  :[],){
  const base=raw&&typeof raw==='object'?raw:{};
  const goals=Array.isArray(base.goals)?base.goals:starterGoals;
  const books=Array.isArray(base.books)?base.books:starterBooks;
@@ -131,6 +148,17 @@ function persist(){
 }
 function pct(g){return Math.min(100,Math.round(g.current/Math.max(1,g.target)*100))}
 const editModes={target:false,service:false,church:false,books:false,truth:false};
+function syncBaptismGoal(){
+  const goal=state.goals.find(
+    g=>g.name.trim()==='帶 30 位北科大女同學信而受浸得救成為姊妹'
+  );
+  if(goal){
+    goal.current=Math.min(
+      goal.target,
+      state.baptizedPeople.length
+    );
+  }
+}
 function renderGoals(){
  const el=$('goalList');
  if(!state.goals.length){el.innerHTML='<div class="empty">還沒有目標，按「新增目標」開始吧！</div>'}
@@ -165,6 +193,103 @@ function renderGoals(){
       </article>`).join(''):'<div class="empty">目前還沒有姊妹，按「新增姊妹」開始記錄。</div>'}
     </div>
    </div>`:'';
+  const isBaptismGoal=g.name.trim()==='帶 30 位北科大女同學信而受浸得救成為姊妹';
+
+const baptizedSection=isBaptismGoal?`
+<div class="shepherd-panel">
+  <div class="shepherd-heading">
+    <div>
+      <strong>🌱 受浸姊妹名單</strong>
+      <div class="muted shepherd-count">
+        目前受浸人數：
+        <span class="shepherd-count-number">
+          ${state.baptizedPeople.length}
+        </span> / 30 人
+      </div>
+    </div>
+    <button class="btn secondary" type="button" data-add-baptized>
+      ＋ 新增受浸人位
+    </button>
+  </div>
+
+  <p class="muted shepherd-hint">
+    點擊姓名展開個人資料，可以修改資料或刪除紀錄。
+  </p>
+
+  <div class="shepherd-list">
+  ${state.baptizedPeople.length
+    ?state.baptizedPeople.map(p=>`
+      <article class="shepherd-card">
+
+        <button class="shepherd-toggle"
+          type="button"
+          data-baptized-toggle="${p.id}"
+          aria-expanded="${!!p.expanded}">
+
+          <span class="shepherd-avatar">🌿</span>
+
+          <span class="shepherd-person">
+            <strong>${esc(p.name||'新受浸姊妹')}</strong>
+            <span class="shepherd-summary">
+              ${esc(p.department||'尚未填寫系級')}
+              ${p.date?' · '+esc(p.date):''}
+            </span>
+          </span>
+
+          <span class="shepherd-chevron">
+            ${p.expanded?'▲':'▼'}
+          </span>
+        </button>
+
+        <div class="shepherd-details" ${p.expanded?'':'hidden'}>
+
+          <label>姓名
+            <input type="text"
+              data-baptized-field="name"
+              data-id="${p.id}"
+              value="${esc(p.name)}"
+              placeholder="輸入姓名">
+          </label>
+
+          <label>受浸日期
+            <input type="date"
+              data-baptized-field="date"
+              data-id="${p.id}"
+              value="${esc(p.date)}">
+          </label>
+
+          <label>系級
+            <input type="text"
+              data-baptized-field="department"
+              data-id="${p.id}"
+              value="${esc(p.department)}"
+              placeholder="例如：資工系二年級">
+          </label>
+
+          <label>牧養人
+            <input type="text"
+              data-baptized-field="shepherd"
+              data-id="${p.id}"
+              value="${esc(p.shepherd)}"
+              placeholder="輸入牧養人姓名">
+          </label>
+
+          <div class="shepherd-actions">
+            <button class="btn secondary"
+              type="button"
+              data-delete-baptized="${p.id}">
+              🗑 刪除紀錄
+            </button>
+          </div>
+
+        </div>
+      </article>
+    `).join('')
+    :'<div class="empty">目前還沒有受浸紀錄，按「新增受浸人位」開始記錄。</div>'
+  }
+  </div>
+</div>
+`: '';
   const isBookGoal=g.name.trim()==='讀完十本書報';
   const goalMeta=isBookGoal?`已完成 ${Math.min(g.current,10)} / 10 本`:`${esc(g.category)} · ${g.current>=g.target?'已達成':`進度 ${g.current} / ${g.target}`}`;
   const goalActions=`${(isBookGoal||isShepherdGoal)?'':`<button class="mini" data-act="minus" data-id="${g.id}" aria-label="減少進度">−</button><button class="mini" data-act="plus" data-id="${g.id}" aria-label="增加進度">＋1</button>`}`;
