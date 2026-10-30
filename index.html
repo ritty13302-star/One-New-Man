@@ -94,7 +94,15 @@ const starterGoals=[
 ];
 const starterBooks=Array.from({length:10},(_,i)=>({id:i+1,name:'',chapters:0,read:0,done:false,expanded:false}));
 const emptyTabRecords=()=>({service:[],church:[],truth:[]});
-const freshState=()=>({goals:starterGoals.map(g=>({...g})),books:starterBooks.map(b=>({...b})),weekNote:'',nextWeek:'',tabRecords:emptyTabRecords(),shepherds:[]});
+const freshState=()=>({
+  goals:starterGoals.map(g=>({...g})),
+  books:starterBooks.map(b=>({...b})),
+  weekNote:'',
+  nextWeek:'',
+  tabRecords:emptyTabRecords(),
+  shepherds:[],
+  baptizedPeople:[]
+});
 let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='';
 const serialize=value=>JSON.stringify({goals:value.goals,books:value.books,weekNote:value.weekNote||'',nextWeek:value.nextWeek||'',tabRecords:value.tabRecords||emptyTabRecords(),shepherds:value.shepherds||[]});
 function normalizeState(raw){
