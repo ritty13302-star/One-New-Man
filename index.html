@@ -257,6 +257,122 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 .book-row .book-fields input{position:relative;z-index:5;min-height:44px;font-size:16px;-webkit-user-select:text;user-select:text}
 .book-chapter-item{min-height:34px;min-width:34px;padding:0 5px;gap:4px;box-sizing:border-box}
 .book-chapter-item input{width:18px;height:18px;min-width:18px;min-height:18px;margin:0;accent-color:var(--green)}
+
+/* 直向時間軸：時間｜計畫｜結果 */
+.schedule-timeline-head,
+.schedule-timeline-slots .schedule-slot{
+ display:grid;
+ grid-template-columns:78px minmax(0,1.2fr) minmax(0,1fr) 38px;
+ gap:8px;
+}
+.schedule-timeline-head{
+ align-items:center;
+ padding:0 10px 10px;
+ color:var(--ink);
+ font-size:14px;
+ font-weight:800;
+ text-align:center;
+}
+.schedule-timeline-slots{display:grid;gap:0}
+.schedule-timeline-slots .schedule-slot{
+ align-items:stretch;
+ min-height:88px;
+ padding:0;
+ border:0;
+ border-top:1px solid var(--line);
+ border-radius:0;
+ background:transparent;
+}
+.schedule-timeline-slots .schedule-time{
+ justify-content:flex-start;
+ align-items:flex-start;
+ padding:15px 5px 0 3px;
+ color:var(--muted);
+ font-size:14px;
+ font-weight:600;
+}
+.schedule-timeline-slots .schedule-cell{
+ min-height:88px;
+ height:100%;
+ padding:8px;
+ border-radius:0;
+ background:#fff;
+ border-left:1px solid var(--line);
+ border-right:1px solid var(--line);
+}
+.schedule-timeline-slots .schedule-cell.empty{
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:#fff;
+}
+.schedule-timeline-slots .schedule-cell.has-plan{background:#fff}
+.timeline-entry{
+ min-height:70px;
+ padding:10px 11px;
+ border-radius:11px;
+ background:#e8e0ef;
+ color:var(--ink);
+}
+.timeline-entry.done{opacity:.62}
+.timeline-entry.done strong{text-decoration:line-through}
+.timeline-entry-title{display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.5}
+.timeline-entry-title input{width:17px;height:17px;flex:0 0 auto;margin:3px 0 0;accent-color:var(--green)}
+.timeline-entry small{display:block;margin:5px 0 0 25px;color:var(--muted);font-size:11px}
+.timeline-entry .schedule-entry-actions{margin:5px 0 0 22px}
+.timeline-entry .schedule-entry-actions button{color:#5f5870}
+.timeline-placeholder{color:#a4aaa4;font-size:25px;font-weight:300}
+.timeline-result{
+ min-width:0;
+ min-height:88px;
+ padding:8px;
+ background:#fffefa;
+ border-right:1px solid var(--line);
+}
+.timeline-result-input{
+ display:block;
+ width:100%;
+ min-height:68px;
+ resize:vertical;
+ padding:9px;
+ border:1px solid var(--line);
+ border-radius:10px;
+ background:#fff;
+ color:var(--ink);
+ font:inherit;
+ font-size:12px;
+ line-height:1.5;
+}
+.timeline-result-input:focus{outline:2px solid #607d6530;border-color:var(--green)}
+.timeline-result-empty{display:block;text-align:center;color:#b3b8b2;padding-top:25px}
+.schedule-timeline-slots .schedule-add{
+ align-self:start;
+ justify-self:center;
+ margin-top:26px;
+ width:30px;height:30px;min-height:30px;
+ background:#fff;
+ border:1px dashed #cbd2ca;
+ color:#87948a;
+}
+@media(max-width:620px){
+ .schedule-timeline-head,.schedule-timeline-slots .schedule-slot{
+  grid-template-columns:52px minmax(0,1.15fr) minmax(0,.9fr) 28px;
+  gap:4px;
+ }
+ .schedule-timeline-head{font-size:12px;padding-left:2px;padding-right:2px}
+ .schedule-timeline-slots .schedule-time{font-size:11px;padding:12px 2px 0}
+ .schedule-timeline-slots .schedule-slot{min-height:80px}
+ .schedule-timeline-slots .schedule-cell,.timeline-result{min-height:80px;padding:5px}
+ .timeline-entry{min-height:66px;padding:8px 6px;border-radius:8px}
+ .timeline-entry-title{font-size:12px;gap:5px}
+ .timeline-entry-title input{width:14px;height:14px}
+ .timeline-entry small{font-size:10px;margin-left:19px}
+ .timeline-entry .schedule-entry-actions{margin-left:17px}
+ .timeline-entry .schedule-entry-actions button{font-size:10px;padding:2px}
+ .timeline-result-input{min-height:64px;padding:6px;font-size:11px}
+ .schedule-timeline-slots .schedule-add{width:25px;height:25px;min-height:25px;font-size:17px;margin-top:24px}
+}
+
 </style>
 </head>
 <body>
@@ -345,8 +461,8 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
  </div>
  <div class="schedule-card">
   <div class="schedule-card-head"><div><h3 id="scheduleDayHeading">今天的安排</h3><div class="muted">時間以每 30 分鐘為一格</div></div></div>
-  <div class="schedule-grid-head" style="grid-template-columns:58px minmax(0,1fr) 34px"><span>時間</span><span>時間計畫</span><span></span></div>
-  <div class="schedule-slots" id="scheduleSlots"></div>
+  <div class="schedule-grid-head schedule-timeline-head"><span>時間</span><span>計畫</span><span>結果</span><span></span></div>
+  <div class="schedule-slots schedule-timeline-slots" id="scheduleSlots"></div>
  </div>
 </section>
 <section id="page-life-reading" class="page-panel subpage life-reading-page" role="tabpanel" hidden>
@@ -826,14 +942,30 @@ function renderSchedule(){
  const notes=dayData.notes;$('scheduleNoteCount').textContent=`${notes.filter(n=>n.done).length}/${notes.length}`;$('scheduleNotesToggle').textContent=scheduleNotesExpanded?'收起':'展開';$('scheduleNoteForm').hidden=!scheduleNotesExpanded;$('scheduleNotes').hidden=!scheduleNotesExpanded;
  $('scheduleNotes').innerHTML=notes.length?notes.map(n=>`<div class="schedule-note ${n.done?'done':''}"><input type="checkbox" data-schedule-note-done="${n.id}" ${n.done?'checked':''}><span>${esc(n.text)}</span><button type="button" class="mini" data-schedule-note-delete="${n.id}" aria-label="刪除事項">×</button></div>`).join(''):'<div class="schedule-note-empty">當天尚無臨時事項</div>';
  const slots=dayData.slots;
- $('scheduleSlots').innerHTML=scheduleTimeList().map(time=>{const entries=Array.isArray(slots[time])?slots[time]:[];const plan=entries.map(x=>`<div><div class="schedule-entry ${x.done?'done':''}"><input type="checkbox" data-schedule-entry-done="${x.id}" ${x.done?'checked':''} aria-label="完成"><span><strong>${esc(x.plan||'未命名')}</strong><small style="display:block;color:var(--muted);margin-top:2px">${esc(x.category||'未分類')} · ${esc(x.start||time)}–${esc(x.end||'')}</small></span></div><div class="schedule-entry-actions"><button type="button" data-schedule-entry-edit="${x.id}" data-schedule-time="${time}">編輯</button><button type="button" data-schedule-entry-delete="${x.id}" data-schedule-time="${time}">刪除</button></div></div>`).join('');return `<div class="schedule-slot" style="grid-template-columns:58px minmax(0,1fr) 34px"><div class="schedule-time">${time}</div><div class="schedule-cell ${entries.length?'':'empty'}">${plan||'—'}</div><button class="schedule-add" type="button" data-schedule-add="${time}" aria-label="新增 ${time} 安排">＋</button></div>`}).join('');
+ $('scheduleSlots').innerHTML=scheduleTimeList().map(time=>{
+  const entries=Array.isArray(slots[time])?slots[time]:[];
+  const plan=entries.map(x=>`<div class="timeline-entry ${x.done?'done':''}">
+   <div class="timeline-entry-title"><input type="checkbox" data-schedule-entry-done="${x.id}" ${x.done?'checked':''} aria-label="完成"><strong>${esc(x.plan||'未命名')}</strong></div>
+   <small>${esc(x.category||'未分類')} · ${esc(x.start||time)}–${esc(x.end||'')}</small>
+   <div class="schedule-entry-actions"><button type="button" data-schedule-entry-edit="${x.id}" data-schedule-time="${time}">編輯</button><button type="button" data-schedule-entry-delete="${x.id}" data-schedule-time="${time}">刪除</button></div>
+  </div>`).join('');
+  const result=entries.map(x=>`<textarea class="timeline-result-input" rows="2" maxlength="500" data-schedule-entry-result="${x.id}" placeholder="記錄實際完成情況">${esc(x.result||'')}</textarea>`).join('');
+  return `<div class="schedule-slot timeline-row"><div class="schedule-time">${time}</div><div class="schedule-cell ${entries.length?'has-plan':'empty'}">${plan||'<span class="timeline-placeholder">＋</span>'}</div><div class="timeline-result">${result||'<span class="timeline-result-empty">—</span>'}</div><button class="schedule-add" type="button" data-schedule-add="${time}" aria-label="新增 ${time} 安排">＋</button></div>`;
+ }).join('');
 }
 function addScheduleMinutes(time,minutes){const [h,m]=String(time).split(':').map(Number),total=Math.min(23*60+30,h*60+m+minutes);return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`}
 function openScheduleEntry(time,id=null){const day=scheduleDayData(scheduleSelectedDate),entry=id?Object.values(day.slots).flat().find(x=>String(x.id)===String(id)):null;scheduleEditing={time,id};$('scheduleEntryTitle').textContent=entry?'編輯時間安排':'新增時間安排';$('scheduleEntryMeta').textContent=`${scheduleSelectedDate} · ${time}`;$('schedulePlanInput').value=entry?.plan||'';$('scheduleCategoryInput').value=entry?.category||'生活';$('scheduleStartInput').value=entry?.start||time;$('scheduleEndInput').value=entry?.end||addScheduleMinutes(time,30);$('scheduleEntryModal').hidden=false;$('scheduleEntryModal').classList.add('open');$('schedulePlanInput').focus()}
 function closeScheduleEntry(){$('scheduleEntryModal').classList.remove('open');$('scheduleEntryModal').hidden=true;scheduleEditing=null}
 function saveScheduleEntry(){if(!scheduleEditing)return;const plan=$('schedulePlanInput').value.trim(),category=$('scheduleCategoryInput').value,start=$('scheduleStartInput').value,end=$('scheduleEndInput').value;if(!plan){alert('請輸入名稱。');return}if(!start||!end){alert('請設定開始與結束時間。');return}if(end<=start){alert('結束時間必須晚於開始時間。');return}const day=scheduleDayData(scheduleSelectedDate),list=day.slots[scheduleEditing.time]||(day.slots[scheduleEditing.time]=[]);let entry=scheduleEditing.id?Object.values(day.slots).flat().find(x=>String(x.id)===String(scheduleEditing.id)):null;if(!entry){entry={id:Date.now(),done:false};list.push(entry)}entry.plan=plan;entry.category=category;entry.start=start;entry.end=end;delete entry.result;persist();closeScheduleEntry();renderSchedule()}
 function handleScheduleClick(e){const dayBtn=e.target.closest('[data-schedule-day]');if(dayBtn){scheduleSelectedDate=dayBtn.dataset.scheduleDay;renderSchedule();return}const add=e.target.closest('[data-schedule-add]');if(add){openScheduleEntry(add.dataset.scheduleAdd);return}const edit=e.target.closest('[data-schedule-entry-edit]');if(edit){openScheduleEntry(edit.dataset.scheduleTime,edit.dataset.scheduleEntryEdit);return}const del=e.target.closest('[data-schedule-entry-delete]');if(del){const day=scheduleDayData(scheduleSelectedDate),time=del.dataset.scheduleTime;day.slots[time]=(day.slots[time]||[]).filter(x=>String(x.id)!==String(del.dataset.scheduleEntryDelete));if(!day.slots[time].length)delete day.slots[time];persist();renderSchedule();return}const noteDel=e.target.closest('[data-schedule-note-delete]');if(noteDel){const day=scheduleDayData(scheduleSelectedDate);day.notes=day.notes.filter(n=>String(n.id)!==String(noteDel.dataset.scheduleNoteDelete));persist();renderSchedule();return}}
-function handleScheduleChange(e){const entry=e.target.closest('[data-schedule-entry-done]');if(entry){const day=scheduleDayData(scheduleSelectedDate),item=Object.values(day.slots).flat().find(x=>String(x.id)===String(entry.dataset.scheduleEntryDone));if(item){item.done=entry.checked;persist();renderSchedule()}return}const note=e.target.closest('[data-schedule-note-done]');if(note){const item=scheduleDayData(scheduleSelectedDate).notes.find(x=>String(x.id)===String(note.dataset.scheduleNoteDone));if(item){item.done=note.checked;persist();renderSchedule()}}}
+function handleScheduleChange(e){
+ const result=e.target.closest('[data-schedule-entry-result]');
+ if(result){const item=Object.values(scheduleDayData(scheduleSelectedDate).slots).flat().find(x=>String(x.id)===String(result.dataset.scheduleEntryResult));if(item){item.result=result.value;persist()}return}
+ const entry=e.target.closest('[data-schedule-entry-done]');
+ if(entry){const day=scheduleDayData(scheduleSelectedDate),item=Object.values(day.slots).flat().find(x=>String(x.id)===String(entry.dataset.scheduleEntryDone));if(item){item.done=entry.checked;persist();renderSchedule()}return}
+ const note=e.target.closest('[data-schedule-note-done]');
+ if(note){const item=scheduleDayData(scheduleSelectedDate).notes.find(x=>String(x.id)===String(note.dataset.scheduleNoteDone));if(item){item.done=note.checked;persist();renderSchedule()}}
+}
 function renderCountdown(){
  const value=$('countdownValue');
  $('countdownLabel').textContent=state.countdownName||'倒數天數';
