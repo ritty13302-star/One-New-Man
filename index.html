@@ -207,7 +207,7 @@ function renderGoals(){
   const isBaptismGoal=g.name.trim()==='帶 30 位北科大女同學信而受浸得救成為姊妹';
 
 const baptizedSection=isBaptismGoal?`
-<div class="shepherd-panel">
+<div class="shepherd-panel baptized-panel">
   <div class="shepherd-heading">
     <div>
       <strong>🌱 受浸姊妹名單</strong>
@@ -416,7 +416,7 @@ const themeMap={
  blue:{bg:'#f3f8fc',card:'#fff',ink:'#283b4b',muted:'#6d8292',green:'#5d88ad',pale:'#deebf5',paleSoft:'#f0f6fa',line:'#dce7ef',hero:'#e3eff7',heroAfter:'#bfd7e8'},
  gray:{bg:'#f5f6f7',card:'#fff',ink:'#30363d',muted:'#737b84',green:'#737d88',pale:'#e5e8eb',paleSoft:'#f1f2f4',line:'#e0e3e6',hero:'#e9ecef',heroAfter:'#cdd3d9'}
 };
-function applyTheme(name,save=true){const t=themeMap[name]||themeMap.green;const root=document.documentElement;Object.entries({bg:t.bg,card:t.card,ink:t.ink,muted:t.muted,green:t.green,pale:t.pale,'pale-soft':t.paleSoft,line:t.line}).forEach(([k,v])=>root.style.setProperty('--'+k,v));document.querySelector('.hero')?.style.setProperty('background',t.hero);root.style.setProperty('--hero-after',t.heroAfter);let style=document.getElementById('themeDynamicStyle');if(!style){style=document.createElement('style');style.id='themeDynamicStyle';document.head.appendChild(style)}style.textContent='.hero:after{color:var(--hero-after,#c5d4c0)}.btn,.progressline span,.goalbar span{background:var(--green)}.progressline,.goalbar{background:var(--pale)}.shepherd-panel,.care-record{background:var(--pale-soft)}.nav-tab.active,.btn.secondary{background:var(--pale)}';document.querySelectorAll('[data-theme]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.theme===name)));if(save)localStorage.setItem('yearGoalTheme',name)}
+function applyTheme(name,save=true){const t=themeMap[name]||themeMap.green;const root=document.documentElement;Object.entries({bg:t.bg,card:t.card,ink:t.ink,muted:t.muted,green:t.green,pale:t.pale,'pale-soft':t.paleSoft,line:t.line}).forEach(([k,v])=>root.style.setProperty('--'+k,v));document.querySelector('.hero')?.style.setProperty('background',t.hero);root.style.setProperty('--hero-after',t.heroAfter);let style=document.getElementById('themeDynamicStyle');if(!style){style=document.createElement('style');style.id='themeDynamicStyle';document.head.appendChild(style)}style.textContent='.hero:after{color:var(--hero-after,#c5d4c0)}.btn,.progressline span,.goalbar span{background:var(--green)}.progressline,.goalbar{background:var(--pale)}.shepherd-panel,.care-record{background:var(--pale-soft)}.shepherd-panel.baptized-panel{background:transparent}.nav-tab.active,.btn.secondary{background:var(--pale)}';document.querySelectorAll('[data-theme]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.theme===name)));if(save)localStorage.setItem('yearGoalTheme',name)}
 function applyFont(name,save=true){const scale={small:.9,normal:1,large:1.12}[name]||1;document.documentElement.style.setProperty('--ui-zoom',scale);document.querySelectorAll('[data-font]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.font===name)));if(save)localStorage.setItem('yearGoalFont',name)}
 const openMenu=()=>{$('sideMenu').hidden=false;$('menuBackdrop').hidden=false;$('menuToggle').setAttribute('aria-expanded','true')};
 const closeMenu=()=>{$('sideMenu').hidden=true;$('menuBackdrop').hidden=true;$('menuToggle').setAttribute('aria-expanded','false')};
