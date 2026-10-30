@@ -70,6 +70,61 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 .schedule-page{display:grid;gap:14px}.schedule-hero{padding:18px;border:1px solid var(--line);border-radius:18px;background:var(--card)}.schedule-month{font-size:12px;color:var(--muted);font-weight:700}.schedule-title{font-size:23px;font-weight:800;margin:3px 0 5px}.schedule-subtitle{font-size:13px;color:var(--muted)}.schedule-week-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}.schedule-week-actions .mini{min-width:42px;font-size:20px}.schedule-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin-top:14px}.schedule-day{border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--muted);padding:8px 2px;min-width:0;cursor:pointer}.schedule-day strong,.schedule-day span{display:block}.schedule-day strong{font-size:13px;color:var(--ink)}.schedule-day span{font-size:11px}.schedule-day.active{background:var(--pale);border-color:var(--green);color:var(--ink)}.schedule-day.today{outline:1px solid var(--green);outline-offset:1px}.schedule-progress{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted);margin-top:12px}.schedule-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px}.schedule-card h3{font-size:16px;margin:0}.schedule-card-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.schedule-note-form{display:flex;gap:7px;margin-bottom:10px}.schedule-note-form input{min-width:0;flex:1;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink)}.schedule-notes{display:grid;gap:7px}.schedule-note{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--bg);font-size:13px}.schedule-note input{width:18px;height:18px;accent-color:var(--green);flex:0 0 auto}.schedule-note.done span{text-decoration:line-through;color:var(--muted)}.schedule-grid-head{display:grid;grid-template-columns:62px 1fr 1fr 34px;gap:7px;padding:0 8px 7px;color:var(--muted);font-size:11px;font-weight:700}.schedule-slots{display:grid;gap:7px}.schedule-slot{display:grid;grid-template-columns:62px 1fr 1fr 34px;gap:7px;align-items:stretch;padding:7px;border:1px solid var(--line);border-radius:11px;background:var(--card)}.schedule-time{font-size:12px;font-weight:750;display:flex;align-items:center;color:var(--green)}.schedule-cell{min-width:0;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;padding:7px;border-radius:8px;background:var(--bg);min-height:34px}.schedule-cell.empty{color:var(--muted);opacity:.7}.schedule-add{border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--green);font-size:20px;cursor:pointer;min-height:34px}.schedule-entry{display:flex;align-items:flex-start;gap:5px}.schedule-entry input{width:15px;height:15px;accent-color:var(--green);flex:0 0 auto;margin:2px 0}.schedule-entry.done{opacity:.6;text-decoration:line-through}.schedule-entry-actions{display:flex;gap:4px;margin-top:5px}.schedule-entry-actions button{border:0;background:transparent;color:var(--muted);font-size:11px;padding:2px 4px;cursor:pointer}.schedule-note-empty{font-size:12px;color:var(--muted);padding:6px 2px}.schedule-modal .dialog{max-width:460px}.schedule-modal textarea{width:100%;min-height:74px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink);resize:vertical}.schedule-modal label{display:block;margin:10px 0 5px;font-size:13px;color:var(--muted)}.schedule-modal[hidden]{display:none!important}
 @media(max-width:520px){.schedule-day{padding:7px 1px}.schedule-day strong{font-size:12px}.schedule-day span{font-size:10px}.schedule-grid-head,.schedule-slot{grid-template-columns:48px minmax(0,1fr) minmax(0,1fr) 30px;gap:4px}.schedule-slot{padding:5px}.schedule-cell{padding:6px 5px;font-size:11px}.schedule-time{font-size:11px}.schedule-add{font-size:18px}}
 
+
+/* 生命讀經進度 */
+.life-reading-page{display:grid;gap:14px}
+.life-reading-summary{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px}
+.life-reading-daily{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px}
+.life-reading-annual{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px}
+.life-reading-annual-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.life-reading-annual-head h3{font-size:16px;margin:0 0 4px}
+.life-reading-annual-head p{font-size:12px;margin:0}
+.life-reading-annual-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.life-reading-annual-stats>div{padding:10px 8px;border-radius:11px;background:var(--bg);min-width:0}
+.life-reading-annual-stats strong,.life-reading-annual-stats span{display:block}
+.life-reading-annual-stats strong{font-size:19px;line-height:1.2;color:var(--green);font-weight:800}
+.life-reading-annual-stats span{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}
+.life-reading-annual-status{font-size:13px;font-weight:750;margin:10px 0 5px}
+.life-reading-annual-note{font-size:11px;line-height:1.5;margin-top:9px}
+.life-reading-daily-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.life-reading-daily-head h3{font-size:16px;margin:0 0 4px}
+.life-reading-daily-head p{font-size:12px;margin:0}
+.life-reading-today{flex:0 0 auto;padding:6px 9px;border-radius:9px;background:var(--pale);color:var(--green);font-size:12px;font-weight:750}
+.life-reading-daily-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.life-reading-monthly-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+.life-reading-daily-stats>div{padding:10px 8px;border-radius:11px;background:var(--bg);min-width:0}
+.life-reading-daily-stats strong,.life-reading-daily-stats span{display:block}
+.life-reading-daily-stats strong{font-size:20px;line-height:1.2;color:var(--green);font-weight:800}
+.life-reading-daily-stats span{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}
+.life-reading-daily-list{max-height:260px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-top:1px solid var(--line)}
+.life-reading-daily-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 3px;border-bottom:1px solid var(--line);font-size:13px}
+.life-reading-daily-row:last-child{border-bottom:0}
+.life-reading-daily-row strong{color:var(--green);white-space:nowrap}
+.life-reading-untracked{font-size:11px;line-height:1.5;margin:10px 0 0}
+.life-reading-summary-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:9px}
+.life-reading-total{font-size:27px;font-weight:850;color:var(--green);line-height:1.2}
+.life-reading-progress{height:9px;background:var(--pale);border-radius:99px;overflow:hidden}
+.life-reading-progress span{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .2s}
+.life-reading-testament{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px}
+.life-reading-testament-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.life-reading-testament-head h3{margin:0;font-size:17px}
+.life-reading-book{border-top:1px solid var(--line);padding:8px 0}
+.life-reading-book:first-of-type{border-top:0}
+.life-reading-book-toggle{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;color:var(--ink);text-align:left;padding:7px 2px;cursor:pointer}
+.life-reading-book-name{font-weight:700;flex:1;min-width:0}
+.life-reading-book-count{font-size:12px;color:var(--muted);white-space:nowrap}
+.life-reading-book-progress{height:5px;background:var(--pale);border-radius:99px;overflow:hidden;margin:2px 0 0 2px}
+.life-reading-book-progress span{display:block;height:100%;background:var(--green);border-radius:99px}
+.life-reading-book-details{padding:10px 2px 4px}
+.life-reading-book-details[hidden]{display:none}
+.life-reading-lessons{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px}
+.life-reading-lesson{display:flex;align-items:center;justify-content:center;gap:4px;min-height:34px;border:1px solid var(--line);border-radius:9px;background:var(--bg);font-size:12px;cursor:pointer}
+.life-reading-lesson input{width:15px;height:15px;margin:0;accent-color:var(--green)}
+.life-reading-lesson:has(input:checked){background:var(--pale);border-color:var(--green);color:var(--ink);font-weight:750}
+.life-reading-shared{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 2px;color:var(--muted);font-size:12px}
+.life-reading-shared strong{color:var(--ink);font-size:14px}
+@media(max-width:520px){.life-reading-lessons{grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}.life-reading-lesson{min-height:33px;font-size:11px}.life-reading-total{font-size:24px}}
+
 .shepherd-goal-average{display:block;margin-top:3px;color:var(--muted);font-size:12px;}
 </style>
 </head>
@@ -82,6 +137,7 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
  <div class="menu-head"><div class="menu-title">👤 個人選單</div><button class="mini" id="menuClose" type="button" aria-label="關閉選單">✕</button></div>
  <div class="avatar-upload-row"><button class="avatar-action" id="changeAvatarBtn" type="button">更換頭貼</button><button class="avatar-action" id="resetAvatarBtn" type="button">恢復預設</button><input id="avatarFileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden></div><div class="avatar-note" id="avatarStatus">登入 Google 後可將頭貼儲存至雲端</div>
  <button class="menu-item" id="menuHome" type="button"><span>🏠</span>主頁</button>
+ <button class="menu-item" id="menuLifeReading" type="button"><span>📖</span>生命讀經</button>
  <button class="menu-item" id="menuSchedule" type="button"><span>🗓️</span>時間表</button>
  <div class="menu-divider"></div>
  <button class="menu-item" id="settingsToggle" type="button" aria-expanded="true"><span>⚙️</span><span style="flex:1">設定</span><span id="settingsChevron">⌄</span></button>
@@ -162,6 +218,35 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
   <div class="schedule-slots" id="scheduleSlots"></div>
  </div>
 </section>
+<section id="page-life-reading" class="page-panel subpage life-reading-page" role="tabpanel" hidden>
+ <div class="life-reading-summary">
+  <div class="life-reading-summary-top"><div><div class="muted">生命讀經總進度</div><div class="life-reading-total" id="lifeReadingTotal">0 / 1,984 篇</div></div><strong id="lifeReadingPercent">0%</strong></div>
+  <div class="life-reading-progress"><span id="lifeReadingTotalBar" style="width:0%"></span></div>
+  <p class="muted" id="lifeReadingRemaining" style="margin-top:9px">尚餘 1,984 篇</p>
+ </div>
+ <section class="life-reading-annual" aria-labelledby="lifeReadingAnnualTitle">
+  <div class="life-reading-annual-head"><div><h3 id="lifeReadingAnnualTitle">🎯 年度目標追蹤</h3><p class="muted" id="lifeReadingAnnualSubtitle">對照全年 1,984 篇目標，查看目前是否跟上進度</p></div><span class="life-reading-today" id="lifeReadingAnnualYear">今年</span></div>
+  <div class="life-reading-annual-stats"><div><strong id="lifeReadingAnnualActual">0</strong><span>今年已完成篇數</span></div><div><strong id="lifeReadingAnnualExpected">0</strong><span>目前應完成篇數</span></div><div><strong id="lifeReadingAnnualGap">0</strong><span>領先／落後篇數</span></div></div>
+  <div class="life-reading-progress"><span id="lifeReadingAnnualBar" style="width:0%"></span></div>
+  <p class="life-reading-annual-status" id="lifeReadingAnnualStatus">尚未開始記錄今年進度</p>
+  <p class="life-reading-annual-note muted" id="lifeReadingAnnualPace"></p>
+  <p class="life-reading-annual-note muted">年度追蹤只計入有日期、且日期在今年的完成篇數；先前已完成但沒有日期的篇數不會自動算入今年。</p>
+ </section>
+ <section class="life-reading-daily" aria-labelledby="lifeReadingDailyTitle">
+  <div class="life-reading-daily-head"><div><h3 id="lifeReadingDailyTitle">📅 每日完成篇數</h3><p class="muted">勾選完成篇數時，會自動記錄當天日期</p></div><span class="life-reading-today" id="lifeReadingTodayCount">今天 0 篇</span></div>
+  <div class="life-reading-daily-stats"><div><strong id="lifeReadingActiveDays">0</strong><span>有讀經紀錄的天數</span></div><div><strong id="lifeReadingDailyAverage">0</strong><span>平均每天完成篇數</span></div><div><strong id="lifeReadingTrackedTotal">0</strong><span>有日期的完成篇數</span></div></div>
+  <div class="life-reading-daily-list" id="lifeReadingDailyRows"><div class="muted">尚無每日完成紀錄</div></div>
+  <p class="life-reading-untracked muted" id="lifeReadingUntracked"></p>
+ </section>
+ <section class="life-reading-daily" aria-labelledby="lifeReadingMonthlyTitle">
+  <div class="life-reading-daily-head"><div><h3 id="lifeReadingMonthlyTitle">🗓️ 每月完成篇數</h3><p class="muted">依照每篇完成時記錄的日期，自動彙整每月進度</p></div><span class="life-reading-today" id="lifeReadingThisMonthCount">本月 0 篇</span></div>
+  <div class="life-reading-daily-stats life-reading-monthly-stats"><div><strong id="lifeReadingActiveMonths">0</strong><span>有讀經紀錄的月份</span></div><div><strong id="lifeReadingMonthlyAverage">0</strong><span>平均每月完成篇數</span></div><div><strong id="lifeReadingMonthlyTrackedTotal">0</strong><span>有日期的完成篇數</span></div></div>
+  <div class="life-reading-daily-list" id="lifeReadingMonthlyRows"><div class="muted">尚無每月完成紀錄</div></div>
+ </section>
+ <section class="life-reading-testament" aria-labelledby="lifeReadingOldTitle"><div class="life-reading-testament-head"><h3 id="lifeReadingOldTitle">📜 舊約</h3><span class="muted" id="lifeReadingOldCount">0 / 867 篇 · 39 卷</span></div><div id="lifeReadingOldBooks"></div></section>
+ <section class="life-reading-testament" aria-labelledby="lifeReadingNewTitle"><div class="life-reading-testament-head"><h3 id="lifeReadingNewTitle">✝️ 新約</h3><span class="muted" id="lifeReadingNewCount">0 / 1,117 篇 · 27 卷</span></div><div id="lifeReadingNewBooks"></div></section>
+ <p class="notice">撒母耳記上下、列王紀上下、歷代志上下的篇數合併計算；在上卷展開並勾選篇數，下卷會共用同一份進度。</p>
+</section>
 <div class="cloud-state" id="cloudStatus">登入後開始同步</div></div></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="dialog"><h2 id="modalTitle">新增年度目標</h2><label for="goalName">目標名稱</label><input id="goalName" maxlength="100" placeholder="例如：每週禱研背講"><label for="goalCategory">分類</label><select id="goalCategory"><option>生活</option><option>閱讀</option><option>學習</option><option>服事</option><option>健康</option><option>其他</option></select><label for="goalTarget">目標數量（沒有數量目標可填 1）</label><input id="goalTarget" type="number" min="1" max="100000" value="1"><div class="dialog-actions"><button class="btn secondary" id="cancelBtn">取消</button><button class="btn" id="createBtn">新增</button></div><div class="notice">例如「讀完十本書報」可設定數量 10，之後用 +1 記錄進度。</div></div></div>
 <div class="modal" id="countdownModal" role="dialog" aria-modal="true" aria-labelledby="countdownModalTitle"><div class="dialog"><h2 id="countdownModalTitle">編輯倒數項目</h2><p class="muted">可以自訂首頁顯示的名稱，也可以設定或更改倒數日期。</p><label for="countdownNameInput">自訂名稱</label><input id="countdownNameInput" type="text" maxlength="24" placeholder="例如：年度目標、受浸目標、活動倒數" required><label for="countdownDateInput">倒數目標日期</label><input id="countdownDateInput" type="date" min="2026-01-01"><div class="dialog-actions"><button class="btn secondary" id="countdownCancelBtn" type="button">取消</button><button class="btn" id="countdownSaveBtn" type="button">儲存日期</button></div><div class="notice">日期可以隨時重新設定；儲存後會同步至你的雲端紀錄。</div></div></div>
@@ -191,9 +276,21 @@ const starterGoals=[
 {id:3,name:'每位姊妹都有可牧養的對象',category:'服事',target:1,current:0},
 {id:4,name:'鳥瞰帖撒羅尼迦前後書和腓利門書',category:'學習',target:1,current:0},
 {id:5,name:'有 15 位姊妹參加期末特會',category:'服事',target:15,current:0},
-{id:6,name:'週週禱研背講',category:'學習',target:52,current:0}
+{id:6,name:'週週禱研背講',category:'學習',target:52,current:0},
+{id:7,name:'生命讀經1984篇',category:'閱讀',target:1984,current:0}
 ];
 const starterBooks=Array.from({length:10},(_,i)=>({id:i+1,name:'',chapters:0,read:0,done:false,expanded:false}));
+const lifeReadingOldGroups=[
+ {key:'ot-gen',books:['創世記'],total:120},{key:'ot-exo',books:['出埃及記'],total:185},{key:'ot-lev',books:['利未記'],total:64},{key:'ot-num',books:['民數記'],total:53},{key:'ot-deut',books:['申命記'],total:30},{key:'ot-josh',books:['約書亞記'],total:15},{key:'ot-judg',books:['士師記'],total:10},{key:'ot-ruth',books:['路得記'],total:8},
+ {key:'ot-sam',books:['撒母耳記上','撒母耳記下'],total:38},{key:'ot-kings',books:['列王紀上','列王紀下'],total:23},{key:'ot-chron',books:['歷代志上','歷代志下'],total:13},
+ {key:'ot-ezra',books:['以斯拉記'],total:5},{key:'ot-neh',books:['尼希米記'],total:5},{key:'ot-est',books:['以斯帖記'],total:3},{key:'ot-job',books:['約伯記'],total:38},{key:'ot-ps',books:['詩篇'],total:45},{key:'ot-prov',books:['箴言'],total:8},{key:'ot-eccl',books:['傳道書'],total:2},{key:'ot-song',books:['雅歌'],total:10},{key:'ot-isa',books:['以賽亞書'],total:54},{key:'ot-jer',books:['耶利米書'],total:40},{key:'ot-lam',books:['耶利米哀歌'],total:4},{key:'ot-ezek',books:['以西結書'],total:27},{key:'ot-dan',books:['但以理書'],total:17},{key:'ot-hos',books:['何西阿書'],total:9},{key:'ot-joel',books:['約珥書'],total:7},{key:'ot-amos',books:['阿摩司書'],total:3},{key:'ot-obad',books:['俄巴底亞書'],total:1},{key:'ot-jonah',books:['約拿書'],total:1},{key:'ot-mic',books:['彌迦書'],total:4},{key:'ot-nah',books:['那鴻書'],total:1},{key:'ot-hab',books:['哈巴谷書'],total:3},{key:'ot-zeph',books:['西番雅書'],total:1},{key:'ot-hag',books:['哈該書'],total:1},{key:'ot-zech',books:['撒迦利亞書'],total:15},{key:'ot-mal',books:['瑪拉基書'],total:4}
+];
+const lifeReadingNewGroups=[
+ {key:'nt-matt',books:['馬太福音'],total:72},{key:'nt-mark',books:['馬可福音'],total:70},{key:'nt-luke',books:['路加福音'],total:79},{key:'nt-john',books:['約翰福音'],total:51},{key:'nt-acts',books:['使徒行傳'],total:72},{key:'nt-rom',books:['羅馬書'],total:69},{key:'nt-1cor',books:['哥林多前書'],total:69},{key:'nt-2cor',books:['哥林多後書'],total:59},{key:'nt-gal',books:['加拉太書'],total:46},{key:'nt-eph',books:['以弗所書'],total:97},{key:'nt-phil',books:['腓立比書'],total:62},{key:'nt-col',books:['歌羅西書'],total:65},{key:'nt-1th',books:['帖撒羅尼迦前書'],total:24},{key:'nt-2th',books:['帖撒羅尼迦後書'],total:7},{key:'nt-1tim',books:['提摩太前書'],total:12},{key:'nt-2tim',books:['提摩太後書'],total:8},{key:'nt-titus',books:['提多書'],total:6},{key:'nt-phlm',books:['腓利門書'],total:2},{key:'nt-heb',books:['希伯來書'],total:69},{key:'nt-james',books:['雅各書'],total:14},{key:'nt-1pet',books:['彼得前書'],total:34},{key:'nt-2pet',books:['彼得後書'],total:13},{key:'nt-1john',books:['約翰一書'],total:40},{key:'nt-2john',books:['約翰二書'],total:2},{key:'nt-3john',books:['約翰三書'],total:2},{key:'nt-jude',books:['猶大書'],total:5},{key:'nt-rev',books:['啟示錄'],total:68}
+];
+const lifeReadingGroups=[...lifeReadingOldGroups,...lifeReadingNewGroups];
+// 舊約 36 組（含三組上下卷合併）= 867 篇；新約 27 卷 = 1,117 篇；合計 1,984 篇。
+const LIFE_READING_TOTAL=1984;
 const emptyTabRecords=()=>({service:[],church:[],truth:[]});
 const freshState=()=>({
   goals:starterGoals.map(g=>({...g})),
@@ -207,7 +304,8 @@ const freshState=()=>({
   countdownDate:'',
   countdownName:'倒數天數',
   pageBlockOrder:{},
-  weeklySchedule:{}
+  weeklySchedule:{},
+  lifeReading:{completed:{},completedAt:{}}
 });
 let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='';
 const editingCareRecords=new Set();
@@ -224,17 +322,21 @@ const serialize=value=>JSON.stringify({
   countdownDate:value.countdownDate||'',
   countdownName:value.countdownName||'倒數天數',
   pageBlockOrder:value.pageBlockOrder||{},
-  weeklySchedule:value.weeklySchedule||{}
+  weeklySchedule:value.weeklySchedule||{},
+  lifeReading:value.lifeReading||{completed:{},completedAt:{}}
 });
 function normalizeState(raw){
  const base=raw&&typeof raw==='object'?raw:{};
- const goals=Array.isArray(base.goals)?base.goals:starterGoals;
+ const goals=Array.isArray(base.goals)?base.goals.map((g,i)=>({id:g.id??i+1,name:String(g.name||''),category:String(g.category||'其他'),target:Math.max(1,Number(g.target)||1),current:Math.max(0,Number(g.current)||0)})):starterGoals.map(g=>({...g}));
+ if(!goals.some(g=>String(g.name||'').trim()==='生命讀經1984篇'))goals.push({id:Math.max(0,...goals.map(g=>Number(g.id)||0))+1,name:'生命讀經1984篇',category:'閱讀',target:LIFE_READING_TOTAL,current:0});
  const books=Array.isArray(base.books)?base.books:starterBooks;
  const savedTabs=base.tabRecords&&typeof base.tabRecords==='object'?base.tabRecords:{};
  const tabRecords={};
  ['service','church','truth'].forEach(key=>{tabRecords[key]=Array.isArray(savedTabs[key])?savedTabs[key].map((r,i)=>({id:r.id??Date.now()+i,title:String(r.title||''),body:String(r.body||''),createdAt:String(r.createdAt||'')})):[]});
  const weeklyGoal=goals.find(g=>String(g.name||'').trim()==='週週禱研背講');
  const weeklyPrayerStudy=Array.isArray(base.weeklyPrayerStudy)?Array.from({length:52},(_,i)=>!!base.weeklyPrayerStudy[i]):Array.from({length:52},(_,i)=>i<Math.min(52,Math.max(0,Number(weeklyGoal?.current)||0)));
+ const savedLife=base.lifeReading&&typeof base.lifeReading==='object'?base.lifeReading:{},savedCompleted=savedLife.completed&&typeof savedLife.completed==='object'?savedLife.completed:{},savedCompletedAt=savedLife.completedAt&&typeof savedLife.completedAt==='object'?savedLife.completedAt:{},lifeCompleted={},lifeCompletedAt={};
+ lifeReadingGroups.forEach(group=>{const source=Array.isArray(savedCompleted[group.key])?savedCompleted[group.key]:[];lifeCompleted[group.key]=[...new Set(source.map(Number).filter(n=>Number.isInteger(n)&&n>=1&&n<=group.total))].sort((a,b)=>a-b);const dateSource=savedCompletedAt[group.key]&&typeof savedCompletedAt[group.key]==='object'?savedCompletedAt[group.key]:{},validDates={};lifeCompleted[group.key].forEach(lesson=>{const date=String(dateSource[lesson]||'');if(/^\d{4}-\d{2}-\d{2}$/.test(date))validDates[lesson]=date});lifeCompletedAt[group.key]=validDates});
  return {
   goals:goals.map((g,i)=>({id:g.id??i+1,name:String(g.name||''),category:String(g.category||'其他'),target:Math.max(1,Number(g.target)||1),current:Math.max(0,Number(g.current)||0)})),
   books:books.map((b,i)=>({id:b.id??i+1,name:String(b.name||''),chapters:Math.max(0,Number(b.chapters)||0),read:Math.max(0,Number(b.read)||0),done:!!b.done,expanded:!!b.expanded})),
@@ -244,7 +346,8 @@ function normalizeState(raw){
   countdownDate:/^\d{4}-\d{2}-\d{2}$/.test(String(base.countdownDate||''))?String(base.countdownDate):'',
   countdownName:String(base.countdownName||'倒數天數').slice(0,24),
   pageBlockOrder:base.pageBlockOrder&&typeof base.pageBlockOrder==='object'?base.pageBlockOrder:{},
-  weeklySchedule:base.weeklySchedule&&typeof base.weeklySchedule==='object'?base.weeklySchedule:{}
+  weeklySchedule:base.weeklySchedule&&typeof base.weeklySchedule==='object'?base.weeklySchedule:{},
+  lifeReading:{completed:lifeCompleted,completedAt:lifeCompletedAt}
  };
 }
 function persist(){
@@ -355,10 +458,85 @@ function renderShepherdList(){
    </div>`;
  refreshShepherdGoalDisplay();
 }
+function lifeReadingProgress(group){return (state.lifeReading?.completed?.[group.key]||[]).length}
+function lifeReadingStats(groups){const total=groups.reduce((sum,g)=>sum+g.total,0),completed=groups.reduce((sum,g)=>sum+lifeReadingProgress(g),0);return {total,completed,remaining:Math.max(0,total-completed),percent:total?Math.round(completed/total*100):0}}
+function syncLifeReadingGoal(){
+ if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{}};
+ if(!state.lifeReading.completed)state.lifeReading.completed={};
+ if(!state.lifeReading.completedAt)state.lifeReading.completedAt={};
+ const completed=lifeReadingStats(lifeReadingGroups).completed;
+ let goal=state.goals.find(g=>String(g.name||'').trim()==='生命讀經1984篇');
+ if(!goal){goal={id:Math.max(0,...state.goals.map(g=>Number(g.id)||0))+1,name:'生命讀經1984篇',category:'閱讀',target:LIFE_READING_TOTAL,current:completed};state.goals.push(goal)}
+ goal.category='閱讀';goal.target=LIFE_READING_TOTAL;goal.current=completed;
+ return goal;
+}
+const openLifeReadingGroups=new Set();
+function renderLifeReadingGroup(group,secondaryBook=false){
+ const completed=lifeReadingProgress(group),percent=Math.round(completed/group.total*100),primaryName=group.books[0];
+ if(secondaryBook)return `<div class="life-reading-shared"><strong>${esc(group.books[1])}</strong><span>與${esc(primaryName)}共用進度 · ${completed} / ${group.total} 篇</span></div>`;
+ const expanded=openLifeReadingGroups.has(group.key);
+ const lessons=expanded?Array.from({length:group.total},(_,i)=>{const n=i+1,checked=(state.lifeReading.completed[group.key]||[]).includes(n);return `<label class="life-reading-lesson"><input type="checkbox" data-life-reading-key="${group.key}" data-life-reading-lesson="${n}" ${checked?'checked':''}><span>${n}</span></label>`}).join(''):'';
+ return `<div class="life-reading-book"><button class="life-reading-book-toggle" type="button" data-life-reading-toggle="${group.key}" aria-expanded="${expanded}"><span class="life-reading-book-name">${esc(primaryName)}</span><span class="life-reading-book-count">${completed} / ${group.total} 篇</span><span class="book-chevron">${expanded?'▲':'▼'}</span></button><div class="life-reading-book-progress"><span style="width:${percent}%"></span></div><div class="life-reading-book-details" ${expanded?'':'hidden'}><div class="muted" style="margin-bottom:8px">勾選已完成的生命讀經篇數</div><div class="life-reading-lessons">${lessons}</div></div></div>`;
+}
+function renderLifeReadingAnnualStats(byDate){
+ const now=new Date(),year=now.getFullYear(),start=new Date(year,0,1),nextYear=new Date(year+1,0,1),daysInYear=Math.round((nextYear-start)/86400000),dayOfYear=Math.floor((now-start)/86400000)+1;
+ const yearPrefix=String(year)+'-',actual=Object.entries(byDate).reduce((sum,[date,count])=>date.startsWith(yearPrefix)?sum+count:sum,0);
+ const expected=Math.round(LIFE_READING_TOTAL*dayOfYear/daysInYear),gap=actual-expected,remaining=Math.max(0,LIFE_READING_TOTAL-actual),daysAfterToday=Math.max(0,daysInYear-dayOfYear),neededPerDay=daysAfterToday>0?remaining/daysAfterToday:null,percent=Math.min(100,Math.round(actual/LIFE_READING_TOTAL*100));
+ $('lifeReadingAnnualYear').textContent=String(year)+' 年';
+ $('lifeReadingAnnualActual').textContent=actual.toLocaleString('zh-TW');
+ $('lifeReadingAnnualExpected').textContent=expected.toLocaleString('zh-TW');
+ $('lifeReadingAnnualGap').textContent=gap===0?'0':`${gap>0?'+':''}${gap.toLocaleString('zh-TW')}`;
+ $('lifeReadingAnnualBar').style.width=percent+'%';
+ if(actual>=LIFE_READING_TOTAL){$('lifeReadingAnnualStatus').textContent=actual===LIFE_READING_TOTAL?'🎉 已達成今年 1,984 篇目標！':`🎉 已超越年度目標 ${ (actual-LIFE_READING_TOTAL).toLocaleString('zh-TW') } 篇！`; }
+ else if(gap>0){$('lifeReadingAnnualStatus').textContent=`目前領先預定進度 ${gap.toLocaleString('zh-TW')} 篇`; }
+ else if(gap<0){$('lifeReadingAnnualStatus').textContent=`目前落後預定進度 ${Math.abs(gap).toLocaleString('zh-TW')} 篇`; }
+ else {$('lifeReadingAnnualStatus').textContent='目前剛好跟上年度進度';}
+ $('lifeReadingAnnualPace').textContent=remaining===0?'年度目標已完成。':daysAfterToday>0?`距離年底還有 ${daysAfterToday} 天，接下來平均每天約需完成 ${neededPerDay.toFixed(1)} 篇，才能達成年度目標。`:`今年最後一天，距離年度目標還差 ${remaining.toLocaleString('zh-TW')} 篇。`;
+}
+function renderLifeReadingDailyStats(){
+ const completedAt=state.lifeReading?.completedAt||{},byDate={};
+ lifeReadingGroups.forEach(group=>{
+  const dates=completedAt[group.key]&&typeof completedAt[group.key]==='object'?completedAt[group.key]:{};
+  const completed=new Set(state.lifeReading?.completed?.[group.key]||[]);
+  Object.entries(dates).forEach(([lesson,date])=>{if(!completed.has(Number(lesson))||!/^\d{4}-\d{2}-\d{2}$/.test(String(date)))return;byDate[date]=(byDate[date]||0)+1});
+ });
+ const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
+ const trackedTotal=dates.reduce((sum,date)=>sum+byDate[date],0),activeDays=dates.length,today=dateKey(new Date()),todayCount=byDate[today]||0;
+ const totalCompleted=lifeReadingStats(lifeReadingGroups).completed,untracked=Math.max(0,totalCompleted-trackedTotal);
+ $('lifeReadingTodayCount').textContent=`今天 ${todayCount} 篇`;
+ $('lifeReadingActiveDays').textContent=String(activeDays);
+ $('lifeReadingDailyAverage').textContent=activeDays?(trackedTotal/activeDays).toFixed(1):'0';
+ $('lifeReadingTrackedTotal').textContent=trackedTotal.toLocaleString('zh-TW');
+ $('lifeReadingDailyRows').innerHTML=dates.length?dates.map(date=>{const d=new Date(date+'T00:00:00');const label=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;return `<div class="life-reading-daily-row"><span>${label}${date===today?'（今天）':''}</span><strong>${byDate[date]} 篇</strong></div>`}).join(''):'<div class="muted" style="padding:10px 2px;font-size:13px">尚無每日完成紀錄，勾選生命讀經篇數後就會從當天開始記錄。</div>';
+ $('lifeReadingUntracked').textContent=untracked?`另有 ${untracked.toLocaleString('zh-TW')} 篇是新增每日統計前已勾選完成，沒有日期資料，因此不列入每日統計。`:'';
+ renderLifeReadingMonthlyStats(byDate,trackedTotal);
+ renderLifeReadingAnnualStats(byDate);
+}
+function renderLifeReadingMonthlyStats(byDate,trackedTotal){
+ const byMonth={};
+ Object.entries(byDate).forEach(([date,count])=>{const month=String(date).slice(0,7);if(/^\d{4}-\d{2}$/.test(month))byMonth[month]=(byMonth[month]||0)+count});
+ const months=Object.keys(byMonth).sort((a,b)=>b.localeCompare(a));
+ const now=new Date(),currentMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`,thisMonth=byMonth[currentMonth]||0;
+ const activeMonths=months.length,monthlyAverage=activeMonths?(trackedTotal/activeMonths).toFixed(1):'0';
+ $('lifeReadingThisMonthCount').textContent=`本月 ${thisMonth} 篇`;$('lifeReadingActiveMonths').textContent=String(activeMonths);$('lifeReadingMonthlyAverage').textContent=monthlyAverage;$('lifeReadingMonthlyTrackedTotal').textContent=trackedTotal.toLocaleString('zh-TW');
+ $('lifeReadingMonthlyRows').innerHTML=months.length?months.map(month=>{const [year,monthNumber]=month.split('-');return `<div class="life-reading-daily-row"><span>${year} 年 ${Number(monthNumber)} 月</span><strong>${byMonth[month]} 篇</strong></div>`}).join(''):'<div class="muted" style="padding:10px 2px;font-size:13px">尚無每月完成紀錄，勾選生命讀經篇數後就會從當月開始記錄。</div>';
+}
+function renderLifeReading(){
+ if(!$('lifeReadingOldBooks'))return;
+ syncLifeReadingGoal();
+ const oldStats=lifeReadingStats(lifeReadingOldGroups),newStats=lifeReadingStats(lifeReadingNewGroups),allStats=lifeReadingStats(lifeReadingGroups);
+ $('lifeReadingTotal').textContent=`${allStats.completed.toLocaleString('zh-TW')} / ${LIFE_READING_TOTAL.toLocaleString('zh-TW')} 篇`;
+ $('lifeReadingPercent').textContent=`${allStats.percent}%`;$('lifeReadingTotalBar').style.width=`${allStats.percent}%`;$('lifeReadingRemaining').textContent=`尚餘 ${allStats.remaining.toLocaleString('zh-TW')} 篇`;
+ $('lifeReadingOldCount').textContent=`${oldStats.completed} / ${oldStats.total} 篇 · 39 卷`;$('lifeReadingNewCount').textContent=`${newStats.completed} / ${newStats.total} 篇 · 27 卷`;
+ $('lifeReadingOldBooks').innerHTML=lifeReadingOldGroups.map(g=>g.books.map((name,i)=>renderLifeReadingGroup(g,i>0)).join('')).join('');
+ $('lifeReadingNewBooks').innerHTML=lifeReadingNewGroups.map(g=>renderLifeReadingGroup(g,false)).join('');
+ renderLifeReadingDailyStats();
+}
 function renderGoals(){
  syncBaptismGoal();
  syncShepherdGoal();
  syncWeeklyPrayerGoal();
+ syncLifeReadingGoal();
  const el=$('goalList');
  if(!state.goals.length){el.innerHTML='<div class="empty">還沒有目標，按「新增目標」開始吧！</div>'}
  else el.innerHTML=state.goals.map(g=>{
@@ -367,9 +545,10 @@ function renderGoals(){
   const isBaptismGoal=g.name.trim()==='帶 30 位北科大女同學信而受浸得救成為姊妹';
 
   const isBookGoal=g.name.trim()==='讀完十本書報';
+  const isLifeReadingGoal=g.name.trim()==='生命讀經1984篇';
   const shepherdStats=isShepherdGoal?getShepherdStats():null;
-  const goalMeta=isBookGoal?`已完成 ${Math.min(g.current,10)} / 10 本`:isBaptismGoal?`<span class="baptism-progress-inline"><span class="baptism-progress-label">目前受浸人數</span><span class="baptism-progress-number"><strong>${state.baptizedPeople.length}</strong><small> / ${g.target}</small></span></span>`:isShepherdGoal?`<span>已有 ${shepherdStats.coveredCount} / ${shepherdStats.sisterCount} 位姊妹有牧養人</span><span class="shepherd-goal-average">平均每位姊妹牧養 ${Number(shepherdStats.average.toFixed(1))} 人</span>`:`${esc(g.category)} · ${g.current>=g.target?'已達成':`進度 ${g.current} / ${g.target}`}`;
-  const goalActions=`${(isBookGoal||isShepherdGoal||isBaptismGoal)?'':`<button class="mini" data-act="minus" data-id="${g.id}" aria-label="減少進度">−</button><button class="mini" data-act="plus" data-id="${g.id}" aria-label="增加進度">＋1</button>`}`;
+  const goalMeta=isLifeReadingGoal?`已完成 ${g.current.toLocaleString('zh-TW')} / ${LIFE_READING_TOTAL.toLocaleString('zh-TW')} 篇`:isBookGoal?`已完成 ${Math.min(g.current,10)} / 10 本`:isBaptismGoal?`<span class="baptism-progress-inline"><span class="baptism-progress-label">目前受浸人數</span><span class="baptism-progress-number"><strong>${state.baptizedPeople.length}</strong><small> / ${g.target}</small></span></span>`:isShepherdGoal?`<span>已有 ${shepherdStats.coveredCount} / ${shepherdStats.sisterCount} 位姊妹有牧養人</span><span class="shepherd-goal-average">平均每位姊妹牧養 ${Number(shepherdStats.average.toFixed(1))} 人</span>`:`${esc(g.category)} · ${g.current>=g.target?'已達成':`進度 ${g.current} / ${g.target}`}`;
+  const goalActions=`${(isBookGoal||isShepherdGoal||isBaptismGoal||isLifeReadingGoal)?'':`<button class="mini" data-act="minus" data-id="${g.id}" aria-label="減少進度">−</button><button class="mini" data-act="plus" data-id="${g.id}" aria-label="增加進度">＋1</button>`}`;
   return `<article class="goal ${editModes.target?'edit-mode':''}" data-goal-id="${g.id}"><div class="move-controls"><button class="move-btn" type="button" data-move="goal" data-index="${state.goals.findIndex(x=>x.id===g.id)}" data-dir="-1" ${state.goals.findIndex(x=>x.id===g.id)===0?'disabled':''} aria-label="目標往前移">↑</button><button class="move-btn" type="button" data-move="goal" data-index="${state.goals.findIndex(x=>x.id===g.id)}" data-dir="1" ${state.goals.findIndex(x=>x.id===g.id)===state.goals.length-1?'disabled':''} aria-label="目標往後移">↓</button></div><button class="delete-x" type="button" data-act="delete" data-id="${g.id}" aria-label="刪除目標" title="刪除">×</button><div class="goal-top"><div class="goal-icon">${g.category==='閱讀'?'📚':g.category==='服事'?'🤝':g.category==='健康'?'🌿':g.category==='學習'?'✍️':'🎯'}</div><div class="goal-main"><div class="goal-title">${esc(g.name)}</div><div class="goal-meta">${goalMeta}</div></div><div class="goal-actions">${goalActions}</div></div><div class="goalbar ${isBaptismGoal?'baptism-goalbar':''}"><span style="width:${pct(g)}%"></span></div>${shepherdSection}</article>`;
  }).join('');
  const total=state.goals.length?Math.round(state.goals.reduce((s,g)=>s+pct(g),0)/state.goals.length):0;
@@ -497,7 +676,7 @@ function refreshPageBlockEditControls(){
   });
  });
 }
-function render(){renderCountdown();renderBooks();renderGoals();renderShepherdList();renderAllTabRecords();renderSchedule();$('weekNote').value=state.weekNote||'';$('nextWeek').value=state.nextWeek||'';applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()}
+function render(){renderCountdown();renderBooks();renderGoals();renderShepherdList();renderAllTabRecords();renderSchedule();renderLifeReading();$('weekNote').value=state.weekNote||'';$('nextWeek').value=state.nextWeek||'';applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()}
 function friendlyError(error){const map={'auth/unauthorized-domain':'此網站網域尚未加入 Firebase 授權網域。','auth/popup-closed-by-user':'你已關閉 Google 登入視窗。','auth/popup-blocked':'瀏覽器封鎖了登入視窗，請允許彈出視窗後重試。','permission-denied':'Firebase 權限規則未允許此操作。','storage/unauthorized':'Firebase Storage 權限規則未允許上傳，請確認 Storage Rules。','storage/bucket-not-found':'找不到 Firebase Storage 儲存空間，請先在 Firebase Console 啟用 Storage。','unavailable':'目前無法連線雲端，請稍後再試。'};return map[error?.code]||error?.message||'未知錯誤'}
 function renderHeaderAvatar(url=''){avatarUrl=url||'';$('headerAvatarImage').hidden=!avatarUrl;$('headerAvatarFallback').hidden=!!avatarUrl;if(avatarUrl)$('headerAvatarImage').src=avatarUrl;else $('headerAvatarImage').removeAttribute('src')}
 async function loadCloudAvatar(user){try{const snap=await getDoc(doc(db,'users',user.uid,'profile','avatar'));if(!currentUser||currentUser.uid!==user.uid)return;const data=snap.exists()?snap.data():{};avatarUrl=String(data.avatarUrl||'');avatarStoragePath=String(data.storagePath||'');renderHeaderAvatar(avatarUrl);$('avatarStatus').textContent=avatarUrl?'頭貼已同步至雲端 ✓':'尚未設定頭貼'}catch(error){console.error(error);$('avatarStatus').textContent='讀取頭貼失敗：'+friendlyError(error)}}
@@ -511,12 +690,13 @@ function showApp(user){
  stopListening=onSnapshot(ref,async snap=>{
   if(!currentUser||currentUser.uid!==user.uid)return;
   if(!snap.exists()){const initial=freshState();try{await setDoc(ref,{...initial,updatedAt:serverTimestamp()});lastSerialized=serialize(initial);state=normalizeState(initial);render();setCloudStatus('已建立新的雲端紀錄 ✓')}catch(error){setStatus('無法建立雲端資料：'+friendlyError(error),true);setCloudStatus('同步失敗')}return}
-  const remote=normalizeState(snap.data()),serialized=serialize(remote);
+  const rawData=snap.data(),remote=normalizeState(rawData),serialized=serialize(remote),rawSerialized=serialize(rawData);
   if(serialized!==lastSerialized){
    const active=document.activeElement;
    const editingCareField=active&&($('goalList').contains(active)||$('baptizedList')?.contains(active)||$('shepherdListPanel')?.contains(active))&&(active.matches('[data-shepherd-field], [data-record-field], [data-baptized-field]'));
    if(editingCareField && (saveTimer || document.activeElement.value!==undefined)){ setCloudStatus('正在編輯，稍後同步…'); return; }
-   applyingRemote=true;state=remote;lastSerialized=serialized;render();applyingRemote=false
+   applyingRemote=true;state=remote;lastSerialized=serialized;render();applyingRemote=false;
+   if(rawSerialized!==serialized){lastSerialized=rawSerialized;persist()}
   }
   setCloudStatus('已同步至雲端 ✓');
  },error=>{console.error(error);setStatus('讀取雲端失敗：'+friendlyError(error),true);setCloudStatus('同步失敗')});
@@ -602,6 +782,11 @@ function applyTheme(name,save=true){const t=themeMap[name]||themeMap.green;const
 function applyFont(name,save=true){const scale={small:.9,normal:1,large:1.12}[name]||1;document.documentElement.style.setProperty('--ui-zoom',scale);document.querySelectorAll('[data-font]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.font===name)));if(save)localStorage.setItem('yearGoalFont',name)}
 const openMenu=()=>{$('sideMenu').hidden=false;$('menuBackdrop').hidden=false;$('menuToggle').setAttribute('aria-expanded','true')};
 const closeMenu=()=>{$('sideMenu').hidden=true;$('menuBackdrop').hidden=true;$('menuToggle').setAttribute('aria-expanded','false')};
+$('lifeReadingOldBooks').addEventListener('click',e=>{const toggle=e.target.closest('[data-life-reading-toggle]');if(!toggle)return;const key=toggle.dataset.lifeReadingToggle;if(openLifeReadingGroups.has(key))openLifeReadingGroups.delete(key);else openLifeReadingGroups.add(key);renderLifeReading()});
+$('lifeReadingNewBooks').addEventListener('click',e=>{const toggle=e.target.closest('[data-life-reading-toggle]');if(!toggle)return;const key=toggle.dataset.lifeReadingToggle;if(openLifeReadingGroups.has(key))openLifeReadingGroups.delete(key);else openLifeReadingGroups.add(key);renderLifeReading()});
+function handleLifeReadingChange(e){const input=e.target.closest('input[data-life-reading-key]');if(!input)return;const key=input.dataset.lifeReadingKey,lesson=Number(input.dataset.lifeReadingLesson),group=lifeReadingGroups.find(g=>g.key===key);if(!group||!Number.isInteger(lesson)||lesson<1||lesson>group.total)return;if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{}};if(!state.lifeReading.completed)state.lifeReading.completed={};if(!state.lifeReading.completedAt)state.lifeReading.completedAt={};const set=new Set(state.lifeReading.completed[key]||[]);if(input.checked){set.add(lesson);if(!state.lifeReading.completedAt[key])state.lifeReading.completedAt[key]={};state.lifeReading.completedAt[key][lesson]=dateKey(new Date())}else{set.delete(lesson);if(state.lifeReading.completedAt[key])delete state.lifeReading.completedAt[key][lesson]}state.lifeReading.completed[key]=[...set].sort((a,b)=>a-b);syncLifeReadingGoal();persist();renderLifeReading();renderGoals()}
+$('lifeReadingOldBooks').addEventListener('change',handleLifeReadingChange);$('lifeReadingNewBooks').addEventListener('change',handleLifeReadingChange);
+$('menuLifeReading').addEventListener('click',()=>{document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-life-reading');document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false')});$('mainNavTabs').hidden=true;$('pageEditToolbar').hidden=true;closeMenu();renderLifeReading();window.scrollTo({top:0,behavior:'smooth'})});
 $('schedulePrev').addEventListener('click',()=>{scheduleWeekStart.setDate(scheduleWeekStart.getDate()-7);scheduleSelectedDate=dateKey(scheduleWeekStart);renderSchedule()});
 $('scheduleNext').addEventListener('click',()=>{scheduleWeekStart.setDate(scheduleWeekStart.getDate()+7);scheduleSelectedDate=dateKey(scheduleWeekStart);renderSchedule()});
 $('scheduleToday').addEventListener('click',()=>{scheduleWeekStart=getMonday(new Date());scheduleSelectedDate=dateKey(new Date());renderSchedule()});
