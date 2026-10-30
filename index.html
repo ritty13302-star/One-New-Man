@@ -78,10 +78,10 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 .life-reading-annual{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px}
 .life-reading-annual-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .life-reading-annual-head h3{font-size:16px;margin:0;flex:0 0 auto}
-.life-reading-date-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;flex:0 1 306px;min-width:0;max-width:306px;transform:translateX(8px)}
+.life-reading-date-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;flex:1 1 100%;width:100%;min-width:0;max-width:100%;transform:none}
 .life-reading-deadline{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:11px;font-weight:750;color:var(--muted)}
-.life-reading-deadline input{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);padding:8px 7px;font:inherit;font-size:12px;font-weight:600}
-@media(max-width:420px){.life-reading-date-row{flex:0 1 306px;max-width:306px;width:100%;gap:12px;transform:translateX(5px)}.life-reading-deadline input{padding:7px 4px;font-size:11px}}
+.life-reading-deadline input{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);padding:8px 6px;font:inherit;font-size:12px;font-weight:600}
+@media(max-width:420px){.life-reading-date-row{grid-template-columns:repeat(2,minmax(0,1fr));flex:1 1 100%;max-width:100%;width:100%;gap:14px;transform:none}.life-reading-deadline{min-width:0}.life-reading-deadline input{padding:7px 3px;font-size:11px;letter-spacing:-.2px}}
 .life-reading-annual-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .life-reading-annual-stats>div{padding:10px 8px;border-radius:11px;background:var(--bg);min-width:0}
 .life-reading-annual-stats strong,.life-reading-annual-stats span{display:block}
