@@ -86,6 +86,19 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 .life-reading-annual-stats span{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}
 .life-reading-annual-status{font-size:13px;font-weight:750;margin:10px 0 5px}
 .life-reading-annual-note{font-size:11px;line-height:1.5;margin-top:9px}
+.life-reading-plan{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px}
+.life-reading-plan-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.life-reading-plan-head h3{font-size:16px;margin:0 0 4px}
+.life-reading-plan-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 14px}
+.life-reading-plan-option{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:11px;padding:10px 8px;font-size:13px;font-weight:700;cursor:pointer}
+.life-reading-plan-option.active{border-color:var(--green);background:var(--pale);color:var(--green)}
+.life-reading-plan-fields{display:grid;gap:10px}
+.life-reading-plan-fields label{display:grid;gap:5px;font-size:12px;color:var(--muted)}
+.life-reading-plan-fields input{width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);padding:10px 11px}
+.life-reading-plan-result{margin-top:13px;padding:12px;border-radius:12px;background:var(--pale-soft);font-size:13px;line-height:1.6}
+.life-reading-plan-result strong{color:var(--green);font-size:18px}
+.life-reading-plan-actions{display:flex;justify-content:flex-end;margin-top:11px}
+@media(max-width:420px){.life-reading-plan-options{grid-template-columns:1fr}}
 .life-reading-daily-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
 .life-reading-daily-head h3{font-size:16px;margin:0 0 4px}
 .life-reading-daily-head p{font-size:12px;margin:0}
@@ -232,6 +245,23 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
   <p class="life-reading-annual-note muted" id="lifeReadingAnnualPace"></p>
   <p class="life-reading-annual-note muted">年度追蹤只計入有日期、且日期在今年的完成篇數；先前已完成但沒有日期的篇數不會自動算入今年。</p>
  </section>
+ <section class="life-reading-plan" aria-labelledby="lifeReadingPlanTitle">
+  <div class="life-reading-plan-head"><div><h3 id="lifeReadingPlanTitle">🧭 生命讀經目標達成計算</h3><p class="muted">選擇完成期限或每週閱讀量，估算達成 1,984 篇的時間</p></div></div>
+  <div class="life-reading-plan-options" role="group" aria-label="選擇計算方式">
+   <button type="button" class="life-reading-plan-option" id="lifeReadingPlanModeDate" data-life-plan-mode="date">設定完成日期</button>
+   <button type="button" class="life-reading-plan-option" id="lifeReadingPlanModeWeekly" data-life-plan-mode="weekly">設定每週篇數</button>
+  </div>
+  <div class="life-reading-plan-fields" id="lifeReadingPlanDateFields" hidden>
+   <label>我希望在這一天前完成<input type="date" id="lifeReadingPlanDeadline"></label>
+   <p class="muted">從今天開始計算，包含今天在內，估算平均每天需要完成幾篇。</p>
+  </div>
+  <div class="life-reading-plan-fields" id="lifeReadingPlanWeeklyFields" hidden>
+   <label>我一週想完成幾篇<input type="number" id="lifeReadingPlanWeeklyTarget" min="1" max="1984" step="1" inputmode="numeric" placeholder="例如：每週 20 篇"></label>
+   <p class="muted">從今天開始計算，依照設定的每週篇數估算完成日期。</p>
+  </div>
+  <div class="life-reading-plan-actions"><button type="button" class="btn" id="lifeReadingPlanCalculate">計算目標</button></div>
+  <div class="life-reading-plan-result" id="lifeReadingPlanResult" aria-live="polite">請選擇一種方式並輸入目標，系統會依照目前尚未完成的篇數計算。</div>
+ </section>
  <section class="life-reading-daily" aria-labelledby="lifeReadingDailyTitle">
   <div class="life-reading-daily-head"><div><h3 id="lifeReadingDailyTitle">📅 每日完成篇數</h3><p class="muted">勾選完成篇數時，會自動記錄當天日期</p></div><span class="life-reading-today" id="lifeReadingTodayCount">今天 0 篇</span></div>
   <div class="life-reading-daily-stats"><div><strong id="lifeReadingActiveDays">0</strong><span>有讀經紀錄的天數</span></div><div><strong id="lifeReadingDailyAverage">0</strong><span>平均每天完成篇數</span></div><div><strong id="lifeReadingTrackedTotal">0</strong><span>有日期的完成篇數</span></div></div>
@@ -305,7 +335,7 @@ const freshState=()=>({
   countdownName:'倒數天數',
   pageBlockOrder:{},
   weeklySchedule:{},
-  lifeReading:{completed:{},completedAt:{}}
+  lifeReading:{completed:{},completedAt:{},plan:{mode:'date',deadline:'',weeklyTarget:''}}
 });
 let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='';
 const editingCareRecords=new Set();
@@ -323,7 +353,7 @@ const serialize=value=>JSON.stringify({
   countdownName:value.countdownName||'倒數天數',
   pageBlockOrder:value.pageBlockOrder||{},
   weeklySchedule:value.weeklySchedule||{},
-  lifeReading:value.lifeReading||{completed:{},completedAt:{}}
+  lifeReading:value.lifeReading||{completed:{},completedAt:{},plan:{mode:'date',deadline:'',weeklyTarget:''}}
 });
 function normalizeState(raw){
  const base=raw&&typeof raw==='object'?raw:{};
@@ -335,7 +365,7 @@ function normalizeState(raw){
  ['service','church','truth'].forEach(key=>{tabRecords[key]=Array.isArray(savedTabs[key])?savedTabs[key].map((r,i)=>({id:r.id??Date.now()+i,title:String(r.title||''),body:String(r.body||''),createdAt:String(r.createdAt||'')})):[]});
  const weeklyGoal=goals.find(g=>String(g.name||'').trim()==='週週禱研背講');
  const weeklyPrayerStudy=Array.isArray(base.weeklyPrayerStudy)?Array.from({length:52},(_,i)=>!!base.weeklyPrayerStudy[i]):Array.from({length:52},(_,i)=>i<Math.min(52,Math.max(0,Number(weeklyGoal?.current)||0)));
- const savedLife=base.lifeReading&&typeof base.lifeReading==='object'?base.lifeReading:{},savedCompleted=savedLife.completed&&typeof savedLife.completed==='object'?savedLife.completed:{},savedCompletedAt=savedLife.completedAt&&typeof savedLife.completedAt==='object'?savedLife.completedAt:{},lifeCompleted={},lifeCompletedAt={};
+ const savedLife=base.lifeReading&&typeof base.lifeReading==='object'?base.lifeReading:{},savedCompleted=savedLife.completed&&typeof savedLife.completed==='object'?savedLife.completed:{},savedCompletedAt=savedLife.completedAt&&typeof savedLife.completedAt==='object'?savedLife.completedAt:{},savedPlan=savedLife.plan&&typeof savedLife.plan==='object'?savedLife.plan:{},lifeCompleted={},lifeCompletedAt={};
  lifeReadingGroups.forEach(group=>{const source=Array.isArray(savedCompleted[group.key])?savedCompleted[group.key]:[];lifeCompleted[group.key]=[...new Set(source.map(Number).filter(n=>Number.isInteger(n)&&n>=1&&n<=group.total))].sort((a,b)=>a-b);const dateSource=savedCompletedAt[group.key]&&typeof savedCompletedAt[group.key]==='object'?savedCompletedAt[group.key]:{},validDates={};lifeCompleted[group.key].forEach(lesson=>{const date=String(dateSource[lesson]||'');if(/^\d{4}-\d{2}-\d{2}$/.test(date))validDates[lesson]=date});lifeCompletedAt[group.key]=validDates});
  return {
   goals:goals.map((g,i)=>({id:g.id??i+1,name:String(g.name||''),category:String(g.category||'其他'),target:Math.max(1,Number(g.target)||1),current:Math.max(0,Number(g.current)||0)})),
@@ -347,7 +377,7 @@ function normalizeState(raw){
   countdownName:String(base.countdownName||'倒數天數').slice(0,24),
   pageBlockOrder:base.pageBlockOrder&&typeof base.pageBlockOrder==='object'?base.pageBlockOrder:{},
   weeklySchedule:base.weeklySchedule&&typeof base.weeklySchedule==='object'?base.weeklySchedule:{},
-  lifeReading:{completed:lifeCompleted,completedAt:lifeCompletedAt}
+  lifeReading:{completed:lifeCompleted,completedAt:lifeCompletedAt,plan:{mode:savedPlan.mode==='weekly'?'weekly':'date',deadline:/^\d{4}-\d{2}-\d{2}$/.test(String(savedPlan.deadline||''))?String(savedPlan.deadline):'',weeklyTarget:Math.max(0,Math.min(LIFE_READING_TOTAL,Math.floor(Number(savedPlan.weeklyTarget)||0)))}}
  };
 }
 function persist(){
@@ -461,7 +491,7 @@ function renderShepherdList(){
 function lifeReadingProgress(group){return (state.lifeReading?.completed?.[group.key]||[]).length}
 function lifeReadingStats(groups){const total=groups.reduce((sum,g)=>sum+g.total,0),completed=groups.reduce((sum,g)=>sum+lifeReadingProgress(g),0);return {total,completed,remaining:Math.max(0,total-completed),percent:total?Math.round(completed/total*100):0}}
 function syncLifeReadingGoal(){
- if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{}};
+ if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{},plan:{mode:'date',deadline:'',weeklyTarget:''}};
  if(!state.lifeReading.completed)state.lifeReading.completed={};
  if(!state.lifeReading.completedAt)state.lifeReading.completedAt={};
  const completed=lifeReadingStats(lifeReadingGroups).completed;
@@ -477,6 +507,46 @@ function renderLifeReadingGroup(group,secondaryBook=false){
  const expanded=openLifeReadingGroups.has(group.key);
  const lessons=expanded?Array.from({length:group.total},(_,i)=>{const n=i+1,checked=(state.lifeReading.completed[group.key]||[]).includes(n);return `<label class="life-reading-lesson"><input type="checkbox" data-life-reading-key="${group.key}" data-life-reading-lesson="${n}" ${checked?'checked':''}><span>${n}</span></label>`}).join(''):'';
  return `<div class="life-reading-book"><button class="life-reading-book-toggle" type="button" data-life-reading-toggle="${group.key}" aria-expanded="${expanded}"><span class="life-reading-book-name">${esc(primaryName)}</span><span class="life-reading-book-count">${completed} / ${group.total} 篇</span><span class="book-chevron">${expanded?'▲':'▼'}</span></button><div class="life-reading-book-progress"><span style="width:${percent}%"></span></div><div class="life-reading-book-details" ${expanded?'':'hidden'}><div class="muted" style="margin-bottom:8px">勾選已完成的生命讀經篇數</div><div class="life-reading-lessons">${lessons}</div></div></div>`;
+}
+function lifeReadingPlanState(){
+ if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{},plan:{mode:'date',deadline:'',weeklyTarget:''}};
+ if(!state.lifeReading.plan)state.lifeReading.plan={mode:'date',deadline:'',weeklyTarget:''};
+ return state.lifeReading.plan;
+}
+function renderLifeReadingPlan(){
+ const plan=lifeReadingPlanState(),mode=plan.mode==='weekly'?'weekly':'date';
+ $('lifeReadingPlanModeDate').classList.toggle('active',mode==='date');$('lifeReadingPlanModeWeekly').classList.toggle('active',mode==='weekly');
+ $('lifeReadingPlanModeDate').setAttribute('aria-pressed',String(mode==='date'));$('lifeReadingPlanModeWeekly').setAttribute('aria-pressed',String(mode==='weekly'));
+ $('lifeReadingPlanDateFields').hidden=mode!=='date';$('lifeReadingPlanWeeklyFields').hidden=mode!=='weekly';
+ $('lifeReadingPlanDeadline').value=plan.deadline||'';$('lifeReadingPlanWeeklyTarget').value=plan.weeklyTarget||'';
+ calculateLifeReadingPlan(false);
+}
+function calculateLifeReadingPlan(showErrors=true){
+ const plan=lifeReadingPlanState(),remaining=lifeReadingStats(lifeReadingGroups).remaining,now=new Date();now.setHours(0,0,0,0);
+ const result=$('lifeReadingPlanResult');
+ if(remaining===0){result.innerHTML='🎉 <strong>已完成 1,984 篇目標！</strong><br>目前沒有剩餘篇數。';return}
+ if(plan.mode==='weekly'){
+  const weekly=Math.floor(Number(plan.weeklyTarget)||0);
+  if(weekly<1){result.textContent='請輸入每週想完成的篇數，再按「計算目標」。';return}
+  const totalDays=Math.ceil(remaining/weekly*7),finish=new Date(now);finish.setDate(finish.getDate()+totalDays);
+  const weeks=(remaining/weekly),dateLabel=`${finish.getFullYear()} 年 ${finish.getMonth()+1} 月 ${finish.getDate()} 日`;
+  result.innerHTML=`以每週 <strong>${weekly.toLocaleString('zh-TW')} 篇</strong> 的速度，從今天起完成剩餘 <strong>${remaining.toLocaleString('zh-TW')} 篇</strong>，約需 <strong>${weeks.toFixed(1)} 週</strong>。<br>預計完成日期：<strong>${dateLabel}</strong>。`;
+  return;
+ }
+ const deadline=String(plan.deadline||'');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(deadline)){result.textContent='請設定希望完成的日期，再按「計算目標」。';return}
+ const target=new Date(deadline+'T00:00:00');
+ if(Number.isNaN(target.getTime())||target<now){result.textContent='完成日期不能早於今天，請重新選擇日期。';return}
+ const days=Math.floor((target-now)/86400000)+1,perDay=remaining/days;
+ result.innerHTML=`從今天起（含今天）到 <strong>${target.getFullYear()} 年 ${target.getMonth()+1} 月 ${target.getDate()} 日</strong> 共 <strong>${days} 天</strong>。<br>剩餘 <strong>${remaining.toLocaleString('zh-TW')} 篇</strong>，平均每天需要完成 <strong>${perDay.toFixed(1)} 篇</strong>。`;
+}
+function saveLifeReadingPlan(){
+ const plan=lifeReadingPlanState();
+ plan.deadline=$('lifeReadingPlanDeadline').value||'';
+ const weekly=Math.floor(Number($('lifeReadingPlanWeeklyTarget').value)||0);plan.weeklyTarget=Math.max(0,Math.min(LIFE_READING_TOTAL,weekly));
+ if(plan.mode==='weekly'&&weekly<1){calculateLifeReadingPlan();return}
+ if(plan.mode==='date'&&!plan.deadline){calculateLifeReadingPlan();return}
+ persist();calculateLifeReadingPlan();
 }
 function renderLifeReadingAnnualStats(byDate){
  const now=new Date(),year=now.getFullYear(),start=new Date(year,0,1),nextYear=new Date(year+1,0,1),daysInYear=Math.round((nextYear-start)/86400000),dayOfYear=Math.floor((now-start)/86400000)+1;
@@ -531,6 +601,7 @@ function renderLifeReading(){
  $('lifeReadingOldBooks').innerHTML=lifeReadingOldGroups.map(g=>g.books.map((name,i)=>renderLifeReadingGroup(g,i>0)).join('')).join('');
  $('lifeReadingNewBooks').innerHTML=lifeReadingNewGroups.map(g=>renderLifeReadingGroup(g,false)).join('');
  renderLifeReadingDailyStats();
+ renderLifeReadingPlan();
 }
 function renderGoals(){
  syncBaptismGoal();
@@ -784,8 +855,9 @@ const openMenu=()=>{$('sideMenu').hidden=false;$('menuBackdrop').hidden=false;$(
 const closeMenu=()=>{$('sideMenu').hidden=true;$('menuBackdrop').hidden=true;$('menuToggle').setAttribute('aria-expanded','false')};
 $('lifeReadingOldBooks').addEventListener('click',e=>{const toggle=e.target.closest('[data-life-reading-toggle]');if(!toggle)return;const key=toggle.dataset.lifeReadingToggle;if(openLifeReadingGroups.has(key))openLifeReadingGroups.delete(key);else openLifeReadingGroups.add(key);renderLifeReading()});
 $('lifeReadingNewBooks').addEventListener('click',e=>{const toggle=e.target.closest('[data-life-reading-toggle]');if(!toggle)return;const key=toggle.dataset.lifeReadingToggle;if(openLifeReadingGroups.has(key))openLifeReadingGroups.delete(key);else openLifeReadingGroups.add(key);renderLifeReading()});
-function handleLifeReadingChange(e){const input=e.target.closest('input[data-life-reading-key]');if(!input)return;const key=input.dataset.lifeReadingKey,lesson=Number(input.dataset.lifeReadingLesson),group=lifeReadingGroups.find(g=>g.key===key);if(!group||!Number.isInteger(lesson)||lesson<1||lesson>group.total)return;if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{}};if(!state.lifeReading.completed)state.lifeReading.completed={};if(!state.lifeReading.completedAt)state.lifeReading.completedAt={};const set=new Set(state.lifeReading.completed[key]||[]);if(input.checked){set.add(lesson);if(!state.lifeReading.completedAt[key])state.lifeReading.completedAt[key]={};state.lifeReading.completedAt[key][lesson]=dateKey(new Date())}else{set.delete(lesson);if(state.lifeReading.completedAt[key])delete state.lifeReading.completedAt[key][lesson]}state.lifeReading.completed[key]=[...set].sort((a,b)=>a-b);syncLifeReadingGoal();persist();renderLifeReading();renderGoals()}
+function handleLifeReadingChange(e){const input=e.target.closest('input[data-life-reading-key]');if(!input)return;const key=input.dataset.lifeReadingKey,lesson=Number(input.dataset.lifeReadingLesson),group=lifeReadingGroups.find(g=>g.key===key);if(!group||!Number.isInteger(lesson)||lesson<1||lesson>group.total)return;if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{},plan:{mode:'date',deadline:'',weeklyTarget:''}};if(!state.lifeReading.completed)state.lifeReading.completed={};if(!state.lifeReading.completedAt)state.lifeReading.completedAt={};const set=new Set(state.lifeReading.completed[key]||[]);if(input.checked){set.add(lesson);if(!state.lifeReading.completedAt[key])state.lifeReading.completedAt[key]={};state.lifeReading.completedAt[key][lesson]=dateKey(new Date())}else{set.delete(lesson);if(state.lifeReading.completedAt[key])delete state.lifeReading.completedAt[key][lesson]}state.lifeReading.completed[key]=[...set].sort((a,b)=>a-b);syncLifeReadingGoal();persist();renderLifeReading();renderGoals()}
 $('lifeReadingOldBooks').addEventListener('change',handleLifeReadingChange);$('lifeReadingNewBooks').addEventListener('change',handleLifeReadingChange);
+$('lifeReadingPlanModeDate').addEventListener('click',()=>{lifeReadingPlanState().mode='date';persist();renderLifeReadingPlan()});$('lifeReadingPlanModeWeekly').addEventListener('click',()=>{lifeReadingPlanState().mode='weekly';persist();renderLifeReadingPlan()});$('lifeReadingPlanCalculate').addEventListener('click',saveLifeReadingPlan);$('lifeReadingPlanDeadline').addEventListener('change',()=>{lifeReadingPlanState().deadline=$('lifeReadingPlanDeadline').value;persist();calculateLifeReadingPlan()});$('lifeReadingPlanWeeklyTarget').addEventListener('change',()=>{lifeReadingPlanState().weeklyTarget=Math.max(0,Math.min(LIFE_READING_TOTAL,Math.floor(Number($('lifeReadingPlanWeeklyTarget').value)||0)));persist();calculateLifeReadingPlan()});
 $('menuLifeReading').addEventListener('click',()=>{document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-life-reading');document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false')});$('mainNavTabs').hidden=true;$('pageEditToolbar').hidden=true;closeMenu();renderLifeReading();window.scrollTo({top:0,behavior:'smooth'})});
 $('schedulePrev').addEventListener('click',()=>{scheduleWeekStart.setDate(scheduleWeekStart.getDate()-7);scheduleSelectedDate=dateKey(scheduleWeekStart);renderSchedule()});
 $('scheduleNext').addEventListener('click',()=>{scheduleWeekStart.setDate(scheduleWeekStart.getDate()+7);scheduleSelectedDate=dateKey(scheduleWeekStart);renderSchedule()});
