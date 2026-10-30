@@ -79,6 +79,9 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 .life-reading-annual-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
 .life-reading-annual-head h3{font-size:16px;margin:0 0 4px}
 .life-reading-annual-head p{font-size:12px;margin:0}
+.life-reading-deadline{display:flex;flex-direction:column;gap:5px;flex:0 0 auto;font-size:11px;font-weight:750;color:var(--muted);min-width:132px}
+.life-reading-deadline input{width:100%;max-width:160px;min-width:0;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);padding:8px 7px;font:inherit;font-size:12px;font-weight:600}
+@media(max-width:420px){.life-reading-annual-head{flex-wrap:wrap}.life-reading-deadline{width:100%;max-width:190px}}
 .life-reading-annual-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .life-reading-annual-stats>div{padding:10px 8px;border-radius:11px;background:var(--bg);min-width:0}
 .life-reading-annual-stats strong,.life-reading-annual-stats span{display:block}
@@ -238,12 +241,12 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
   <p class="muted" id="lifeReadingRemaining" style="margin-top:9px">尚餘 1,984 篇</p>
  </div>
  <section class="life-reading-annual" aria-labelledby="lifeReadingAnnualTitle">
-  <div class="life-reading-annual-head"><div><h3 id="lifeReadingAnnualTitle">🎯 年度目標追蹤</h3><p class="muted" id="lifeReadingAnnualSubtitle">對照全年 1,984 篇目標，查看目前是否跟上進度</p></div><span class="life-reading-today" id="lifeReadingAnnualYear">今年</span></div>
-  <div class="life-reading-annual-stats"><div><strong id="lifeReadingAnnualActual">0</strong><span>今年已完成篇數</span></div><div><strong id="lifeReadingAnnualExpected">0</strong><span>目前應完成篇數</span></div><div><strong id="lifeReadingAnnualGap">0</strong><span>領先／落後篇數</span></div></div>
+  <div class="life-reading-annual-head"><div><h3 id="lifeReadingAnnualTitle">🎯 目標追蹤</h3><p class="muted" id="lifeReadingAnnualSubtitle">依照預訂完成時間，查看目前是否跟上 1,984 篇目標</p></div><label class="life-reading-deadline">預訂完成時間<input type="date" id="lifeReadingGoalDeadline" aria-label="預訂完成時間"></label></div>
+  <div class="life-reading-annual-stats"><div><strong id="lifeReadingAnnualActual">0</strong><span>今年已完成篇數</span></div><div><strong id="lifeReadingAnnualExpected">—</strong><span>目前應完成篇數</span></div><div><strong id="lifeReadingAnnualGap">—</strong><span>領先／落後篇數</span></div></div>
   <div class="life-reading-progress"><span id="lifeReadingAnnualBar" style="width:0%"></span></div>
-  <p class="life-reading-annual-status" id="lifeReadingAnnualStatus">尚未開始記錄今年進度</p>
+  <p class="life-reading-annual-status" id="lifeReadingAnnualStatus">請先設定預訂完成時間</p>
   <p class="life-reading-annual-note muted" id="lifeReadingAnnualPace"></p>
-  <p class="life-reading-annual-note muted">年度追蹤只計入有日期、且日期在今年的完成篇數；先前已完成但沒有日期的篇數不會自動算入今年。</p>
+  <p class="life-reading-annual-note muted">進度從今年 1 月 1 日起計算；已完成篇數只計入有日期且日期在今年的紀錄，先前已完成但沒有日期的篇數不會自動算入。</p>
  </section>
  <section class="life-reading-plan" aria-labelledby="lifeReadingPlanTitle">
   <div class="life-reading-plan-head"><div><h3 id="lifeReadingPlanTitle">🧭 生命讀經目標達成計算</h3><p class="muted">選擇完成期限或每週閱讀量，估算達成 1,984 篇的時間</p></div></div>
@@ -513,7 +516,8 @@ function renderLifeReadingPlan(){
  $('lifeReadingPlanModeDate').classList.toggle('active',mode==='date');$('lifeReadingPlanModeWeekly').classList.toggle('active',mode==='weekly');
  $('lifeReadingPlanModeDate').setAttribute('aria-pressed',String(mode==='date'));$('lifeReadingPlanModeWeekly').setAttribute('aria-pressed',String(mode==='weekly'));
  $('lifeReadingPlanDateFields').hidden=mode!=='date';$('lifeReadingPlanWeeklyFields').hidden=mode!=='weekly';
- $('lifeReadingPlanDeadline').value=plan.deadline||'';$('lifeReadingPlanWeeklyTarget').value=plan.weeklyTarget||'';
+ const today=dateKey(new Date());$('lifeReadingPlanDeadline').min=today;$('lifeReadingGoalDeadline').min=today;
+ $('lifeReadingPlanDeadline').value=plan.deadline||'';$('lifeReadingGoalDeadline').value=plan.deadline||'';$('lifeReadingPlanWeeklyTarget').value=plan.weeklyTarget||'';
  calculateLifeReadingPlan(false);
 }
 function calculateLifeReadingPlan(showErrors=true){
@@ -544,19 +548,28 @@ function saveLifeReadingPlan(){
  persist();calculateLifeReadingPlan();
 }
 function renderLifeReadingAnnualStats(byDate){
- const now=new Date(),year=now.getFullYear(),start=new Date(year,0,1),nextYear=new Date(year+1,0,1),daysInYear=Math.round((nextYear-start)/86400000),dayOfYear=Math.floor((now-start)/86400000)+1;
- const yearPrefix=String(year)+'-',actual=Object.entries(byDate).reduce((sum,[date,count])=>date.startsWith(yearPrefix)?sum+count:sum,0);
- const expected=Math.round(LIFE_READING_TOTAL*dayOfYear/daysInYear),gap=actual-expected,remaining=Math.max(0,LIFE_READING_TOTAL-actual),daysAfterToday=Math.max(0,daysInYear-dayOfYear),neededPerDay=daysAfterToday>0?remaining/daysAfterToday:null,percent=Math.min(100,Math.round(actual/LIFE_READING_TOTAL*100));
- $('lifeReadingAnnualYear').textContent=String(year)+' 年';
- $('lifeReadingAnnualActual').textContent=actual.toLocaleString('zh-TW');
- $('lifeReadingAnnualExpected').textContent=expected.toLocaleString('zh-TW');
- $('lifeReadingAnnualGap').textContent=gap===0?'0':`${gap>0?'+':''}${gap.toLocaleString('zh-TW')}`;
- $('lifeReadingAnnualBar').style.width=percent+'%';
- if(actual>=LIFE_READING_TOTAL){$('lifeReadingAnnualStatus').textContent=actual===LIFE_READING_TOTAL?'🎉 已達成今年 1,984 篇目標！':`🎉 已超越年度目標 ${ (actual-LIFE_READING_TOTAL).toLocaleString('zh-TW') } 篇！`; }
- else if(gap>0){$('lifeReadingAnnualStatus').textContent=`目前領先預定進度 ${gap.toLocaleString('zh-TW')} 篇`; }
- else if(gap<0){$('lifeReadingAnnualStatus').textContent=`目前落後預定進度 ${Math.abs(gap).toLocaleString('zh-TW')} 篇`; }
- else {$('lifeReadingAnnualStatus').textContent='目前剛好跟上年度進度';}
- $('lifeReadingAnnualPace').textContent=remaining===0?'年度目標已完成。':daysAfterToday>0?`距離年底還有 ${daysAfterToday} 天，接下來平均每天約需完成 ${neededPerDay.toFixed(1)} 篇，才能達成年度目標。`:`今年最後一天，距離年度目標還差 ${remaining.toLocaleString('zh-TW')} 篇。`;
+ const now=new Date();now.setHours(0,0,0,0);const year=now.getFullYear(),start=new Date(year,0,1),yearPrefix=String(year)+'-';
+ const actual=Object.entries(byDate).reduce((sum,[date,count])=>date.startsWith(yearPrefix)?sum+count:sum,0);
+ const plan=lifeReadingPlanState(),deadlineText=String(plan.deadline||''),deadline=/^\d{4}-\d{2}-\d{2}$/.test(deadlineText)?new Date(deadlineText+'T00:00:00'):null;
+ const percent=Math.min(100,Math.round(actual/LIFE_READING_TOTAL*100));
+ $('lifeReadingAnnualActual').textContent=actual.toLocaleString('zh-TW');$('lifeReadingAnnualBar').style.width=percent+'%';
+ $('lifeReadingGoalDeadline').value=deadlineText;$('lifeReadingGoalDeadline').min=dateKey(now);
+ if(!deadline||Number.isNaN(deadline.getTime())){
+  $('lifeReadingAnnualExpected').textContent='—';$('lifeReadingAnnualGap').textContent='—';
+  $('lifeReadingAnnualStatus').textContent='請先設定預訂完成時間，系統就會幫你比較目前進度。';
+  $('lifeReadingAnnualPace').textContent='設定完成日期後，會依照今年 1 月 1 日至預訂完成日的時間，計算目前應完成篇數。';
+  return;
+ }
+ const totalDays=Math.max(1,Math.floor((deadline-start)/86400000)+1),elapsedDays=Math.max(0,Math.min(totalDays,Math.floor((now-start)/86400000)+1));
+ const expected=Math.round(LIFE_READING_TOTAL*elapsedDays/totalDays),gap=actual-expected,remaining=Math.max(0,LIFE_READING_TOTAL-actual),daysLeft=Math.max(0,Math.floor((deadline-now)/86400000)+1);
+ $('lifeReadingAnnualExpected').textContent=expected.toLocaleString('zh-TW');$('lifeReadingAnnualGap').textContent=gap===0?'0':`${gap>0?'+':''}${gap.toLocaleString('zh-TW')}`;
+ if(actual>=LIFE_READING_TOTAL){$('lifeReadingAnnualStatus').textContent=actual===LIFE_READING_TOTAL?'🎉 已完成 1,984 篇目標！':`🎉 已超越目標 ${(actual-LIFE_READING_TOTAL).toLocaleString('zh-TW')} 篇！`;}
+ else if(deadline<now){$('lifeReadingAnnualStatus').textContent=`預訂完成時間已過，距離目標還差 ${remaining.toLocaleString('zh-TW')} 篇。`;}
+ else if(gap>0){$('lifeReadingAnnualStatus').textContent=`目前領先預定進度 ${gap.toLocaleString('zh-TW')} 篇`;}
+ else if(gap<0){$('lifeReadingAnnualStatus').textContent=`目前落後預定進度 ${Math.abs(gap).toLocaleString('zh-TW')} 篇`;}
+ else {$('lifeReadingAnnualStatus').textContent='目前剛好跟上預定進度';}
+ const dateLabel=`${deadline.getFullYear()} 年 ${deadline.getMonth()+1} 月 ${deadline.getDate()} 日`;
+ $('lifeReadingAnnualPace').textContent=remaining===0?'目標已完成。':daysLeft>0?`預訂於 ${dateLabel} 完成，剩餘 ${daysLeft} 天；從今天起平均每天約需完成 ${(remaining/daysLeft).toFixed(1)} 篇。`:`預訂完成時間為 ${dateLabel}，目前尚差 ${remaining.toLocaleString('zh-TW')} 篇。`;
 }
 function renderLifeReadingDailyStats(){
  const completedAt=state.lifeReading?.completedAt||{},byDate={};
@@ -846,7 +859,7 @@ $('lifeReadingOldBooks').addEventListener('click',e=>{const toggle=e.target.clos
 $('lifeReadingNewBooks').addEventListener('click',e=>{const toggle=e.target.closest('[data-life-reading-toggle]');if(!toggle)return;const key=toggle.dataset.lifeReadingToggle;if(openLifeReadingGroups.has(key))openLifeReadingGroups.delete(key);else openLifeReadingGroups.add(key);renderLifeReading()});
 function handleLifeReadingChange(e){const input=e.target.closest('input[data-life-reading-key]');if(!input)return;const key=input.dataset.lifeReadingKey,lesson=Number(input.dataset.lifeReadingLesson),group=lifeReadingGroups.find(g=>g.key===key);if(!group||!Number.isInteger(lesson)||lesson<1||lesson>group.total)return;if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{},plan:{mode:'date',deadline:'',weeklyTarget:''}};if(!state.lifeReading.completed)state.lifeReading.completed={};if(!state.lifeReading.completedAt)state.lifeReading.completedAt={};const set=new Set(state.lifeReading.completed[key]||[]);if(input.checked){set.add(lesson);if(!state.lifeReading.completedAt[key])state.lifeReading.completedAt[key]={};state.lifeReading.completedAt[key][lesson]=dateKey(new Date())}else{set.delete(lesson);if(state.lifeReading.completedAt[key])delete state.lifeReading.completedAt[key][lesson]}state.lifeReading.completed[key]=[...set].sort((a,b)=>a-b);syncLifeReadingGoal();persist();renderLifeReading();renderGoals()}
 $('lifeReadingOldBooks').addEventListener('change',handleLifeReadingChange);$('lifeReadingNewBooks').addEventListener('change',handleLifeReadingChange);
-$('lifeReadingPlanModeDate').addEventListener('click',()=>{lifeReadingPlanState().mode='date';persist();renderLifeReadingPlan()});$('lifeReadingPlanModeWeekly').addEventListener('click',()=>{lifeReadingPlanState().mode='weekly';persist();renderLifeReadingPlan()});$('lifeReadingPlanCalculate').addEventListener('click',saveLifeReadingPlan);$('lifeReadingPlanDeadline').addEventListener('change',()=>{lifeReadingPlanState().deadline=$('lifeReadingPlanDeadline').value;persist();calculateLifeReadingPlan()});$('lifeReadingPlanWeeklyTarget').addEventListener('input',e=>{const clean=e.target.value.replace(/[^0-9]/g,'').slice(0,4);if(e.target.value!==clean)e.target.value=clean;lifeReadingPlanState().weeklyTarget=clean?Math.min(LIFE_READING_TOTAL,Number(clean)):'';calculateLifeReadingPlan()});$('lifeReadingPlanWeeklyTarget').addEventListener('change',()=>{const clean=$('lifeReadingPlanWeeklyTarget').value.replace(/[^0-9]/g,'').slice(0,4);$('lifeReadingPlanWeeklyTarget').value=clean;lifeReadingPlanState().weeklyTarget=clean?Math.min(LIFE_READING_TOTAL,Number(clean)):'';persist();calculateLifeReadingPlan()});
+$('lifeReadingPlanModeDate').addEventListener('click',()=>{lifeReadingPlanState().mode='date';persist();renderLifeReadingPlan()});$('lifeReadingPlanModeWeekly').addEventListener('click',()=>{lifeReadingPlanState().mode='weekly';persist();renderLifeReadingPlan()});$('lifeReadingPlanCalculate').addEventListener('click',saveLifeReadingPlan);$('lifeReadingPlanDeadline').addEventListener('change',()=>{lifeReadingPlanState().deadline=$('lifeReadingPlanDeadline').value;persist();renderLifeReadingDailyStats();calculateLifeReadingPlan()});$('lifeReadingGoalDeadline').addEventListener('change',()=>{lifeReadingPlanState().deadline=$('lifeReadingGoalDeadline').value;persist();$('lifeReadingPlanDeadline').value=lifeReadingPlanState().deadline;renderLifeReadingDailyStats();calculateLifeReadingPlan()});$('lifeReadingPlanWeeklyTarget').addEventListener('input',e=>{const clean=e.target.value.replace(/[^0-9]/g,'').slice(0,4);if(e.target.value!==clean)e.target.value=clean;lifeReadingPlanState().weeklyTarget=clean?Math.min(LIFE_READING_TOTAL,Number(clean)):'';calculateLifeReadingPlan()});$('lifeReadingPlanWeeklyTarget').addEventListener('change',()=>{const clean=$('lifeReadingPlanWeeklyTarget').value.replace(/[^0-9]/g,'').slice(0,4);$('lifeReadingPlanWeeklyTarget').value=clean;lifeReadingPlanState().weeklyTarget=clean?Math.min(LIFE_READING_TOTAL,Number(clean)):'';persist();calculateLifeReadingPlan()});
 $('menuLifeReading').addEventListener('click',()=>{document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-life-reading');document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false')});$('mainNavTabs').hidden=true;$('pageEditToolbar').hidden=true;closeMenu();renderLifeReading();window.scrollTo({top:0,behavior:'smooth'})});
 $('schedulePrev').addEventListener('click',()=>{scheduleWeekStart.setDate(scheduleWeekStart.getDate()-7);scheduleSelectedDate=dateKey(scheduleWeekStart);renderSchedule()});
 $('scheduleNext').addEventListener('click',()=>{scheduleWeekStart.setDate(scheduleWeekStart.getDate()+7);scheduleSelectedDate=dateKey(scheduleWeekStart);renderSchedule()});
