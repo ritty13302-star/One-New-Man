@@ -308,6 +308,45 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 @media(max-width:620px){.schedule-delete-modal{align-items:flex-end;padding:0}.schedule-delete-dialog{width:100%;border-radius:24px 24px 0 0;padding-bottom:env(safe-area-inset-bottom)}.schedule-delete-title{font-size:17px;padding:22px 16px}.schedule-delete-option,.schedule-delete-cancel{font-size:17px;padding:19px 12px}}
 
 </style>
+
+<style id="schedule-independent-columns-fix">
+/* 每個行程直接使用獨立的計劃／結果儲存格，表格中線即為唯一分隔線 */
+.schedule-agenda-table{width:100%!important;table-layout:fixed!important;border-collapse:collapse!important;border-spacing:0!important}
+.schedule-agenda-table .schedule-time-head,
+.schedule-agenda-table tbody th{width:62px!important;box-sizing:border-box!important;text-align:left!important;white-space:nowrap!important}
+.schedule-agenda-table .schedule-plan-head,
+.schedule-agenda-table .schedule-result-head{width:auto!important;box-sizing:border-box!important;text-align:center!important}
+.schedule-agenda-table .schedule-plan-head{border-right:2px solid var(--line)!important}
+.schedule-agenda-table .schedule-result-head{border-left:0!important}
+.schedule-agenda-table td.schedule-plan-cell,
+.schedule-agenda-table td.schedule-result-cell{width:calc((100% - 62px)/2)!important;box-sizing:border-box!important;padding:0!important;vertical-align:stretch!important;border:0!important;border-bottom:1px solid var(--line)!important;overflow:hidden!important}
+.schedule-agenda-table td.schedule-plan-cell{border-right:2px solid var(--line)!important}
+.schedule-agenda-table td.schedule-result-cell{border-left:0!important}
+.schedule-plan-fill,.schedule-result-fill{box-sizing:border-box!important;display:flex!important;width:100%!important;height:100%!important;min-width:0!important;min-height:100%!important;align-items:center!important;justify-content:center!important;gap:8px!important;padding:8px 7px!important;overflow:hidden!important;border-radius:0!important}
+.schedule-plan-fill{flex-direction:column!important;text-align:center!important;background:color-mix(in srgb,var(--event-color) 60%,transparent)!important;cursor:pointer!important;pointer-events:auto!important}
+.schedule-plan-fill strong{display:block!important;max-width:100%!important;min-width:0!important;font-size:13px!important;line-height:1.35!important;overflow-wrap:anywhere!important}
+.schedule-plan-fill small{display:block!important;max-width:100%!important;font-size:10px!important;line-height:1.3!important;color:var(--muted)!important;overflow-wrap:anywhere!important}
+.schedule-result-fill{flex-direction:row!important;justify-content:flex-start!important;background:color-mix(in srgb,var(--event-color) 30%,transparent)!important;pointer-events:auto!important}
+.schedule-result-check{display:flex!important;flex:0 0 22px!important;width:22px!important;min-width:22px!important;align-items:center!important;justify-content:center!important;margin:0!important;padding:0!important;cursor:pointer!important;pointer-events:auto!important}
+.schedule-result-check input{display:block!important;width:19px!important;height:19px!important;min-width:19px!important;margin:0!important;accent-color:var(--green)!important;cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important}
+.schedule-result-text{display:block!important;flex:1 1 auto!important;width:1%!important;min-width:0!important;max-width:100%!important;min-height:36px!important;box-sizing:border-box!important;margin:0!important;padding:6px 7px!important;border:1px solid color-mix(in srgb,var(--event-color) 55%,#667)!important;border-radius:7px!important;background:#ffffffd9!important;color:var(--ink)!important;font:inherit!important;font-size:12px!important;line-height:1.35!important;pointer-events:auto!important;user-select:text!important;-webkit-user-select:text!important;-webkit-appearance:none!important;touch-action:manipulation!important}
+.schedule-result-text:focus{outline:2px solid var(--green)!important;outline-offset:1px!important;background:#fff!important}
+.schedule-agenda-table .schedule-add-cell{width:auto!important;padding:0!important;text-align:center!important;vertical-align:middle!important;border-right:2px solid var(--line)!important}
+.schedule-agenda-table .schedule-empty-cell{width:auto!important;padding:0!important;border-left:0!important;background:transparent!important}
+.schedule-agenda-table .schedule-event{pointer-events:auto!important}
+.schedule-agenda-table .schedule-result-cell *{pointer-events:auto!important}
+@media(max-width:620px){
+ .schedule-agenda-table .schedule-time-head,.schedule-agenda-table tbody th{width:52px!important;font-size:10px!important;padding-right:5px!important}
+ .schedule-agenda-table td.schedule-plan-cell,.schedule-agenda-table td.schedule-result-cell{width:calc((100% - 52px)/2)!important}
+ .schedule-plan-fill,.schedule-result-fill{padding:6px 4px!important;gap:4px!important}
+ .schedule-plan-fill strong{font-size:12px!important}
+ .schedule-plan-fill small{font-size:9px!important}
+ .schedule-result-check{flex-basis:18px!important;width:18px!important;min-width:18px!important}
+ .schedule-result-check input{width:18px!important;height:18px!important;min-width:18px!important}
+ .schedule-result-text{min-height:34px!important;padding:5px 4px!important;font-size:11px!important}
+}
+</style>
+
 </head>
 <body>
 <div class="wrap">
@@ -889,7 +928,7 @@ function renderSchedule(){
  const selected=parseDateKey(scheduleSelectedDate),dayData=scheduleDayData(scheduleSelectedDate);$('scheduleDayHeading').textContent=`${['週日','週一','週二','週三','週四','週五','週六'][selected.getDay()]} ${selected.getMonth()+1}/${selected.getDate()} 的安排`;
  const notes=dayData.notes;$('scheduleNoteCount').textContent=`${notes.filter(n=>n.done).length}/${notes.length}`;$('scheduleNotesToggle').textContent=scheduleNotesExpanded?'收起':'展開';$('scheduleNoteForm').hidden=!scheduleNotesExpanded;$('scheduleNotes').hidden=!scheduleNotesExpanded;
  $('scheduleNotes').innerHTML=notes.length?notes.map(n=>`<div class="schedule-note ${n.done?'done':''}"><input type="checkbox" data-schedule-note-done="${n.id}" ${n.done?'checked':''}><span>${esc(n.text)}</span><button type="button" class="mini" data-schedule-note-delete="${n.id}" aria-label="刪除事項">×</button></div>`).join(''):'<div class="schedule-note-empty">當天尚無臨時事項</div>';
- const visibleStart=5*60+30,visibleEnd=23*60+30,slotCount=(visibleEnd-visibleStart)/30,events=scheduleEventsForDate(scheduleSelectedDate),slots=Array.from({length:slotCount},(_,i)=>i),timed=events.map(e=>{const [sh,sm]=e.start.split(':').map(Number),[eh,em]=e.end.split(':').map(Number),eventStart=sh*60+sm,eventEnd=eh*60+em;if(eventEnd<=visibleStart||eventStart>=visibleEnd)return null;return {...e,_from:Math.max(0,Math.min(slotCount-1,Math.floor((eventStart-visibleStart)/30))),_to:Math.max(1,Math.min(slotCount,Math.ceil((eventEnd-visibleStart)/30)))}}).filter(Boolean).sort((a,b)=>a._from-b._from||a._to-b._to);let laneEnds=[];timed.forEach(ev=>{let lane=laneEnds.findIndex(end=>end<=ev._from);if(lane<0){lane=laneEnds.length;laneEnds.push(0)}laneEnds[lane]=ev._to;ev._lane=lane});const startsBySlot={};timed.forEach(ev=>(startsBySlot[ev._from]??=[]).push(ev));const rows=slots.map(i=>{const mins=visibleStart+i*30,t=`${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`,cells=[];for(let lane=0;lane<Math.max(1,laneEnds.length);lane++){const ev=(startsBySlot[i]||[]).find(x=>x._lane===lane);if(ev){const c=scheduleCategory(ev.category),span=Math.max(1,ev._to-ev._from);cells.push(`<td class="schedule-span-cell" colspan="2" rowspan="${span}"><article class="schedule-event ${ev.done?'is-done':''}" style="--event-color:${c.color}" data-schedule-open="${ev.id}" data-origin="${ev._origin}" data-event-date="${scheduleSelectedDate}" tabindex="0" role="button" aria-label="開啟並編輯 ${esc(ev.plan||'未命名安排')}"><div class="schedule-event-main"><div class="schedule-plan-column"><strong class="schedule-event-plan">${esc(ev.plan||'未命名安排')}</strong><span class="schedule-event-category">${ev.start}–${ev.end} · ${esc(ev.category||'其他')}${ev.repeat&&ev.repeat!=='none'?' · 重複':''}</span></div><div class="schedule-result-column"><div class="schedule-result-row"><label class="schedule-result-check" aria-label="完成勾選"><input type="checkbox" data-schedule-entry-done="${ev.id}" data-origin="${ev._origin}" data-occurrence-date="${scheduleSelectedDate}" ${ev.done?'checked':''}></label><input class="schedule-result-text" type="text" maxlength="500" value="${esc(ev.result||'')}" placeholder="最後實際做了什麼" data-schedule-entry-result="${ev.id}" data-origin="${ev._origin}" data-occurrence-date="${scheduleSelectedDate}" aria-label="結果紀錄"></div></div></div></article></td>`)}else if(!timed.some(x=>x._lane===lane&&x._from<i&&x._to>i)){cells.push(`<td class="schedule-add-cell"><button class="schedule-add" type="button" data-schedule-add="${t}" aria-label="新增 ${t} 安排">＋</button></td><td class="schedule-empty-cell"></td>`)}}return `<tr><th scope="row">${t}</th>${cells.join('')}</tr>`}).join('');const laneHeaders=Array.from({length:Math.max(1,laneEnds.length)},()=>'<th scope="col" class="schedule-plan-head">計劃</th><th scope="col" class="schedule-result-head">結果</th>').join('');$('scheduleAgenda').innerHTML=`<table class="schedule-agenda-table"><thead><tr><th scope="col" class="schedule-time-head">時間</th>${laneHeaders}</tr></thead><tbody>${rows}</tbody></table>`;
+ const visibleStart=5*60+30,visibleEnd=23*60+30,slotCount=(visibleEnd-visibleStart)/30,events=scheduleEventsForDate(scheduleSelectedDate),slots=Array.from({length:slotCount},(_,i)=>i),timed=events.map(e=>{const [sh,sm]=e.start.split(':').map(Number),[eh,em]=e.end.split(':').map(Number),eventStart=sh*60+sm,eventEnd=eh*60+em;if(eventEnd<=visibleStart||eventStart>=visibleEnd)return null;return {...e,_from:Math.max(0,Math.min(slotCount-1,Math.floor((eventStart-visibleStart)/30))),_to:Math.max(1,Math.min(slotCount,Math.ceil((eventEnd-visibleStart)/30)))}}).filter(Boolean).sort((a,b)=>a._from-b._from||a._to-b._to);let laneEnds=[];timed.forEach(ev=>{let lane=laneEnds.findIndex(end=>end<=ev._from);if(lane<0){lane=laneEnds.length;laneEnds.push(0)}laneEnds[lane]=ev._to;ev._lane=lane});const startsBySlot={};timed.forEach(ev=>(startsBySlot[ev._from]??=[]).push(ev));const rows=slots.map(i=>{const mins=visibleStart+i*30,t=`${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`,cells=[];for(let lane=0;lane<Math.max(1,laneEnds.length);lane++){const ev=(startsBySlot[i]||[]).find(x=>x._lane===lane);if(ev){const c=scheduleCategory(ev.category),span=Math.max(1,ev._to-ev._from);cells.push(`<td class="schedule-plan-cell" rowspan="${span}"><div class="schedule-plan-fill" style="--event-color:${c.color}" data-schedule-open="${ev.id}" data-origin="${ev._origin}" data-event-date="${scheduleSelectedDate}" tabindex="0" role="button" aria-label="開啟並編輯 ${esc(ev.plan||'未命名安排')}"><strong>${esc(ev.plan||'未命名安排')}</strong><small>${ev.start}–${ev.end} · ${esc(ev.category||'其他')}${ev.repeat&&ev.repeat!=='none'?' · 重複':''}</small></div></td><td class="schedule-result-cell" rowspan="${span}"><div class="schedule-result-fill" style="--event-color:${c.color}"><label class="schedule-result-check" aria-label="完成勾選"><input type="checkbox" data-schedule-entry-done="${ev.id}" data-origin="${ev._origin}" data-occurrence-date="${scheduleSelectedDate}" ${ev.done?'checked':''}></label><input class="schedule-result-text" type="text" maxlength="500" value="${esc(ev.result||'')}" placeholder="最後實際做了什麼" data-schedule-entry-result="${ev.id}" data-origin="${ev._origin}" data-occurrence-date="${scheduleSelectedDate}" aria-label="結果紀錄"></div></td>`)}else if(!timed.some(x=>x._lane===lane&&x._from<i&&x._to>i)){cells.push(`<td class="schedule-add-cell"><button class="schedule-add" type="button" data-schedule-add="${t}" aria-label="新增 ${t} 安排">＋</button></td><td class="schedule-empty-cell"></td>`)}}return `<tr><th scope="row">${t}</th>${cells.join('')}</tr>`}).join('');const laneHeaders=Array.from({length:Math.max(1,laneEnds.length)},()=>'<th scope="col" class="schedule-plan-head">計劃</th><th scope="col" class="schedule-result-head">結果</th>').join('');$('scheduleAgenda').innerHTML=`<table class="schedule-agenda-table"><thead><tr><th scope="col" class="schedule-time-head">時間</th>${laneHeaders}</tr></thead><tbody>${rows}</tbody></table>`;
  $('scheduleDayView').hidden=scheduleOverviewMode;$('scheduleWeekView').hidden=!scheduleOverviewMode;$('scheduleOverviewBtn').setAttribute('aria-pressed',String(scheduleOverviewMode));$('scheduleOverviewBtn').textContent=scheduleOverviewMode?'每日檢視':'整週總覽';
  const weekVisibleStart=5*60+30,weekVisibleEnd=23*60+30,weekSlotCount=(weekVisibleEnd-weekVisibleStart)/30;
  const weekTimeLabels=Array.from({length:weekSlotCount+1},(_,i)=>{const m=weekVisibleStart+i*30;return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`});
@@ -1233,79 +1272,3 @@ const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);s
 </style>
 </body>
 </html>
-
-<style>
-/* 時間表計劃與結果固定雙欄 */
-.schedule-event-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"plan result" "meta result";align-items:center;gap:4px 10px}
-.schedule-event-plan{grid-area:plan;min-width:0}
-.schedule-event-category{grid-area:meta}
-.schedule-result-row{grid-area:result;display:grid;grid-template-columns:20px minmax(0,1fr);align-items:center;gap:6px;min-width:0;margin:0}
-.schedule-result-check{display:flex;align-items:center;justify-content:center;margin:0}
-.schedule-agenda-table .schedule-add-cell{background:transparent!important;text-align:center!important;vertical-align:middle!important;padding:0!important}
-.schedule-agenda-table .schedule-add{display:flex;align-items:center;justify-content:center;margin:0 auto;background:transparent!important;background-color:transparent!important;border:0!important;box-shadow:none!important;color:var(--green);padding:0;width:28px;height:28px;min-height:28px;line-height:1}
-.schedule-agenda-table .schedule-add:active,.schedule-agenda-table .schedule-add:hover{background:transparent!important}
-#scheduleRepeatEndFields{margin-top:8px}
-#scheduleRepeatEndDateWrap{margin-top:8px}
-@media(max-width:620px){.schedule-event-main{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 6px}.schedule-result-row{grid-template-columns:17px minmax(0,1fr);gap:4px}.schedule-result-text{font-size:11px!important;padding:5px 4px!important}}
-</style>
-
-<style>.schedule-plan-column,.schedule-result-column{display:flex;flex-direction:column;gap:3px;min-width:0background:color-mix(in srgb,var(--event-color) 70%,#fff);overflow:hidden;}.schedule-column-label{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.04em}.schedule-result-column{height:100%;justify-content:flex-startbackground:color-mix(in srgb,var(--event-color) 70%,#fff);overflow:hidden;}.schedule-event-main{grid-template-areas:"plan result";grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.schedule-plan-column{grid-area:planbackground:color-mix(in srgb,var(--event-color) 90%,#fff);}.schedule-result-column{grid-area:resultbackground:color-mix(in srgb,var(--event-color) 70%,#fff);overflow:hidden;}.schedule-event-category{grid-area:auto}</style>
-
-<style>
-/* 時間表欄位標題與計劃／結果明確分隔 */
-.schedule-agenda-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0}
-.schedule-agenda-table thead th{position:sticky;top:0;z-index:2;padding:9px 7px;background:var(--card);color:var(--ink);font-size:12px;font-weight:800;text-align:center;border-bottom:2px solid var(--line)}
-.schedule-agenda-table .schedule-time-head,.schedule-agenda-table tbody th{width:62px;text-align:left;color:var(--muted);font-size:11px}
-.schedule-agenda-table .schedule-plan-head{border-right:1px solid var(--line)}
-.schedule-agenda-table .schedule-result-head{border-left:1px solid var(--line)}
-.schedule-agenda-table .schedule-span-cell{padding:4px 0;border:0;vertical-align:stretch}
-.schedule-event{pointer-events:none;height:100%;min-height:100%;border-radius:9px;overflow:hidden}
-.schedule-event-main{height:100%;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"plan result";gap:0;align-items:stretch}
-.schedule-plan-column{grid-area:plan;justify-content:center;align-items:center;text-align:center;padding:9px 8px;border-right:1px solid color-mix(in srgb,var(--event-color) 65%,#777)background:color-mix(in srgb,var(--event-color) 90%,#fff);}
-.schedule-result-column{grid-area:result;justify-content:center;padding:9px 8px;border-left:1px solid color-mix(in srgb,var(--event-color) 65%,#777)background:color-mix(in srgb,var(--event-color) 70%,#fff);overflow:hidden;}
-.schedule-event-category{font-size:10px}
-.schedule-agenda-table .schedule-add-cell{width:auto;min-width:0;padding:0!important;text-align:center!important;vertical-align:middle!important;background:transparent!important;border-right:1px solid var(--line)}
-.schedule-agenda-table .schedule-add{display:flex;align-items:center;justify-content:center;margin:0 auto;width:100%;height:100%;min-height:44px;padding:0;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;color:var(--green);font-size:22px;line-height:1}
-.schedule-agenda-table .schedule-empty-cell{border-left:1px solid var(--line);background:transparent}
-@media(max-width:620px){.schedule-agenda-table .schedule-time-head,.schedule-agenda-table tbody th{width:54px}.schedule-plan-column,.schedule-result-column{padding:7px 5pxbackground:color-mix(in srgb,var(--event-color) 70%,#fff);overflow:hidden;}.schedule-event-plan{font-size:12px}.schedule-event-category{font-size:9px}}
-</style>
-
-<style>
-/* 計劃使用分類色 90% 不透明，結果使用同色 70% 不透明；兩欄嚴格各佔一半 */
-.schedule-event{pointer-events:none;overflow:hidden!important;min-width:0!important;border:0!important;border-radius:9px!important;padding:0!important;background:transparent!important;box-shadow:none!important}
-.schedule-event-main{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-areas:"plan result"!important;gap:0!important;width:100%!important;min-width:0!important;overflow:hidden!important}
-.schedule-plan-column,.schedule-result-column{box-sizing:border-box!important;min-width:0!important;width:100%!important;max-width:100%!important;overflow:hidden!important;padding:9px 7px!importantbackground:color-mix(in srgb,var(--event-color) 70%,#fff);overflow:hidden;}
-.schedule-plan-column{background:color-mix(in srgb,var(--event-color) 90%,transparent)!important;border:0!important;border-right:1px solid color-mix(in srgb,#222 25%,transparent)!important;border-radius:8px 0 0 8px!importantbackground:color-mix(in srgb,var(--event-color) 90%,#fff);}
-.schedule-result-column{background:color-mix(in srgb,var(--event-color) 70%,transparent)!important;border:0!important;border-radius:0 8px 8px 0!importantbackground:color-mix(in srgb,var(--event-color) 70%,#fff);overflow:hidden;}
-.schedule-result-row{display:grid!important;grid-template-columns:18px minmax(0,1fr)!important;gap:4px!important;min-width:0!important;width:100%!important;max-width:100%!important;overflow:hidden!important}
-.schedule-result-text{box-sizing:border-box!important;display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;overflow:hidden!important}
-.schedule-week-overview-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;min-width:0}
-.schedule-week-day{min-width:0;max-width:100%;padding:9px 6px;border:1px solid var(--line);border-radius:10px;background:var(--card);overflow:hidden}
-.schedule-week-day header{min-height:48px;align-items:center;gap:3px}
-.schedule-week-day header strong{font-size:12px;line-height:1.4}
-.schedule-week-day header .schedule-add{flex:0 0 26px;width:26px;height:28px;min-height:28px}
-.schedule-week-day-list{display:grid;gap:6px;min-width:0}
-.schedule-week-event{display:flex;flex-direction:column;align-items:flex-start;gap:3px;box-sizing:border-box;width:100%;min-width:0;max-width:100%;margin:0;padding:7px 6px;overflow:hidden;white-space:normal;overflow-wrap:anywhere;border-left:3px solid var(--event-color);background:color-mix(in srgb,var(--event-color) 16%,white);text-align:left}
-.schedule-week-event b,.schedule-week-event span,.schedule-week-event small{display:block;max-width:100%;min-width:0;margin:0;overflow-wrap:anywhere}
-.schedule-week-event b{font-size:10px}.schedule-week-event span{font-size:11px}.schedule-week-event small{font-size:9px}
-@media(max-width:760px){#scheduleWeekOverview{overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;padding-bottom:6px}.schedule-week-overview-grid{grid-template-columns:repeat(7,minmax(150px,1fr));width:max-content;min-width:100%}.schedule-week-day{width:150px}}
-</style>
-
-<script>
-document.addEventListener('click',e=>{
- const ctrl=e.target.closest('input,textarea,label,.schedule-result-column');
- if(ctrl){e.stopPropagation();}
-});
-document.addEventListener('pointerdown',e=>{
- const ctrl=e.target.closest('input,textarea,label,.schedule-result-column');
- if(ctrl){e.stopPropagation();}
-});
-document.addEventListener('focusin',e=>{
- const c=e.target.closest('.schedule-result-column');
- if(c){c.style.pointerEvents='auto';}
-});
-document.addEventListener('DOMContentLoaded',()=>{
- document.querySelectorAll('.schedule-result-column,.schedule-result-column *,.schedule-plan-column').forEach(el=>el.style.pointerEvents='auto');
- document.querySelectorAll('.schedule-event').forEach(el=>el.style.pointerEvents='auto');
-});
-</script>
