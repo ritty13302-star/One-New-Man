@@ -69,7 +69,12 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 <section><div class="sectionhead"><h2>我的年度目標</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn secondary edit-toggle" type="button" data-edit-page="target" aria-pressed="false">編輯</button><button class="btn" id="addBtn">＋ 新增目標</button></div></div><div class="goal-list" id="goalList"></div></section>
 <section class="two"><div class="panel week"><h2>🗓️ 本週回顧</h2><p class="muted" style="margin-bottom:10px">這週做了什麼？下週想往哪裡前進？</p><label for="weekNote">本週記錄</label><textarea id="weekNote" placeholder="例如：完成兩次讀書進度、關心一位朋友……"></textarea><label for="nextWeek">下週想做的事</label><textarea id="nextWeek" style="min-height:85px" placeholder="寫下下一步的小行動"></textarea><button class="btn" id="saveWeek">儲存本週紀錄</button><div id="savedMsg" class="notice" aria-live="polite"></div></div></section>
 <div class="footer">已透過 Firebase 雲端同步。請使用同一個 Google 帳號在不同裝置登入。</div></section>
-<section id="page-service" class="page-panel subpage" role="tabpanel" hidden><div class="panel"><div class="sectionhead"><h2>🤝 事奉</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn secondary edit-toggle" type="button" data-edit-page="service" aria-pressed="false">編輯</button><button class="btn" type="button" data-add-record="service">＋ 新增紀錄</button></div></div><p class="subpage-intro">記錄服事安排、配搭、代禱事項或事奉中的交通。</p><form class="record-form" id="form-service" hidden><input name="title" maxlength="120" placeholder="紀錄標題，例如：福音行動安排" required><textarea name="body" maxlength="5000" placeholder="補充內容、日期、負責人或代禱事項（選填）"></textarea><div class="dialog-actions"><button class="btn secondary" type="button" data-cancel-record="service">取消</button><button class="btn" type="submit">儲存紀錄</button></div></form><div class="record-list" id="records-service"></div></div></section>
+<section id="page-service" class="page-panel subpage" role="tabpanel" hidden><div class="panel"><div class="sectionhead"><h2>🤝 事奉</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn secondary edit-toggle" type="button" data-edit-page="service" aria-pressed="false">編輯</button><button class="btn" type="button" data-add-record="service">＋ 新增紀錄</button></div></div><p class="subpage-intro">記錄服事安排、配搭、代禱事項或事奉中的交通。</p><form class="record-form" id="form-service" hidden><input name="title" maxlength="120" placeholder="紀錄標題，例如：福音行動安排" required><textarea name="body" maxlength="5000" placeholder="補充內容、日期、負責人或代禱事項（選填）"></textarea><div class="dialog-actions"><button class="btn secondary" type="button" data-cancel-record="service">取消</button><button class="btn" type="submit">儲存紀錄</button></div></form><div class="shepherd-panel baptized-panel" style="margin-top:18px;padding:0;background:transparent;border:0">
+<div class="shepherd-heading"><strong>🌱 受浸姊妹名單</strong><button class="btn secondary" type="button" data-add-baptized>＋ 新增受浸人位</button></div>
+<p class="muted shepherd-hint">點擊姓名展開個人資料，可以修改資料或刪除紀錄。</p>
+<div class="shepherd-list" id="baptizedList"></div>
+</div>
+<div class="record-list" id="records-service"></div></div></section>
 <section id="page-church" class="page-panel subpage" role="tabpanel" hidden><div class="panel"><div class="sectionhead"><h2>🌿 召會</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn secondary edit-toggle" type="button" data-edit-page="church" aria-pressed="false">編輯</button><button class="btn" type="button" data-add-record="church">＋ 新增紀錄</button></div></div><p class="subpage-intro">整理召會生活、聚會、交通、行程與需要關心的事項。</p><form class="record-form" id="form-church" hidden><input name="title" maxlength="120" placeholder="紀錄標題，例如：小排聚會" required><textarea name="body" maxlength="5000" placeholder="補充內容、日期或相關事項（選填）"></textarea><div class="dialog-actions"><button class="btn secondary" type="button" data-cancel-record="church">取消</button><button class="btn" type="submit">儲存紀錄</button></div></form><div class="record-list" id="records-church"></div></div></section>
 <section id="page-truth" class="page-panel subpage" role="tabpanel" hidden>
 <div class="panel" style="margin-bottom:16px"><div class="sectionhead"><h2>📚 書報閱讀紀錄</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn secondary edit-toggle" type="button" data-edit-page="books" aria-pressed="false">編輯</button><button class="btn" id="addBookBtn">＋ 新增書報</button></div></div><p class="subpage-intro">獨立記錄書報名稱、總章數、已讀進度與完成狀態。</p><div class="muted" id="bookProgress" style="margin-bottom:8px">已完成 0 本</div><div id="books"></div><p class="notice">勾選「完成」後，會自動計入「讀完十本書報」的目標進度。</p></div>
@@ -169,6 +174,22 @@ function syncBaptismGoal(){
     );
   }
 }
+function renderBaptizedList(){
+ const el=$('baptizedList');if(!el)return;
+ el.innerHTML=state.baptizedPeople.length?state.baptizedPeople.map(p=>`
+ <article class="shepherd-card">
+  <button class="shepherd-toggle" type="button" data-baptized-toggle="${p.id}" aria-expanded="${!!p.expanded}">
+   <span class="shepherd-avatar">🌿</span><span class="shepherd-person"><strong>${esc(p.name||'新受浸姊妹')}</strong><span class="shepherd-summary">${esc(p.department||'尚未填寫系級')}${p.date?' · '+esc(p.date):''}</span></span><span class="shepherd-chevron">${p.expanded?'▲':'▼'}</span>
+  </button>
+  <div class="shepherd-details" ${p.expanded?'':'hidden'}>
+   <label>姓名<input type="text" data-baptized-field="name" data-id="${p.id}" value="${esc(p.name)}" placeholder="輸入姓名"></label>
+   <label>受浸日期<input type="date" data-baptized-field="date" data-id="${p.id}" value="${esc(p.date)}"></label>
+   <label>系級<input type="text" data-baptized-field="department" data-id="${p.id}" value="${esc(p.department)}" placeholder="例如：資工系二年級"></label>
+   <label>牧養人<input type="text" data-baptized-field="shepherd" data-id="${p.id}" value="${esc(p.shepherd)}" placeholder="輸入牧養人姓名"></label>
+   <div class="shepherd-actions"><button class="btn secondary" type="button" data-delete-baptized="${p.id}">🗑 刪除紀錄</button></div>
+  </div>
+ </article>`).join(''):'<div class="empty">目前還沒有受浸紀錄，按「新增受浸人位」開始記錄。</div>';
+}
 function renderGoals(){
  syncBaptismGoal();
  const el=$('goalList');
@@ -206,99 +227,10 @@ function renderGoals(){
    </div>`:'';
   const isBaptismGoal=g.name.trim()==='帶 30 位北科大女同學信而受浸得救成為姊妹';
 
-const baptizedSection=isBaptismGoal?`
-<div class="shepherd-panel baptized-panel">
-  <div class="shepherd-heading">
-    <div>
-      <strong>🌱 受浸姊妹名單</strong>
-    </div>
-    <button class="btn secondary" type="button" data-add-baptized>
-      ＋ 新增受浸人位
-    </button>
-  </div>
-
-  <p class="muted shepherd-hint">
-    點擊姓名展開個人資料，可以修改資料或刪除紀錄。
-  </p>
-
-  <div class="shepherd-list">
-  ${state.baptizedPeople.length
-    ?state.baptizedPeople.map(p=>`
-      <article class="shepherd-card">
-
-        <button class="shepherd-toggle"
-          type="button"
-          data-baptized-toggle="${p.id}"
-          aria-expanded="${!!p.expanded}">
-
-          <span class="shepherd-avatar">🌿</span>
-
-          <span class="shepherd-person">
-            <strong>${esc(p.name||'新受浸姊妹')}</strong>
-            <span class="shepherd-summary">
-              ${esc(p.department||'尚未填寫系級')}
-              ${p.date?' · '+esc(p.date):''}
-            </span>
-          </span>
-
-          <span class="shepherd-chevron">
-            ${p.expanded?'▲':'▼'}
-          </span>
-        </button>
-
-        <div class="shepherd-details" ${p.expanded?'':'hidden'}>
-
-          <label>姓名
-            <input type="text"
-              data-baptized-field="name"
-              data-id="${p.id}"
-              value="${esc(p.name)}"
-              placeholder="輸入姓名">
-          </label>
-
-          <label>受浸日期
-            <input type="date"
-              data-baptized-field="date"
-              data-id="${p.id}"
-              value="${esc(p.date)}">
-          </label>
-
-          <label>系級
-            <input type="text"
-              data-baptized-field="department"
-              data-id="${p.id}"
-              value="${esc(p.department)}"
-              placeholder="例如：資工系二年級">
-          </label>
-
-          <label>牧養人
-            <input type="text"
-              data-baptized-field="shepherd"
-              data-id="${p.id}"
-              value="${esc(p.shepherd)}"
-              placeholder="輸入牧養人姓名">
-          </label>
-
-          <div class="shepherd-actions">
-            <button class="btn secondary"
-              type="button"
-              data-delete-baptized="${p.id}">
-              🗑 刪除紀錄
-            </button>
-          </div>
-
-        </div>
-      </article>
-    `).join('')
-    :'<div class="empty">目前還沒有受浸紀錄，按「新增受浸人位」開始記錄。</div>'
-  }
-  </div>
-</div>
-`: '';
   const isBookGoal=g.name.trim()==='讀完十本書報';
   const goalMeta=isBookGoal?`已完成 ${Math.min(g.current,10)} / 10 本`:isBaptismGoal?`<span class="baptism-progress-inline"><span class="baptism-progress-label">目前受浸人數</span><span class="baptism-progress-number"><strong>${state.baptizedPeople.length}</strong><small> / 30</small></span></span>`:`${esc(g.category)} · ${g.current>=g.target?'已達成':`進度 ${g.current} / ${g.target}`}`;
   const goalActions=`${(isBookGoal||isShepherdGoal||isBaptismGoal)?'':`<button class="mini" data-act="minus" data-id="${g.id}" aria-label="減少進度">−</button><button class="mini" data-act="plus" data-id="${g.id}" aria-label="增加進度">＋1</button>`}`;
-  return `<article class="goal ${editModes.target?'edit-mode':''}"><div class="move-controls"><button class="move-btn" type="button" data-move="goal" data-index="${state.goals.findIndex(x=>x.id===g.id)}" data-dir="-1" ${state.goals.findIndex(x=>x.id===g.id)===0?'disabled':''} aria-label="目標往前移">↑</button><button class="move-btn" type="button" data-move="goal" data-index="${state.goals.findIndex(x=>x.id===g.id)}" data-dir="1" ${state.goals.findIndex(x=>x.id===g.id)===state.goals.length-1?'disabled':''} aria-label="目標往後移">↓</button></div><button class="delete-x" type="button" data-act="delete" data-id="${g.id}" aria-label="刪除目標" title="刪除">×</button><div class="goal-top"><div class="goal-icon">${g.category==='閱讀'?'📚':g.category==='服事'?'🤝':g.category==='健康'?'🌿':g.category==='學習'?'✍️':'🎯'}</div><div class="goal-main"><div class="goal-title">${esc(g.name)}</div><div class="goal-meta">${goalMeta}</div></div><div class="goal-actions">${goalActions}</div></div><div class="goalbar ${isBaptismGoal?'baptism-goalbar':''}"><span style="width:${pct(g)}%"></span></div>${shepherdSection}${baptizedSection}</article>`;
+  return `<article class="goal ${editModes.target?'edit-mode':''}"><div class="move-controls"><button class="move-btn" type="button" data-move="goal" data-index="${state.goals.findIndex(x=>x.id===g.id)}" data-dir="-1" ${state.goals.findIndex(x=>x.id===g.id)===0?'disabled':''} aria-label="目標往前移">↑</button><button class="move-btn" type="button" data-move="goal" data-index="${state.goals.findIndex(x=>x.id===g.id)}" data-dir="1" ${state.goals.findIndex(x=>x.id===g.id)===state.goals.length-1?'disabled':''} aria-label="目標往後移">↓</button></div><button class="delete-x" type="button" data-act="delete" data-id="${g.id}" aria-label="刪除目標" title="刪除">×</button><div class="goal-top"><div class="goal-icon">${g.category==='閱讀'?'📚':g.category==='服事'?'🤝':g.category==='健康'?'🌿':g.category==='學習'?'✍️':'🎯'}</div><div class="goal-main"><div class="goal-title">${esc(g.name)}</div><div class="goal-meta">${goalMeta}</div></div><div class="goal-actions">${goalActions}</div></div><div class="goalbar ${isBaptismGoal?'baptism-goalbar':''}"><span style="width:${pct(g)}%"></span></div>${shepherdSection}</article>`;
  }).join('');
  const total=state.goals.length?Math.round(state.goals.reduce((s,g)=>s+pct(g),0)/state.goals.length):0;
  $('totalText').textContent=total+'%';$('totalBar').style.width=total+'%';$('activeCount').textContent=state.goals.filter(g=>g.current<g.target).length;$('doneCount').textContent=state.goals.filter(g=>g.current>=g.target).length;
@@ -314,7 +246,7 @@ function renderBooks(){
  const n=state.books.filter(b=>b.done).length;$('bookCount').textContent=n+'/'+state.books.length;$('bookProgress').textContent=`已完成 ${n} 本，共 ${state.books.length} 本`;
 }
 function renderTabRecords(key){const el=$('records-'+key),records=(state.tabRecords&&state.tabRecords[key])||[];if(!records.length){el.innerHTML='<div class="empty">目前還沒有紀錄，按「新增紀錄」開始整理。</div>';return}el.innerHTML=records.map((r,i)=>`<article class="record-card ${editModes[key]?'edit-mode':''}"><div class="move-controls"><button class="move-btn" type="button" data-move="record" data-key="${key}" data-index="${i}" data-dir="-1" ${i===0?'disabled':''} aria-label="紀錄往前移">↑</button><button class="move-btn" type="button" data-move="record" data-key="${key}" data-index="${i}" data-dir="1" ${i===records.length-1?'disabled':''} aria-label="紀錄往後移">↓</button></div><button class="delete-x" type="button" data-delete-record="${key}" data-record-id="${Number(r.id)}" aria-label="刪除紀錄" title="刪除">×</button><h3>${esc(r.title)}</h3>${r.body?`<p>${esc(r.body)}</p>`:'<p class="muted">尚未填寫補充內容</p>'}</article>`).join('')}
-function renderAllTabRecords(){['service','church','truth'].forEach(renderTabRecords)}
+function renderAllTabRecords(){['service','church','truth'].forEach(renderTabRecords);renderBaptizedList()}
 function renderCountdown(){
  const value=$('countdownValue');
  $('countdownLabel').textContent=state.countdownName||'倒數天數';
@@ -362,7 +294,7 @@ function showApp(user){
   const remote=normalizeState(snap.data()),serialized=serialize(remote);
   if(serialized!==lastSerialized){
    const active=document.activeElement;
-   const editingCareField=active&&$('goalList').contains(active)&&(active.matches('[data-shepherd-field], [data-record-field]'));
+   const editingCareField=active&&($('goalList').contains(active)||$('baptizedList')?.contains(active))&&(active.matches('[data-shepherd-field], [data-record-field], [data-baptized-field]'));
    if(editingCareField && (saveTimer || document.activeElement.value!==undefined)){ setCloudStatus('正在編輯，稍後同步…'); return; }
    applyingRemote=true;state=remote;lastSerialized=serialized;render();applyingRemote=false
   }
@@ -383,14 +315,15 @@ $('goalList').addEventListener('click',e=>{
  if(delRecord){if(!editModes.target)return;const sid=Number(delRecord.dataset.deleteCareRecord),rid=Number(delRecord.dataset.recordId),person=state.shepherds.find(s=>Number(s.id)===sid);if(person&&confirm('確定刪除這筆牧養紀錄？')){person.records=person.records.filter(r=>Number(r.id)!==rid);persist();renderGoals()}return}
  const delShepherd=e.target.closest('[data-delete-shepherd]');
  if(delShepherd){if(!editModes.target)return;const id=Number(delShepherd.dataset.deleteShepherd);if(confirm('確定刪除這位姊妹的牧養紀錄？')){state.shepherds=state.shepherds.filter(s=>Number(s.id)!==id);persist();renderGoals()}return}
- const baptizedToggle=e.target.closest('[data-baptized-toggle]');
- if(baptizedToggle){const person=state.baptizedPeople.find(p=>Number(p.id)===Number(baptizedToggle.dataset.baptizedToggle));if(person){person.expanded=!person.expanded;renderGoals();persist()}return}
- const addBaptized=e.target.closest('[data-add-baptized]');
- if(addBaptized){state.baptizedPeople.push({id:Date.now(),name:'',date:'',department:'',shepherd:'',expanded:true});syncBaptismGoal();persist();renderGoals();const fields=$('goalList').querySelectorAll('[data-baptized-field="name"]');fields[fields.length-1]?.focus();return}
- const deleteBaptized=e.target.closest('[data-delete-baptized]');
- if(deleteBaptized){const id=Number(deleteBaptized.dataset.deleteBaptized);if(confirm('確定刪除這筆受浸紀錄？')){state.baptizedPeople=state.baptizedPeople.filter(p=>Number(p.id)!==id);syncBaptismGoal();persist();renderGoals()}return}
  const b=e.target.closest('button[data-act]');if(!b)return;const g=state.goals.find(x=>x.id===Number(b.dataset.id));if(!g)return;if(b.dataset.act==='plus')g.current=Math.min(g.target,g.current+1);if(b.dataset.act==='minus')g.current=Math.max(0,g.current-1);if(b.dataset.act==='delete'&&editModes.target&&confirm('確定刪除此目標？'))state.goals=state.goals.filter(x=>x.id!==g.id);persist();renderGoals();
 });
+$('page-service').addEventListener('click',e=>{
+ const toggle=e.target.closest('[data-baptized-toggle]');if(toggle){const person=state.baptizedPeople.find(p=>Number(p.id)===Number(toggle.dataset.baptizedToggle));if(person){person.expanded=!person.expanded;renderBaptizedList();persist()}return}
+ if(e.target.closest('[data-add-baptized]')){state.baptizedPeople.push({id:Date.now(),name:'',date:'',department:'',shepherd:'',expanded:true});syncBaptismGoal();persist();renderBaptizedList();(()=>{const fields=$('baptizedList').querySelectorAll('[data-baptized-field="name"]');fields[fields.length-1]?.focus()})();return}
+ const del=e.target.closest('[data-delete-baptized]');if(del){const id=Number(del.dataset.deleteBaptized);if(confirm('確定刪除這筆受浸紀錄？')){state.baptizedPeople=state.baptizedPeople.filter(p=>Number(p.id)!==id);syncBaptismGoal();persist();renderBaptizedList();renderGoals()}return}
+});
+$('page-service').addEventListener('input',e=>{const field=e.target.dataset.baptizedField;if(!field)return;const person=state.baptizedPeople.find(p=>Number(p.id)===Number(e.target.dataset.id));if(!person)return;person[field]=e.target.value;if(field==='name'){const heading=e.target.closest('.shepherd-card')?.querySelector('.shepherd-person strong');if(heading)heading.textContent=person.name.trim()||'新受浸姊妹'}if(field==='department'){const summary=e.target.closest('.shepherd-card')?.querySelector('.shepherd-summary');if(summary)summary.textContent=person.department||'尚未填寫系級'}persist()});
+$('page-service').addEventListener('change',e=>{const field=e.target.dataset.baptizedField;if(!field)return;const person=state.baptizedPeople.find(p=>Number(p.id)===Number(e.target.dataset.id));if(person){person[field]=e.target.value;persist()}});
 $('goalList').addEventListener('change',e=>{const id=Number(e.target.dataset.shepherdId);if(!Number.isFinite(id))return;const person=state.shepherds.find(s=>Number(s.id)===id);if(!person)return;const field=e.target.dataset.shepherdField;if(field==='name'){person.name=e.target.value;persist();return}const recordField=e.target.dataset.recordField,rid=Number(e.target.dataset.recordId);if(recordField){const record=person.records.find(r=>Number(r.id)===rid);if(record){record[recordField]=e.target.value;persist()}}});
 $('goalList').addEventListener('input',e=>{const id=Number(e.target.dataset.shepherdId);if(!Number.isFinite(id))return;const person=state.shepherds.find(s=>Number(s.id)===id);if(!person)return;const field=e.target.dataset.shepherdField;if(field==='name'){person.name=e.target.value;const card=e.target.closest('.shepherd-card');const heading=card?.querySelector('.shepherd-person strong');if(heading)heading.textContent=person.name.trim()||'點此輸入姊妹名字';persist();return}const recordField=e.target.dataset.recordField,rid=Number(e.target.dataset.recordId);if(recordField){const record=person.records.find(r=>Number(r.id)===rid);if(record){record[recordField]=e.target.value;persist()}}});
 $('books').addEventListener('click',e=>{const toggle=e.target.closest('button[data-booktoggle]');if(toggle){const i=Number(toggle.dataset.booktoggle);state.books[i].expanded=!state.books[i].expanded;renderBooks();if(state.books[i].expanded)$('books').querySelector(`[data-bookname="${i}"]`)?.focus();return}const del=e.target.closest('button[data-bookdelete]');if(del){if(!editModes.books)return;const i=Number(del.dataset.bookdelete);if(confirm('確定刪除這筆書報紀錄？')){state.books.splice(i,1);syncBookGoal();persist();renderBooks();renderGoals()}}});
