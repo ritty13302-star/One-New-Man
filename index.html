@@ -117,6 +117,7 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 <section class="two" data-block-id="target-week-review"><div class="panel week"><h2>🗓️ 本週回顧</h2><p class="muted" style="margin-bottom:10px">這週做了什麼？下週想往哪裡前進？</p><label for="weekNote">本週記錄</label><textarea id="weekNote" placeholder="例如：完成兩次讀書進度、關心一位朋友……"></textarea><label for="nextWeek">下週想做的事</label><textarea id="nextWeek" style="min-height:85px" placeholder="寫下下一步的小行動"></textarea><button class="btn" id="saveWeek">儲存本週紀錄</button><div id="savedMsg" class="notice" aria-live="polite"></div></div></section>
 <div class="footer" data-block-id="target-footer">已透過 Firebase 雲端同步。請使用同一個 Google 帳號在不同裝置登入。</div></section>
 <section id="page-service" class="page-panel subpage" role="tabpanel" hidden>
+ <section class="service-section shepherd-service-section" data-block-id="service-shepherd" aria-labelledby="shepherdServiceTitle"><div class="service-section-heading"><div class="service-section-title"><span class="service-section-icon">🌿</span><div><h3 id="shepherdServiceTitle">姊妹牧養名單</h3><p>記錄每位姊妹的牧養人、身分、家聚會時間與材料</p></div></div></div><div id="shepherdListPanel"></div></section>
  <section class="service-section baptized-section" data-block-id="service-baptized" aria-labelledby="baptizedSectionTitle">
   <div class="service-section-heading"><div class="service-section-title"><span class="service-section-icon">🌱</span><div><h3 id="baptizedSectionTitle">受浸姊妹名單</h3><p class="baptized-count" id="baptizedCount">目前受浸人數：0 人</p></div></div><button class="btn" type="button" data-add-baptized>＋ 新增姊妹</button></div>
   <p class="service-section-hint">點擊姓名展開個人資料，可以修改資料或刪除紀錄。</p>
@@ -290,20 +291,15 @@ function syncWeeklyPrayerGoal(){
  const goal=state.goals.find(g=>g.name.trim()==='週週禱研背講');
  if(goal)goal.current=completed;
 }
-function renderGoals(){
- syncBaptismGoal();
- syncWeeklyPrayerGoal();
- const el=$('goalList');
- if(!state.goals.length){el.innerHTML='<div class="empty">還沒有目標，按「新增目標」開始吧！</div>'}
- else el.innerHTML=state.goals.map(g=>{
-  const isShepherdGoal=g.name.trim()==='每位姊妹都有可牧養的對象';
-  const shepherdSection=isShepherdGoal?`
+function renderShepherdList(){
+ const host=$('shepherdListPanel');if(!host)return;
+  host.innerHTML = `
    <div class="shepherd-panel">
-    <div class="shepherd-heading"><div><strong>🌿 姊妹牧養名單</strong><div class="muted shepherd-count">目前牧養人數：<span class="shepherd-count-number">${state.shepherds.reduce((total,s)=>total+(Array.isArray(s.records)?s.records.filter(r=>String(r.shepherdName||'').trim()).length:0),0)}</span> 人</div></div><button class="btn secondary" type="button" data-add-shepherd>＋ 新增姊妹</button></div>
+    <div class="shepherd-heading"><div><strong>牧養人數</strong><div class="muted shepherd-count">目前牧養人數：<span class="shepherd-count-number">${state.shepherds.reduce((total,s)=>total+(Array.isArray(s.records)?s.records.filter(r=>String(r.shepherdName||'').trim()).length:0),0)}</span> 人</div></div><button class="btn secondary" type="button" data-add-shepherd>＋ 新增姊妹</button></div>
     <p class="muted shepherd-hint">點擊姊妹名字展開或收合。每位姊妹底下可新增多筆牧養紀錄；每筆紀錄的姓名、身分、家聚會時間和材料都可直接編輯；按右上角編輯鈕可調整順序或刪除，修改會自動儲存。</p>
     <div class="shepherd-list">
      ${state.shepherds.length?state.shepherds.map((s,i)=>`
-      <article class="shepherd-card ${editModes.target?'edit-mode':''}"><div class="move-controls"><button class="move-btn" type="button" data-move="shepherd" data-index="${i}" data-dir="-1" ${i===0?'disabled':''} aria-label="姊妹往前移">↑</button><button class="move-btn" type="button" data-move="shepherd" data-index="${i}" data-dir="1" ${i===state.shepherds.length-1?'disabled':''} aria-label="姊妹往後移">↓</button></div><button class="delete-x" type="button" data-delete-shepherd="${s.id}" aria-label="刪除姊妹" title="刪除">×</button>
+      <article class="shepherd-card ${editModes.service?'edit-mode':''}"><div class="move-controls"><button class="move-btn" type="button" data-move="shepherd" data-index="${i}" data-dir="-1" ${i===0?'disabled':''} aria-label="姊妹往前移">↑</button><button class="move-btn" type="button" data-move="shepherd" data-index="${i}" data-dir="1" ${i===state.shepherds.length-1?'disabled':''} aria-label="姊妹往後移">↓</button></div><button class="delete-x" type="button" data-delete-shepherd="${s.id}" aria-label="刪除姊妹" title="刪除">×</button>
        <button class="shepherd-toggle" type="button" data-shepherd-toggle="${s.id}" aria-expanded="${!!s.expanded}">
         <span class="shepherd-avatar">🌱</span>
         <span class="shepherd-person"><strong>${esc(s.name.trim()||'點此輸入姊妹名字')}</strong><span class="shepherd-summary">${!s.expanded?s.records.map(r=>[r.shepherdName,(r.identity==='S 姊妹'?'S':r.identity==='F 福音朋友'?'F':r.identity),r.homeTime,r.material].map(v=>String(v||'').trim()).filter(Boolean).join(' ')).filter(Boolean).map(line=>esc(line)).join('<br>'):''}</span></span>
@@ -326,7 +322,16 @@ function renderGoals(){
        </div>
       </article>`).join(''):'<div class="empty">目前還沒有姊妹，按「新增姊妹」開始記錄。</div>'}
     </div>
-   </div>`:'';
+   </div>`;
+}
+function renderGoals(){
+ syncBaptismGoal();
+ syncWeeklyPrayerGoal();
+ const el=$('goalList');
+ if(!state.goals.length){el.innerHTML='<div class="empty">還沒有目標，按「新增目標」開始吧！</div>'}
+ else el.innerHTML=state.goals.map(g=>{
+  const isShepherdGoal=g.name.trim()==='每位姊妹都有可牧養的對象';
+  const shepherdSection='';
   const isBaptismGoal=g.name.trim()==='帶 30 位北科大女同學信而受浸得救成為姊妹';
 
   const isBookGoal=g.name.trim()==='讀完十本書報';
@@ -336,6 +341,7 @@ function renderGoals(){
  }).join('');
  const total=state.goals.length?Math.round(state.goals.reduce((s,g)=>s+pct(g),0)/state.goals.length):0;
  $('totalText').textContent=total+'%';$('totalBar').style.width=total+'%';$('activeCount').textContent=state.goals.filter(g=>g.current<g.target).length;$('doneCount').textContent=state.goals.filter(g=>g.current>=g.target).length;
+ renderShepherdList();
 }
 function syncBookGoal(){
  const completed=state.books.filter(b=>b.done).length;
@@ -458,7 +464,7 @@ function refreshPageBlockEditControls(){
   });
  });
 }
-function render(){renderCountdown();renderBooks();renderGoals();renderAllTabRecords();renderSchedule();$('weekNote').value=state.weekNote||'';$('nextWeek').value=state.nextWeek||'';applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()}
+function render(){renderCountdown();renderBooks();renderGoals();renderShepherdList();renderAllTabRecords();renderSchedule();$('weekNote').value=state.weekNote||'';$('nextWeek').value=state.nextWeek||'';applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()}
 function friendlyError(error){const map={'auth/unauthorized-domain':'此網站網域尚未加入 Firebase 授權網域。','auth/popup-closed-by-user':'你已關閉 Google 登入視窗。','auth/popup-blocked':'瀏覽器封鎖了登入視窗，請允許彈出視窗後重試。','permission-denied':'Firebase 權限規則未允許此操作。','storage/unauthorized':'Firebase Storage 權限規則未允許上傳，請確認 Storage Rules。','storage/bucket-not-found':'找不到 Firebase Storage 儲存空間，請先在 Firebase Console 啟用 Storage。','unavailable':'目前無法連線雲端，請稍後再試。'};return map[error?.code]||error?.message||'未知錯誤'}
 function renderHeaderAvatar(url=''){avatarUrl=url||'';$('headerAvatarImage').hidden=!avatarUrl;$('headerAvatarFallback').hidden=!!avatarUrl;if(avatarUrl)$('headerAvatarImage').src=avatarUrl;else $('headerAvatarImage').removeAttribute('src')}
 async function loadCloudAvatar(user){try{const snap=await getDoc(doc(db,'users',user.uid,'profile','avatar'));if(!currentUser||currentUser.uid!==user.uid)return;const data=snap.exists()?snap.data():{};avatarUrl=String(data.avatarUrl||'');avatarStoragePath=String(data.storagePath||'');renderHeaderAvatar(avatarUrl);$('avatarStatus').textContent=avatarUrl?'頭貼已同步至雲端 ✓':'尚未設定頭貼'}catch(error){console.error(error);$('avatarStatus').textContent='讀取頭貼失敗：'+friendlyError(error)}}
@@ -475,7 +481,7 @@ function showApp(user){
   const remote=normalizeState(snap.data()),serialized=serialize(remote);
   if(serialized!==lastSerialized){
    const active=document.activeElement;
-   const editingCareField=active&&($('goalList').contains(active)||$('baptizedList')?.contains(active))&&(active.matches('[data-shepherd-field], [data-record-field], [data-baptized-field]'));
+   const editingCareField=active&&($('goalList').contains(active)||$('baptizedList')?.contains(active)||$('shepherdListPanel')?.contains(active))&&(active.matches('[data-shepherd-field], [data-record-field], [data-baptized-field]'));
    if(editingCareField && (saveTimer || document.activeElement.value!==undefined)){ setCloudStatus('正在編輯，稍後同步…'); return; }
    applyingRemote=true;state=remote;lastSerialized=serialized;render();applyingRemote=false
   }
@@ -485,21 +491,21 @@ function showApp(user){
 function clearUser(){if(stopListening){stopListening();stopListening=null}clearTimeout(saveTimer);currentUser=null;avatarStoragePath='';renderHeaderAvatar('');$('avatarStatus').textContent='登入 Google 後可將頭貼儲存至雲端';state=freshState();lastSerialized='';document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{const active=t.dataset.page==='target';t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('#appContent > .page-panel').forEach(p=>p.hidden=p.id!=='page-target');renderAllTabRecords();applyPageBlockOrder();refreshPageBlockEditControls();$('appContent').classList.add('auth-hidden');$('pageEditToolbar').classList.add('auth-hidden');$('pageEditToolbar').hidden=false;$('googleSignIn').classList.remove('auth-hidden');$('signOutBtn').classList.add('auth-hidden');$('authAvatar').textContent='☁️';$('authTitle').textContent='登入以同步你的年度紀錄';$('authSubtitle').textContent='使用 Google 帳號，在不同裝置繼續記錄';setStatus('尚未登入');setCloudStatus('登入後開始同步')}
 $('googleSignIn').addEventListener('click',async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(error){console.error(error);if(error.code==='auth/popup-blocked'){try{await signInWithRedirect(auth,new GoogleAuthProvider());return}catch(redirectError){setStatus(friendlyError(redirectError),true);return}}setStatus(friendlyError(error),true)}});
 $('signOutBtn').addEventListener('click',async()=>{try{await signOut(auth);clearUser()}catch(error){setStatus('登出失敗：'+friendlyError(error),true)}});
-$('goalList').addEventListener('click',e=>{
+$('page-service').addEventListener('click',e=>{
  const toggle=e.target.closest('[data-shepherd-toggle]');
- if(toggle){const id=Number(toggle.dataset.shepherdToggle),person=state.shepherds.find(s=>Number(s.id)===id);if(person){person.expanded=!person.expanded;renderGoals();persist()}return}
+ if(toggle){const id=Number(toggle.dataset.shepherdToggle),person=state.shepherds.find(s=>Number(s.id)===id);if(person){person.expanded=!person.expanded;renderShepherdList();persist()}return}
  const add=e.target.closest('[data-add-shepherd]');
- if(add){if(!state.shepherds)state.shepherds=[];state.shepherds.push({id:Date.now(),name:'',records:[{id:Date.now()+1,shepherdName:'',identity:'',homeTime:'',material:''}],expanded:true});persist();renderGoals();const inputs=$('goalList').querySelectorAll('[data-shepherd-field="name"]');inputs[inputs.length-1]?.focus();return}
+ if(add){if(!state.shepherds)state.shepherds=[];state.shepherds.push({id:Date.now(),name:'',records:[{id:Date.now()+1,shepherdName:'',identity:'',homeTime:'',material:''}],expanded:true});persist();renderShepherdList();const inputs=$('shepherdListPanel').querySelectorAll('[data-shepherd-field="name"]');inputs[inputs.length-1]?.focus();return}
  const addRecord=e.target.closest('[data-add-care-record]');
- if(addRecord){const person=state.shepherds.find(s=>Number(s.id)===Number(addRecord.dataset.addCareRecord));if(person){const newRecord={id:Date.now(),shepherdName:'',identity:'',homeTime:'',material:''};person.records.push(newRecord);person.expanded=true;editingCareRecords.add(`${person.id}:${newRecord.id}`);persist();renderGoals();const fields=$('goalList').querySelectorAll(`[data-record-field=\"shepherdName\"][data-shepherd-id=\"${person.id}\"]`);fields[fields.length-1]?.focus()}return}
+ if(addRecord){const person=state.shepherds.find(s=>Number(s.id)===Number(addRecord.dataset.addCareRecord));if(person){const newRecord={id:Date.now(),shepherdName:'',identity:'',homeTime:'',material:''};person.records.push(newRecord);person.expanded=true;editingCareRecords.add(`${person.id}:${newRecord.id}`);persist();renderShepherdList();const fields=$('shepherdListPanel').querySelectorAll(`[data-record-field=\"shepherdName\"][data-shepherd-id=\"${person.id}\"]`);fields[fields.length-1]?.focus()}return}
  const manageRecords=e.target.closest('[data-toggle-care-manage]');
- if(manageRecords){const sid=String(manageRecords.dataset.toggleCareManage);if(managingCareRecords.has(sid))managingCareRecords.delete(sid);else managingCareRecords.add(sid);renderGoals();return}
+ if(manageRecords){const sid=String(manageRecords.dataset.toggleCareManage);if(managingCareRecords.has(sid))managingCareRecords.delete(sid);else managingCareRecords.add(sid);renderShepherdList();return}
  const editRecord=e.target.closest('[data-edit-care-record]');
- if(editRecord){const sid=Number(editRecord.dataset.editCareRecord),rid=Number(editRecord.dataset.recordId),key=`${sid}:${rid}`;if(editingCareRecords.has(key))editingCareRecords.delete(key);else editingCareRecords.add(key);renderGoals();if(editingCareRecords.has(key))$('goalList').querySelector(`[data-record-field=\"shepherdName\"][data-shepherd-id=\"${sid}\"][data-record-id=\"${rid}\"]`)?.focus();return}
+ if(editRecord){const sid=Number(editRecord.dataset.editCareRecord),rid=Number(editRecord.dataset.recordId),key=`${sid}:${rid}`;if(editingCareRecords.has(key))editingCareRecords.delete(key);else editingCareRecords.add(key);renderShepherdList();if(editingCareRecords.has(key))$('shepherdListPanel').querySelector(`[data-record-field=\"shepherdName\"][data-shepherd-id=\"${sid}\"][data-record-id=\"${rid}\"]`)?.focus();return}
  const delRecord=e.target.closest('[data-delete-care-record]');
- if(delRecord){const sid=Number(delRecord.dataset.deleteCareRecord),rid=Number(delRecord.dataset.recordId),person=state.shepherds.find(s=>Number(s.id)===sid);if(person&&confirm('確定刪除這筆牧養紀錄？')){person.records=person.records.filter(r=>Number(r.id)!==rid);editingCareRecords.delete(`${sid}:${rid}`);persist();renderGoals()}return}
+ if(delRecord){const sid=Number(delRecord.dataset.deleteCareRecord),rid=Number(delRecord.dataset.recordId),person=state.shepherds.find(s=>Number(s.id)===sid);if(person&&confirm('確定刪除這筆牧養紀錄？')){person.records=person.records.filter(r=>Number(r.id)!==rid);editingCareRecords.delete(`${sid}:${rid}`);persist();renderShepherdList()}return}
  const delShepherd=e.target.closest('[data-delete-shepherd]');
- if(delShepherd){if(!editModes.target)return;const id=Number(delShepherd.dataset.deleteShepherd);if(confirm('確定刪除這位姊妹的牧養紀錄？')){state.shepherds=state.shepherds.filter(s=>Number(s.id)!==id);persist();renderGoals()}return}
+ if(delShepherd){if(!editModes.service)return;const id=Number(delShepherd.dataset.deleteShepherd);if(confirm('確定刪除這位姊妹的牧養紀錄？')){state.shepherds=state.shepherds.filter(s=>Number(s.id)!==id);persist();renderShepherdList()}return}
  const b=e.target.closest('button[data-act]');if(!b)return;const g=state.goals.find(x=>x.id===Number(b.dataset.id));if(!g)return;if(b.dataset.act==='plus')g.current=Math.min(g.target,g.current+1);if(b.dataset.act==='minus')g.current=Math.max(0,g.current-1);if(b.dataset.act==='delete'&&editModes.target&&confirm('確定刪除此目標？'))state.goals=state.goals.filter(x=>x.id!==g.id);persist();renderGoals();
 });
 $('page-service').addEventListener('click',e=>{
@@ -509,8 +515,8 @@ $('page-service').addEventListener('click',e=>{
 });
 $('page-service').addEventListener('input',e=>{const field=e.target.dataset.baptizedField;if(!field)return;const person=state.baptizedPeople.find(p=>Number(p.id)===Number(e.target.dataset.id));if(!person)return;person[field]=e.target.value;if(field==='name'){const heading=e.target.closest('.shepherd-card')?.querySelector('.shepherd-person strong');if(heading)heading.textContent=person.name.trim()||'新受浸姊妹'}if(field==='department'){const summary=e.target.closest('.shepherd-card')?.querySelector('.shepherd-summary');if(summary)summary.textContent=person.department||'尚未填寫系級'}persist()});
 $('page-service').addEventListener('change',e=>{const field=e.target.dataset.baptizedField;if(!field)return;const person=state.baptizedPeople.find(p=>Number(p.id)===Number(e.target.dataset.id));if(person){person[field]=e.target.value;persist()}});
-$('goalList').addEventListener('change',e=>{const id=Number(e.target.dataset.shepherdId);if(!Number.isFinite(id))return;const person=state.shepherds.find(s=>Number(s.id)===id);if(!person)return;const field=e.target.dataset.shepherdField;if(field==='name'){person.name=e.target.value;persist();return}const recordField=e.target.dataset.recordField,rid=Number(e.target.dataset.recordId);if(recordField){const record=person.records.find(r=>Number(r.id)===rid);if(record){record[recordField]=e.target.value;persist()}}});
-$('goalList').addEventListener('input',e=>{const id=Number(e.target.dataset.shepherdId);if(!Number.isFinite(id))return;const person=state.shepherds.find(s=>Number(s.id)===id);if(!person)return;const field=e.target.dataset.shepherdField;if(field==='name'){person.name=e.target.value;const card=e.target.closest('.shepherd-card');const heading=card?.querySelector('.shepherd-person strong');if(heading)heading.textContent=person.name.trim()||'點此輸入姊妹名字';persist();return}const recordField=e.target.dataset.recordField,rid=Number(e.target.dataset.recordId);if(recordField){const record=person.records.find(r=>Number(r.id)===rid);if(record){record[recordField]=e.target.value;persist()}}});
+$('page-service').addEventListener('change',e=>{const id=Number(e.target.dataset.shepherdId);if(!Number.isFinite(id))return;const person=state.shepherds.find(s=>Number(s.id)===id);if(!person)return;const field=e.target.dataset.shepherdField;if(field==='name'){person.name=e.target.value;persist();return}const recordField=e.target.dataset.recordField,rid=Number(e.target.dataset.recordId);if(recordField){const record=person.records.find(r=>Number(r.id)===rid);if(record){record[recordField]=e.target.value;persist()}}});
+$('page-service').addEventListener('input',e=>{const id=Number(e.target.dataset.shepherdId);if(!Number.isFinite(id))return;const person=state.shepherds.find(s=>Number(s.id)===id);if(!person)return;const field=e.target.dataset.shepherdField;if(field==='name'){person.name=e.target.value;const card=e.target.closest('.shepherd-card');const heading=card?.querySelector('.shepherd-person strong');if(heading)heading.textContent=person.name.trim()||'點此輸入姊妹名字';persist();return}const recordField=e.target.dataset.recordField,rid=Number(e.target.dataset.recordId);if(recordField){const record=person.records.find(r=>Number(r.id)===rid);if(record){record[recordField]=e.target.value;persist()}}});
 $('books').addEventListener('click',e=>{const toggle=e.target.closest('button[data-booktoggle]');if(toggle){const i=Number(toggle.dataset.booktoggle);state.books[i].expanded=!state.books[i].expanded;renderBooks();if(state.books[i].expanded)$('books').querySelector(`[data-bookname="${i}"]`)?.focus();return}const del=e.target.closest('button[data-bookdelete]');if(del){if(!editModes.books)return;const i=Number(del.dataset.bookdelete);if(confirm('確定刪除這筆書報紀錄？')){state.books.splice(i,1);syncBookGoal();persist();renderBooks();renderGoals()}}});
 $('books').addEventListener('change',e=>{if(e.target.dataset.bookcheck!==undefined){state.books[Number(e.target.dataset.bookcheck)].done=e.target.checked;syncBookGoal();persist();renderBooks();renderGoals()}if(e.target.dataset.bookchapters!==undefined){const i=Number(e.target.dataset.bookchapters);state.books[i].chapters=Math.max(0,Math.floor(Number(e.target.value)||0));state.books[i].read=Math.min(state.books[i].read,state.books[i].chapters||state.books[i].read);syncBookGoal();persist();renderBooks();renderGoals()}if(e.target.dataset.bookread!==undefined){const i=Number(e.target.dataset.bookread);state.books[i].read=Math.max(0,Math.floor(Number(e.target.value)||0));if(state.books[i].chapters>0)state.books[i].read=Math.min(state.books[i].read,state.books[i].chapters);if(state.books[i].chapters>0&&state.books[i].read>=state.books[i].chapters)state.books[i].done=true;syncBookGoal();persist();renderBooks();renderGoals()}if(e.target.dataset.bookname!==undefined){state.books[Number(e.target.dataset.bookname)].name=e.target.value;persist();renderBooks()}});
 $('books').addEventListener('input',e=>{if(e.target.dataset.bookname!==undefined){state.books[Number(e.target.dataset.bookname)].name=e.target.value;persist()}});
@@ -522,7 +528,7 @@ $('saveWeek').onclick=()=>{state.weekNote=$('weekNote').value;state.nextWeek=$('
 $('weekNote').addEventListener('input',()=>{state.weekNote=$('weekNote').value;persist()});$('nextWeek').addEventListener('input',()=>{state.nextWeek=$('nextWeek').value;persist()});
 function activePageKey(){return document.querySelector('.nav-tab[data-page].active')?.dataset.page||'target'}
 function refreshPageEditToolbar(){const key=activePageKey(),toggle=$('pageEditToggle'),bookToggle=$('bookEditToggle');toggle.textContent=editModes[key]?'完成編輯':'編輯區塊';toggle.setAttribute('aria-pressed',String(!!editModes[key]));bookToggle.textContent=editModes.books?'完成':'編輯書報';bookToggle.setAttribute('aria-pressed',String(!!editModes.books))}
-$('pageEditToggle').addEventListener('click',()=>{const key=activePageKey();editModes[key]=!editModes[key];if(key==='target')renderGoals();if(['service','church','truth'].includes(key))renderTabRecords(key);refreshPageBlockEditControls();refreshPageEditToolbar()});
+$('pageEditToggle').addEventListener('click',()=>{const key=activePageKey();editModes[key]=!editModes[key];if(key==='target')renderGoals();if(key==='service')renderShepherdList();if(['service','church','truth'].includes(key))renderTabRecords(key);refreshPageBlockEditControls();refreshPageEditToolbar()});
 $('bookEditToggle').addEventListener('click',()=>{editModes.books=!editModes.books;renderBooks();refreshPageEditToolbar()});
 document.querySelectorAll('.nav-tab[data-page]').forEach(tab=>tab.addEventListener('click',()=>{const page=tab.dataset.page;document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{const active=t===tab;t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-'+page);refreshPageEditToolbar()}));
 ['service','church','truth'].forEach(key=>{const form=$('form-'+key);document.querySelector(`[data-add-record="${key}"]`).addEventListener('click',()=>{form.hidden=false;form.querySelector('input[name="title"]').focus()});document.querySelector(`[data-cancel-record="${key}"]`).addEventListener('click',()=>{form.reset();form.hidden=true});form.addEventListener('submit',e=>{e.preventDefault();const title=form.elements.title.value.trim(),body=form.elements.body.value.trim();if(!title){alert('請輸入紀錄標題');return}if(!state.tabRecords)state.tabRecords=emptyTabRecords();state.tabRecords[key].unshift({id:Date.now(),title,body,createdAt:new Date().toISOString()});persist();renderTabRecords(key);form.reset();form.hidden=true})});
@@ -548,7 +554,7 @@ document.addEventListener('click',e=>{
  state.pageBlockOrder=state.pageBlockOrder||{};state.pageBlockOrder[pageKey]=[...page.children].filter(el=>el.dataset.blockId).map(el=>el.dataset.blockId);
  persist();refreshPageBlockEditControls();
 });
-document.addEventListener('click',e=>{const b=e.target.closest('[data-move]');if(!b)return;const type=b.dataset.move,dir=Number(b.dataset.dir),i=Number(b.dataset.index);if(!dir||!Number.isInteger(i))return;let arr,renderFn;if(type==='goal'&&editModes.target){arr=state.goals;renderFn=renderGoals}else if(type==='shepherd'&&editModes.target){arr=state.shepherds;renderFn=renderGoals}else if(type==='care'){const person=state.shepherds.find(s=>Number(s.id)===Number(b.dataset.shepherdId));arr=person?.records;renderFn=renderGoals}else if(type==='book'&&editModes.books){arr=state.books;renderFn=renderBooks}else if(type==='record'&&editModes[b.dataset.key]){arr=state.tabRecords[b.dataset.key];renderFn=()=>renderTabRecords(b.dataset.key)}if(!arr||i<0||i>=arr.length)return;const j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];persist();renderFn();if(type==='book')renderGoals()});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-move]');if(!b)return;const type=b.dataset.move,dir=Number(b.dataset.dir),i=Number(b.dataset.index);if(!dir||!Number.isInteger(i))return;let arr,renderFn;if(type==='goal'&&editModes.target){arr=state.goals;renderFn=renderGoals}else if(type==='shepherd'&&editModes.service){arr=state.shepherds;renderFn=renderShepherdList}else if(type==='care'){const person=state.shepherds.find(s=>Number(s.id)===Number(b.dataset.shepherdId));arr=person?.records;renderFn=renderShepherdList}else if(type==='book'&&editModes.books){arr=state.books;renderFn=renderBooks}else if(type==='record'&&editModes[b.dataset.key]){arr=state.tabRecords[b.dataset.key];renderFn=()=>renderTabRecords(b.dataset.key)}if(!arr||i<0||i>=arr.length)return;const j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];persist();renderFn();if(type==='book')renderGoals()});
 document.addEventListener('click',e=>{const btn=e.target.closest('[data-delete-record]');if(!btn)return;const key=btn.dataset.deleteRecord;if(!editModes[key])return;const id=Number(btn.dataset.recordId);if(confirm('確定刪除這筆紀錄？')){state.tabRecords[key]=state.tabRecords[key].filter(r=>Number(r.id)!==id);persist();renderTabRecords(key)}});
 // 主選單、主題與字體大小：偏好保存在本機，重新開啟仍會保留。
 const themeMap={
