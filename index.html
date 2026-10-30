@@ -17,9 +17,13 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 
 .baptism-progress-inline{display:inline-flex;align-items:baseline;gap:9px;flex-wrap:nowrap;vertical-align:baseline}
 .baptism-progress-label{display:inline;font-size:18px;font-weight:750;line-height:1.4;color:var(--ink);white-space:nowrap}
-.baptism-progress-number{display:inline-flex;align-items:baseline;gap:2px;font-size:25px;font-weight:800;line-height:1.2;letter-spacing:.01em;color:var(--green);white-space:nowrap}
+.baptism-progress-number{display:inline-flex;align-items:baseline;gap:2px;font-size:35px;font-weight:800;line-height:1.2;letter-spacing:.01em;color:var(--green);white-space:nowrap}
 .baptism-progress-number strong{font:inherit}
-.baptism-progress-number small{font-size:15px;font-weight:650;color:var(--muted)}
+.baptism-progress-number small{font-size:25px;font-weight:650;color:var(--muted)}
+
+
+.goalbar.baptism-goalbar{background:var(--pale)}
+.goalbar.baptism-goalbar span{background:var(--green)}
 
 </style>
 </head>
@@ -294,7 +298,7 @@ const baptizedSection=isBaptismGoal?`
   const isBookGoal=g.name.trim()==='讀完十本書報';
   const goalMeta=isBookGoal?`已完成 ${Math.min(g.current,10)} / 10 本`:isBaptismGoal?`<span class="baptism-progress-inline"><span class="baptism-progress-label">目前受浸人數</span><span class="baptism-progress-number"><strong>${state.baptizedPeople.length}</strong><small> / 30</small></span></span>`:`${esc(g.category)} · ${g.current>=g.target?'已達成':`進度 ${g.current} / ${g.target}`}`;
   const goalActions=`${(isBookGoal||isShepherdGoal||isBaptismGoal)?'':`<button class="mini" data-act="minus" data-id="${g.id}" aria-label="減少進度">−</button><button class="mini" data-act="plus" data-id="${g.id}" aria-label="增加進度">＋1</button>`}`;
-  return `<article class="goal ${editModes.target?'edit-mode':''}"><div class="move-controls"><button class="move-btn" type="button" data-move="goal" data-index="${state.goals.findIndex(x=>x.id===g.id)}" data-dir="-1" ${state.goals.findIndex(x=>x.id===g.id)===0?'disabled':''} aria-label="目標往前移">↑</button><button class="move-btn" type="button" data-move="goal" data-index="${state.goals.findIndex(x=>x.id===g.id)}" data-dir="1" ${state.goals.findIndex(x=>x.id===g.id)===state.goals.length-1?'disabled':''} aria-label="目標往後移">↓</button></div><button class="delete-x" type="button" data-act="delete" data-id="${g.id}" aria-label="刪除目標" title="刪除">×</button><div class="goal-top"><div class="goal-icon">${g.category==='閱讀'?'📚':g.category==='服事'?'🤝':g.category==='健康'?'🌿':g.category==='學習'?'✍️':'🎯'}</div><div class="goal-main"><div class="goal-title">${esc(g.name)}</div><div class="goal-meta">${goalMeta}</div></div><div class="goal-actions">${goalActions}</div></div><div class="goalbar"><span style="width:${pct(g)}%"></span></div>${shepherdSection}${baptizedSection}</article>`;
+  return `<article class="goal ${editModes.target?'edit-mode':''}"><div class="move-controls"><button class="move-btn" type="button" data-move="goal" data-index="${state.goals.findIndex(x=>x.id===g.id)}" data-dir="-1" ${state.goals.findIndex(x=>x.id===g.id)===0?'disabled':''} aria-label="目標往前移">↑</button><button class="move-btn" type="button" data-move="goal" data-index="${state.goals.findIndex(x=>x.id===g.id)}" data-dir="1" ${state.goals.findIndex(x=>x.id===g.id)===state.goals.length-1?'disabled':''} aria-label="目標往後移">↓</button></div><button class="delete-x" type="button" data-act="delete" data-id="${g.id}" aria-label="刪除目標" title="刪除">×</button><div class="goal-top"><div class="goal-icon">${g.category==='閱讀'?'📚':g.category==='服事'?'🤝':g.category==='健康'?'🌿':g.category==='學習'?'✍️':'🎯'}</div><div class="goal-main"><div class="goal-title">${esc(g.name)}</div><div class="goal-meta">${goalMeta}</div></div><div class="goal-actions">${goalActions}</div></div><div class="goalbar ${isBaptismGoal?'baptism-goalbar':''}"><span style="width:${pct(g)}%"></span></div>${shepherdSection}${baptizedSection}</article>`;
  }).join('');
  const total=state.goals.length?Math.round(state.goals.reduce((s,g)=>s+pct(g),0)/state.goals.length):0;
  $('totalText').textContent=total+'%';$('totalBar').style.width=total+'%';$('activeCount').textContent=state.goals.filter(g=>g.current<g.target).length;$('doneCount').textContent=state.goals.filter(g=>g.current>=g.target).length;
