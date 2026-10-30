@@ -122,8 +122,12 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 .life-reading-progress{height:9px;background:var(--pale);border-radius:99px;overflow:hidden}
 .life-reading-progress span{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .2s}
 .life-reading-testament{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px}
-.life-reading-testament-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.life-reading-testament-head{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin:0;padding:2px 0 8px;border:0;background:transparent;color:var(--ink);text-align:left;cursor:pointer}
 .life-reading-testament-head h3{margin:0;font-size:17px}
+.life-reading-testament-head .testament-head-main{display:flex;align-items:center;gap:8px;min-width:0}
+.life-reading-testament-head .testament-count{font-size:12px;color:var(--muted);white-space:nowrap}
+.life-reading-testament-head .testament-chevron{font-size:13px;color:var(--muted);flex:0 0 auto}
+.life-reading-testament-content[hidden]{display:none}
 .life-reading-book{border-top:1px solid var(--line);padding:8px 0}
 .life-reading-book:first-of-type{border-top:0}
 .life-reading-book-toggle{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;color:var(--ink);text-align:left;padding:7px 2px;cursor:pointer}
@@ -270,9 +274,9 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
   <div class="life-reading-monthly-list" id="lifeReadingMonthlyRows"><div class="muted">尚無每月完成紀錄</div></div>
   <p class="life-reading-untracked muted" id="lifeReadingUntracked"></p>
  </section>
- <section class="life-reading-testament" aria-labelledby="lifeReadingOldTitle"><div class="life-reading-testament-head"><h3 id="lifeReadingOldTitle">📜 舊約</h3><span class="muted" id="lifeReadingOldCount">0 / 867 篇 · 39 卷</span></div><div id="lifeReadingOldBooks"></div></section>
- <section class="life-reading-testament" aria-labelledby="lifeReadingNewTitle"><div class="life-reading-testament-head"><h3 id="lifeReadingNewTitle">✝️ 新約</h3><span class="muted" id="lifeReadingNewCount">0 / 1,117 篇 · 27 卷</span></div><div id="lifeReadingNewBooks"></div></section>
- <p class="notice">撒母耳記上下、列王紀上下、歷代志上下的篇數合併計算；在上卷展開並勾選篇數，下卷會共用同一份進度。</p>
+ <section class="life-reading-testament" aria-labelledby="lifeReadingOldTitle"><button class="life-reading-testament-head" id="lifeReadingOldToggle" type="button" data-life-reading-testament-toggle="old" aria-expanded="false" aria-controls="lifeReadingOldBooks"><span class="testament-head-main"><h3 id="lifeReadingOldTitle">📜 舊約</h3><span class="testament-count" id="lifeReadingOldCount">0 / 867 篇 · 39 卷</span></span><span class="testament-chevron" id="lifeReadingOldChevron">▼</span></button><div class="life-reading-testament-content" id="lifeReadingOldBooks" hidden></div></section>
+ <section class="life-reading-testament" aria-labelledby="lifeReadingNewTitle"><button class="life-reading-testament-head" id="lifeReadingNewToggle" type="button" data-life-reading-testament-toggle="new" aria-expanded="false" aria-controls="lifeReadingNewBooks"><span class="testament-head-main"><h3 id="lifeReadingNewTitle">✝️ 新約</h3><span class="testament-count" id="lifeReadingNewCount">0 / 1,117 篇 · 27 卷</span></span><span class="testament-chevron" id="lifeReadingNewChevron">▼</span></button><div class="life-reading-testament-content" id="lifeReadingNewBooks" hidden></div></section>
+ <p class="notice">撒母耳記上、下、列王紀上、下、歷代志上、下各自合併顯示並共用同一份篇數進度。</p>
 </section>
 <div class="cloud-state" id="cloudStatus">登入後開始同步</div></div></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="dialog"><h2 id="modalTitle">新增年度目標</h2><label for="goalName">目標名稱</label><input id="goalName" maxlength="100" placeholder="例如：每週禱研背講"><label for="goalCategory">分類</label><select id="goalCategory"><option>生活</option><option>閱讀</option><option>學習</option><option>服事</option><option>健康</option><option>其他</option></select><label for="goalTarget">目標數量（沒有數量目標可填 1）</label><input id="goalTarget" type="number" min="1" max="100000" value="1"><div class="dialog-actions"><button class="btn secondary" id="cancelBtn">取消</button><button class="btn" id="createBtn">新增</button></div><div class="notice">例如「讀完十本書報」可設定數量 10，之後用 +1 記錄進度。</div></div></div>
@@ -498,12 +502,17 @@ function syncLifeReadingGoal(){
  return goal;
 }
 const openLifeReadingGroups=new Set();
-function renderLifeReadingGroup(group,secondaryBook=false){
- const completed=lifeReadingProgress(group),percent=Math.round(completed/group.total*100),primaryName=group.books[0];
- if(secondaryBook)return `<div class="life-reading-shared"><strong>${esc(group.books[1])}</strong><span>與${esc(primaryName)}共用進度 · ${completed} / ${group.total} 篇</span></div>`;
+const openLifeReadingTestaments=new Set();
+function renderLifeReadingGroup(group){
+ const completed=lifeReadingProgress(group),percent=Math.round(completed/group.total*100),displayName=group.books.length>1?`${group.books[0]}、下`:group.books[0];
  const expanded=openLifeReadingGroups.has(group.key);
  const lessons=expanded?Array.from({length:group.total},(_,i)=>{const n=i+1,checked=(state.lifeReading.completed[group.key]||[]).includes(n);return `<label class="life-reading-lesson"><input type="checkbox" data-life-reading-key="${group.key}" data-life-reading-lesson="${n}" ${checked?'checked':''}><span>${n}</span></label>`}).join(''):'';
- return `<div class="life-reading-book"><button class="life-reading-book-toggle" type="button" data-life-reading-toggle="${group.key}" aria-expanded="${expanded}"><span class="life-reading-book-name">${esc(primaryName)}</span><span class="life-reading-book-count">${completed} / ${group.total} 篇</span><span class="book-chevron">${expanded?'▲':'▼'}</span></button><div class="life-reading-book-progress"><span style="width:${percent}%"></span></div><div class="life-reading-book-details" ${expanded?'':'hidden'}><div class="muted" style="margin-bottom:8px">勾選已完成的生命讀經篇數</div><div class="life-reading-lessons">${lessons}</div></div></div>`;
+ return `<div class="life-reading-book"><button class="life-reading-book-toggle" type="button" data-life-reading-toggle="${group.key}" aria-expanded="${expanded}"><span class="life-reading-book-name">${esc(displayName)}</span><span class="life-reading-book-count">${completed} / ${group.total} 篇</span><span class="book-chevron">${expanded?'▲':'▼'}</span></button><div class="life-reading-book-progress"><span style="width:${percent}%"></span></div><div class="life-reading-book-details" ${expanded?'':'hidden'}><div class="muted" style="margin-bottom:8px">勾選已完成的生命讀經篇數</div><div class="life-reading-lessons">${lessons}</div></div></div>`;
+}
+function renderLifeReadingTestament(groupList,booksId,toggleId,chevronId,key){
+ const expanded=openLifeReadingTestaments.has(key),books=$(booksId),toggle=$(toggleId);
+ books.hidden=!expanded;toggle.setAttribute('aria-expanded',String(expanded));$(chevronId).textContent=expanded?'▲':'▼';
+ books.innerHTML=groupList.map(renderLifeReadingGroup).join('');
 }
 function lifeReadingPlanState(){
  if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{},plan:{mode:'date',startDate:'',deadline:'',weeklyTarget:''}};
@@ -601,8 +610,8 @@ function renderLifeReading(){
  $('lifeReadingTotal').textContent=`${allStats.completed.toLocaleString('zh-TW')} / ${LIFE_READING_TOTAL.toLocaleString('zh-TW')} 篇`;
  $('lifeReadingPercent').textContent=`${allStats.percent}%`;$('lifeReadingTotalBar').style.width=`${allStats.percent}%`;$('lifeReadingRemaining').textContent=`尚餘 ${allStats.remaining.toLocaleString('zh-TW')} 篇`;
  $('lifeReadingOldCount').textContent=`${oldStats.completed} / ${oldStats.total} 篇 · 39 卷`;$('lifeReadingNewCount').textContent=`${newStats.completed} / ${newStats.total} 篇 · 27 卷`;
- $('lifeReadingOldBooks').innerHTML=lifeReadingOldGroups.map(g=>g.books.map((name,i)=>renderLifeReadingGroup(g,i>0)).join('')).join('');
- $('lifeReadingNewBooks').innerHTML=lifeReadingNewGroups.map(g=>renderLifeReadingGroup(g,false)).join('');
+ renderLifeReadingTestament(lifeReadingOldGroups,'lifeReadingOldBooks','lifeReadingOldToggle','lifeReadingOldChevron','old');
+ renderLifeReadingTestament(lifeReadingNewGroups,'lifeReadingNewBooks','lifeReadingNewToggle','lifeReadingNewChevron','new');
  renderLifeReadingDailyStats();
  renderLifeReadingPlan();
 }
@@ -856,6 +865,8 @@ function applyTheme(name,save=true){const t=themeMap[name]||themeMap.green;const
 function applyFont(name,save=true){const scale={small:.9,normal:1,large:1.12}[name]||1;document.documentElement.style.setProperty('--ui-zoom',scale);document.querySelectorAll('[data-font]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.font===name)));if(save)localStorage.setItem('yearGoalFont',name)}
 const openMenu=()=>{$('sideMenu').hidden=false;$('menuBackdrop').hidden=false;$('menuToggle').setAttribute('aria-expanded','true')};
 const closeMenu=()=>{$('sideMenu').hidden=true;$('menuBackdrop').hidden=true;$('menuToggle').setAttribute('aria-expanded','false')};
+$('lifeReadingOldToggle').addEventListener('click',()=>{if(openLifeReadingTestaments.has('old'))openLifeReadingTestaments.delete('old');else openLifeReadingTestaments.add('old');renderLifeReadingTestament(lifeReadingOldGroups,'lifeReadingOldBooks','lifeReadingOldToggle','lifeReadingOldChevron','old')});
+$('lifeReadingNewToggle').addEventListener('click',()=>{if(openLifeReadingTestaments.has('new'))openLifeReadingTestaments.delete('new');else openLifeReadingTestaments.add('new');renderLifeReadingTestament(lifeReadingNewGroups,'lifeReadingNewBooks','lifeReadingNewToggle','lifeReadingNewChevron','new')});
 $('lifeReadingOldBooks').addEventListener('click',e=>{const toggle=e.target.closest('[data-life-reading-toggle]');if(!toggle)return;const key=toggle.dataset.lifeReadingToggle;if(openLifeReadingGroups.has(key))openLifeReadingGroups.delete(key);else openLifeReadingGroups.add(key);renderLifeReading()});
 $('lifeReadingNewBooks').addEventListener('click',e=>{const toggle=e.target.closest('[data-life-reading-toggle]');if(!toggle)return;const key=toggle.dataset.lifeReadingToggle;if(openLifeReadingGroups.has(key))openLifeReadingGroups.delete(key);else openLifeReadingGroups.add(key);renderLifeReading()});
 function handleLifeReadingChange(e){const input=e.target.closest('input[data-life-reading-key]');if(!input)return;const key=input.dataset.lifeReadingKey,lesson=Number(input.dataset.lifeReadingLesson),group=lifeReadingGroups.find(g=>g.key===key);if(!group||!Number.isInteger(lesson)||lesson<1||lesson>group.total)return;if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{},plan:{mode:'date',startDate:'',deadline:'',weeklyTarget:''}};if(!state.lifeReading.completed)state.lifeReading.completed={};if(!state.lifeReading.completedAt)state.lifeReading.completedAt={};const set=new Set(state.lifeReading.completed[key]||[]);if(input.checked){set.add(lesson);if(!state.lifeReading.completedAt[key])state.lifeReading.completedAt[key]={};state.lifeReading.completedAt[key][lesson]=dateKey(new Date())}else{set.delete(lesson);if(state.lifeReading.completedAt[key])delete state.lifeReading.completedAt[key][lesson]}state.lifeReading.completed[key]=[...set].sort((a,b)=>a-b);syncLifeReadingGoal();persist();renderLifeReading();renderGoals()}
