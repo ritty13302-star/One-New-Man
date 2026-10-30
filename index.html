@@ -74,7 +74,7 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 /* 生命讀經進度 */
 .life-reading-page{display:grid;gap:14px}
 .life-reading-summary{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px}
-.life-reading-daily{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px}
+.life-reading-monthly{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px}
 .life-reading-annual{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px}
 .life-reading-annual-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
 .life-reading-annual-head h3{font-size:16px;margin:0 0 4px}
@@ -99,20 +99,20 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 .life-reading-plan-result strong{color:var(--green);font-size:18px}
 .life-reading-plan-actions{display:flex;justify-content:flex-end;margin-top:11px}
 @media(max-width:420px){.life-reading-plan-options{grid-template-columns:1fr}}
-.life-reading-daily-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
-.life-reading-daily-head h3{font-size:16px;margin:0 0 4px}
-.life-reading-daily-head p{font-size:12px;margin:0}
+.life-reading-monthly-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.life-reading-monthly-head h3{font-size:16px;margin:0 0 4px}
+.life-reading-monthly-head p{font-size:12px;margin:0}
 .life-reading-today{flex:0 0 auto;padding:6px 9px;border-radius:9px;background:var(--pale);color:var(--green);font-size:12px;font-weight:750}
-.life-reading-daily-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.life-reading-monthly-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .life-reading-monthly-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
-.life-reading-daily-stats>div{padding:10px 8px;border-radius:11px;background:var(--bg);min-width:0}
-.life-reading-daily-stats strong,.life-reading-daily-stats span{display:block}
-.life-reading-daily-stats strong{font-size:20px;line-height:1.2;color:var(--green);font-weight:800}
-.life-reading-daily-stats span{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}
-.life-reading-daily-list{max-height:260px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-top:1px solid var(--line)}
-.life-reading-daily-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 3px;border-bottom:1px solid var(--line);font-size:13px}
-.life-reading-daily-row:last-child{border-bottom:0}
-.life-reading-daily-row strong{color:var(--green);white-space:nowrap}
+.life-reading-monthly-stats>div{padding:10px 8px;border-radius:11px;background:var(--bg);min-width:0}
+.life-reading-monthly-stats strong,.life-reading-monthly-stats span{display:block}
+.life-reading-monthly-stats strong{font-size:20px;line-height:1.2;color:var(--green);font-weight:800}
+.life-reading-monthly-stats span{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}
+.life-reading-monthly-list{max-height:260px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-top:1px solid var(--line)}
+.life-reading-monthly-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 3px;border-bottom:1px solid var(--line);font-size:13px}
+.life-reading-monthly-row:last-child{border-bottom:0}
+.life-reading-monthly-row strong{color:var(--green);white-space:nowrap}
 .life-reading-untracked{font-size:11px;line-height:1.5;margin:10px 0 0}
 .life-reading-summary-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:9px}
 .life-reading-total{font-size:27px;font-weight:850;color:var(--green);line-height:1.2}
@@ -210,7 +210,8 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
   <div id="weeklyPrayerHistory" hidden><div class="weekly-prayer-history-list" id="weeklyPrayerHistoryList"></div></div>
  </div>
 </div>
-<div class="panel" data-block-id="truth-records"><div class="sectionhead"><h2>📖 真理紀錄</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn" type="button" data-add-record="truth">＋ 新增紀錄</button></div></div><p class="subpage-intro">收集真理追求、經節、讀經心得與信息摘要。真理紀錄獨立保存、編輯。</p><form class="record-form" id="form-truth" hidden><input name="title" maxlength="120" placeholder="紀錄標題，例如：羅馬書第八章" required><textarea name="body" maxlength="5000" placeholder="記錄經節、亮光、心得或追求進度（選填）"></textarea><div class="dialog-actions"><button class="btn secondary" type="button" data-cancel-record="truth">取消</button><button class="btn" type="submit">儲存紀錄</button></div></form><div class="record-list" id="records-truth"></div></div></section>
+<div class="panel" data-block-id="truth-records"><div class="sectionhead"><h2>📖 真理紀錄</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn" type="button" data-add-record="truth">＋ 新增紀錄</button></div></div><p class="subpage-intro">收集真理追求、經節、讀經心得與信息摘要。真理紀錄獨立保存、編輯。</p><form class="record-form" id="form-truth" hidden><input name="title" maxlength="120" placeholder="紀錄標題，例如：羅馬書第八章" required><textarea name="body" maxlength="5000" placeholder="記錄經節、亮光、心得或追求進度（選填）"></textarea><div class="dialog-actions"><button class="btn secondary" type="button" data-cancel-recor
+ d="truth">取消</button><button class="btn" type="submit">儲存紀錄</button></div></form><div class="record-list" id="records-truth"></div></div></section>
 <section id="page-schedule" class="page-panel subpage schedule-page" role="tabpanel" hidden>
  <div class="schedule-hero">
   <div class="schedule-month" id="scheduleMonth">2026 · 10月</div>
@@ -256,22 +257,17 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
    <p class="muted">從今天開始計算，包含今天在內，估算平均每天需要完成幾篇。</p>
   </div>
   <div class="life-reading-plan-fields" id="lifeReadingPlanWeeklyFields" hidden>
-   <label>我一週想完成幾篇<input type="number" id="lifeReadingPlanWeeklyTarget" min="1" max="1984" step="1" inputmode="numeric" placeholder="例如：每週 20 篇"></label>
+   <label>我一週想完成幾篇<input type="text" id="lifeReadingPlanWeeklyTarget" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="請輸入數字，例如 20" aria-label="每週想完成的生命讀經篇數"></label>
    <p class="muted">從今天開始計算，依照設定的每週篇數估算完成日期。</p>
   </div>
   <div class="life-reading-plan-actions"><button type="button" class="btn" id="lifeReadingPlanCalculate">計算目標</button></div>
   <div class="life-reading-plan-result" id="lifeReadingPlanResult" aria-live="polite">請選擇一種方式並輸入目標，系統會依照目前尚未完成的篇數計算。</div>
  </section>
- <section class="life-reading-daily" aria-labelledby="lifeReadingDailyTitle">
-  <div class="life-reading-daily-head"><div><h3 id="lifeReadingDailyTitle">📅 每日完成篇數</h3><p class="muted">勾選完成篇數時，會自動記錄當天日期</p></div><span class="life-reading-today" id="lifeReadingTodayCount">今天 0 篇</span></div>
-  <div class="life-reading-daily-stats"><div><strong id="lifeReadingActiveDays">0</strong><span>有讀經紀錄的天數</span></div><div><strong id="lifeReadingDailyAverage">0</strong><span>平均每天完成篇數</span></div><div><strong id="lifeReadingTrackedTotal">0</strong><span>有日期的完成篇數</span></div></div>
-  <div class="life-reading-daily-list" id="lifeReadingDailyRows"><div class="muted">尚無每日完成紀錄</div></div>
+ <section class="life-reading-monthly" aria-labelledby="lifeReadingMonthlyTitle">
+  <div class="life-reading-monthly-head"><div><h3 id="lifeReadingMonthlyTitle">🗓️ 每月完成篇數</h3><p class="muted">勾選完成篇數時會記錄日期，並自動彙整每月進度</p></div><span class="life-reading-today" id="lifeReadingThisMonthCount">本月 0 篇</span></div>
+  <div class="life-reading-monthly-stats"><div><strong id="lifeReadingActiveMonths">0</strong><span>有讀經紀錄的月份</span></div><div><strong id="lifeReadingMonthlyAverage">0</strong><span>平均每月完成篇數</span></div><div><strong id="lifeReadingMonthlyTrackedTotal">0</strong><span>有日期的完成篇數</span></div></div>
+  <div class="life-reading-monthly-list" id="lifeReadingMonthlyRows"><div class="muted">尚無每月完成紀錄</div></div>
   <p class="life-reading-untracked muted" id="lifeReadingUntracked"></p>
- </section>
- <section class="life-reading-daily" aria-labelledby="lifeReadingMonthlyTitle">
-  <div class="life-reading-daily-head"><div><h3 id="lifeReadingMonthlyTitle">🗓️ 每月完成篇數</h3><p class="muted">依照每篇完成時記錄的日期，自動彙整每月進度</p></div><span class="life-reading-today" id="lifeReadingThisMonthCount">本月 0 篇</span></div>
-  <div class="life-reading-daily-stats life-reading-monthly-stats"><div><strong id="lifeReadingActiveMonths">0</strong><span>有讀經紀錄的月份</span></div><div><strong id="lifeReadingMonthlyAverage">0</strong><span>平均每月完成篇數</span></div><div><strong id="lifeReadingMonthlyTrackedTotal">0</strong><span>有日期的完成篇數</span></div></div>
-  <div class="life-reading-daily-list" id="lifeReadingMonthlyRows"><div class="muted">尚無每月完成紀錄</div></div>
  </section>
  <section class="life-reading-testament" aria-labelledby="lifeReadingOldTitle"><div class="life-reading-testament-head"><h3 id="lifeReadingOldTitle">📜 舊約</h3><span class="muted" id="lifeReadingOldCount">0 / 867 篇 · 39 卷</span></div><div id="lifeReadingOldBooks"></div></section>
  <section class="life-reading-testament" aria-labelledby="lifeReadingNewTitle"><div class="life-reading-testament-head"><h3 id="lifeReadingNewTitle">✝️ 新約</h3><span class="muted" id="lifeReadingNewCount">0 / 1,117 篇 · 27 卷</span></div><div id="lifeReadingNewBooks"></div></section>
@@ -568,17 +564,11 @@ function renderLifeReadingDailyStats(){
  lifeReadingGroups.forEach(group=>{
   const dates=completedAt[group.key]&&typeof completedAt[group.key]==='object'?completedAt[group.key]:{};
   const completed=new Set(state.lifeReading?.completed?.[group.key]||[]);
-  Object.entries(dates).forEach(([lesson,date])=>{if(!completed.has(Number(lesson))||!/^\d{4}-\d{2}-\d{2}$/.test(String(date)))return;byDate[date]=(byDate[date]||0)+1});
+  Object.entries(dates).forEach(([lesson,date])=>{if(!completed.has(Number(lesson))||!/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(String(date)))return;byDate[date]=(byDate[date]||0)+1});
  });
- const dates=Object.keys(byDate).sort((a,b)=>b.localeCompare(a));
- const trackedTotal=dates.reduce((sum,date)=>sum+byDate[date],0),activeDays=dates.length,today=dateKey(new Date()),todayCount=byDate[today]||0;
+ const trackedTotal=Object.values(byDate).reduce((sum,count)=>sum+count,0);
  const totalCompleted=lifeReadingStats(lifeReadingGroups).completed,untracked=Math.max(0,totalCompleted-trackedTotal);
- $('lifeReadingTodayCount').textContent=`今天 ${todayCount} 篇`;
- $('lifeReadingActiveDays').textContent=String(activeDays);
- $('lifeReadingDailyAverage').textContent=activeDays?(trackedTotal/activeDays).toFixed(1):'0';
- $('lifeReadingTrackedTotal').textContent=trackedTotal.toLocaleString('zh-TW');
- $('lifeReadingDailyRows').innerHTML=dates.length?dates.map(date=>{const d=new Date(date+'T00:00:00');const label=`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;return `<div class="life-reading-daily-row"><span>${label}${date===today?'（今天）':''}</span><strong>${byDate[date]} 篇</strong></div>`}).join(''):'<div class="muted" style="padding:10px 2px;font-size:13px">尚無每日完成紀錄，勾選生命讀經篇數後就會從當天開始記錄。</div>';
- $('lifeReadingUntracked').textContent=untracked?`另有 ${untracked.toLocaleString('zh-TW')} 篇是新增每日統計前已勾選完成，沒有日期資料，因此不列入每日統計。`:'';
+ $('lifeReadingUntracked').textContent=untracked?`另有 ${untracked.toLocaleString('zh-TW')} 篇是新增日期統計前已勾選完成，沒有日期資料，因此不列入每月統計。`:'';
  renderLifeReadingMonthlyStats(byDate,trackedTotal);
  renderLifeReadingAnnualStats(byDate);
 }
@@ -589,7 +579,7 @@ function renderLifeReadingMonthlyStats(byDate,trackedTotal){
  const now=new Date(),currentMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`,thisMonth=byMonth[currentMonth]||0;
  const activeMonths=months.length,monthlyAverage=activeMonths?(trackedTotal/activeMonths).toFixed(1):'0';
  $('lifeReadingThisMonthCount').textContent=`本月 ${thisMonth} 篇`;$('lifeReadingActiveMonths').textContent=String(activeMonths);$('lifeReadingMonthlyAverage').textContent=monthlyAverage;$('lifeReadingMonthlyTrackedTotal').textContent=trackedTotal.toLocaleString('zh-TW');
- $('lifeReadingMonthlyRows').innerHTML=months.length?months.map(month=>{const [year,monthNumber]=month.split('-');return `<div class="life-reading-daily-row"><span>${year} 年 ${Number(monthNumber)} 月</span><strong>${byMonth[month]} 篇</strong></div>`}).join(''):'<div class="muted" style="padding:10px 2px;font-size:13px">尚無每月完成紀錄，勾選生命讀經篇數後就會從當月開始記錄。</div>';
+ $('lifeReadingMonthlyRows').innerHTML=months.length?months.map(month=>{const [year,monthNumber]=month.split('-');return `<div class="life-reading-monthly-row"><span>${year} 年 ${Number(monthNumber)} 月</span><strong>${byMonth[month]} 篇</strong></div>`}).join(''):'<div class="muted" style="padding:10px 2px;font-size:13px">尚無每月完成紀錄，勾選生命讀經篇數後就會從當月開始記錄。</div>';
 }
 function renderLifeReading(){
  if(!$('lifeReadingOldBooks'))return;
@@ -636,7 +626,8 @@ function renderBooks(){
  $('books').innerHTML=state.books.length?state.books.map((b,i)=>`<div class="book-row ${editModes.books?'edit-mode':''}"><div class="move-controls"><button class="move-btn" type="button" data-move="book" data-index="${i}" data-dir="-1" ${i===0?'disabled':''} aria-label="書報往前移">↑</button><button class="move-btn" type="button" data-move="book" data-index="${i}" data-dir="1" ${i===state.books.length-1?'disabled':''} aria-label="書報往後移">↓</button></div><button class="delete-x" type="button" data-bookdelete="${i}" aria-label="刪除書報" title="刪除">×</button><button type="button" class="book-title-toggle" data-booktoggle="${i}" aria-expanded="${!!b.expanded}"><span class="muted">${String(i+1).padStart(2,'0')}</span><span class="book-title-text">${esc(b.name.trim()||'點此輸入書報名稱')}</span>${b.done?'<span class="book-done-mark" aria-label="已讀完" title="已讀完">✓</span>':''}<span class="book-summary">${b.chapters>0?`${b.read||0}/${b.chapters} 章`:'尚未設定章數'}</span><span class="book-chevron">${b.expanded?'▲':'▼'}</span></button><div class="book-details" ${b.expanded?'':'hidden'}><div class="book-fields"><label style="flex:1;min-width:100px"><span class="book-label">書報名稱</span><input type="text" data-bookname="${i}" value="${esc(b.name)}" placeholder="輸入書報名稱" aria-label="第 ${i+1} 本書報名稱"></label><label><span class="book-label">總章數</span><input type="number" min="0" max="9999" data-bookchapters="${i}" value="${b.chapters||''}" placeholder="章" aria-label="總章數"></label><label><span class="book-label">已完成章數</span><input type="number" min="0" max="${Math.max(0,b.chapters||9999)}" data-bookread="${i}" value="${b.read||''}" placeholder="章" aria-label="已完成章數"></label></div><div class="book-check-delete"><label title="整本完成" style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted)"><input type="checkbox" data-bookcheck="${i}" ${b.done?'checked':''}>完成</label></div></div></div>`).join(''):'<div class="empty">還沒有書報，按「新增書報」開始記錄。</div>';
  const n=state.books.filter(b=>b.done).length;$('bookCount').textContent=n+'/'+state.books.length;$('bookProgress').textContent=`已完成 ${n} 本，共 ${state.books.length} 本`;
 }
-function renderTabRecords(key){const el=$('records-'+key),records=(state.tabRecords&&state.tabRecords[key])||[];if(!records.length){el.innerHTML='<div class="empty">目前還沒有紀錄，按「新增紀錄」開始整理。</div>';return}el.innerHTML=records.map((r,i)=>`<article class="record-card ${editModes[key]?'edit-mode':''}"><div class="move-controls"><button class="move-btn" type="button" data-move="record" data-key="${key}" data-index="${i}" data-dir="-1" ${i===0?'disabled':''} aria-label="紀錄往前移">↑</button><button class="move-btn" type="button" data-move="record" data-key="${key}" data-index="${i}" data-dir="1" ${i===records.length-1?'disabled':''} aria-label="紀錄往後移">↓</button></div><button class="delete-x" type="button" data-delete-record="${key}" data-record-id="${Number(r.id)}" aria-label="刪除紀錄" title="刪除">×</button><h3>${esc(r.title)}</h3>${r.body?`<p>${esc(r.body)}</p>`:'<p class="muted">尚未填寫補充內容</p>'}</article>`).join('')}
+function renderTabRecords(key){const el=$('records-'+key),records=(state.tabRecords&&state.tabRecords[key])||[];if(!records.length){el.innerHTML='<div class="empty">目前還沒有紀錄，按「新增紀錄」開始整理。</div>';return}el.innerHTML=records.map((r,i)=>`<article class="record-card ${editModes[key]?'edit-mode':''}"><div class="move-controls"><button class="move-btn" type="button" data-move="record" data-key="${key}" data-index="${i}" data-dir="-1" ${i===0?'disabled':''} aria-label="紀錄往前移">↑</button><button class="move-btn" type="button" data-move="record" data-key="${key}" data-index="${i}" data-dir="1" ${i===records.length-1?'disabled':''} aria-label="紀錄往後移">↓</button></div><button clas
+s="delete-x" type="button" data-delete-record="${key}" data-record-id="${Number(r.id)}" aria-label="刪除紀錄" title="刪除">×</button><h3>${esc(r.title)}</h3>${r.body?`<p>${esc(r.body)}</p>`:'<p class="muted">尚未填寫補充內容</p>'}</article>`).join('')}
 function getISOWeekInfo(date=new Date()){
  const day=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
  const weekday=day.getUTCDay()||7;
@@ -857,7 +848,7 @@ $('lifeReadingOldBooks').addEventListener('click',e=>{const toggle=e.target.clos
 $('lifeReadingNewBooks').addEventListener('click',e=>{const toggle=e.target.closest('[data-life-reading-toggle]');if(!toggle)return;const key=toggle.dataset.lifeReadingToggle;if(openLifeReadingGroups.has(key))openLifeReadingGroups.delete(key);else openLifeReadingGroups.add(key);renderLifeReading()});
 function handleLifeReadingChange(e){const input=e.target.closest('input[data-life-reading-key]');if(!input)return;const key=input.dataset.lifeReadingKey,lesson=Number(input.dataset.lifeReadingLesson),group=lifeReadingGroups.find(g=>g.key===key);if(!group||!Number.isInteger(lesson)||lesson<1||lesson>group.total)return;if(!state.lifeReading)state.lifeReading={completed:{},completedAt:{},plan:{mode:'date',deadline:'',weeklyTarget:''}};if(!state.lifeReading.completed)state.lifeReading.completed={};if(!state.lifeReading.completedAt)state.lifeReading.completedAt={};const set=new Set(state.lifeReading.completed[key]||[]);if(input.checked){set.add(lesson);if(!state.lifeReading.completedAt[key])state.lifeReading.completedAt[key]={};state.lifeReading.completedAt[key][lesson]=dateKey(new Date())}else{set.delete(lesson);if(state.lifeReading.completedAt[key])delete state.lifeReading.completedAt[key][lesson]}state.lifeReading.completed[key]=[...set].sort((a,b)=>a-b);syncLifeReadingGoal();persist();renderLifeReading();renderGoals()}
 $('lifeReadingOldBooks').addEventListener('change',handleLifeReadingChange);$('lifeReadingNewBooks').addEventListener('change',handleLifeReadingChange);
-$('lifeReadingPlanModeDate').addEventListener('click',()=>{lifeReadingPlanState().mode='date';persist();renderLifeReadingPlan()});$('lifeReadingPlanModeWeekly').addEventListener('click',()=>{lifeReadingPlanState().mode='weekly';persist();renderLifeReadingPlan()});$('lifeReadingPlanCalculate').addEventListener('click',saveLifeReadingPlan);$('lifeReadingPlanDeadline').addEventListener('change',()=>{lifeReadingPlanState().deadline=$('lifeReadingPlanDeadline').value;persist();calculateLifeReadingPlan()});$('lifeReadingPlanWeeklyTarget').addEventListener('change',()=>{lifeReadingPlanState().weeklyTarget=Math.max(0,Math.min(LIFE_READING_TOTAL,Math.floor(Number($('lifeReadingPlanWeeklyTarget').value)||0)));persist();calculateLifeReadingPlan()});
+$('lifeReadingPlanModeDate').addEventListener('click',()=>{lifeReadingPlanState().mode='date';persist();renderLifeReadingPlan()});$('lifeReadingPlanModeWeekly').addEventListener('click',()=>{lifeReadingPlanState().mode='weekly';persist();renderLifeReadingPlan()});$('lifeReadingPlanCalculate').addEventListener('click',saveLifeReadingPlan);$('lifeReadingPlanDeadline').addEventListener('change',()=>{lifeReadingPlanState().deadline=$('lifeReadingPlanDeadline').value;persist();calculateLifeReadingPlan()});$('lifeReadingPlanWeeklyTarget').addEventListener('input',e=>{const clean=e.target.value.replace(/[^0-9]/g,'').slice(0,4);if(e.target.value!==clean)e.target.value=clean;lifeReadingPlanState().weeklyTarget=clean?Math.min(LIFE_READING_TOTAL,Number(clean)):'';calculateLifeReadingPlan()});$('lifeReadingPlanWeeklyTarget').addEventListener('change',()=>{const clean=$('lifeReadingPlanWeeklyTarget').value.replace(/[^0-9]/g,'').slice(0,4);$('lifeReadingPlanWeeklyTarget').value=clean;lifeReadingPlanState().weeklyTarget=clean?Math.min(LIFE_READING_TOTAL,Number(clean)):'';persist();calculateLifeReadingPlan()});
 $('menuLifeReading').addEventListener('click',()=>{document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-life-reading');document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false')});$('mainNavTabs').hidden=true;$('pageEditToolbar').hidden=true;closeMenu();renderLifeReading();window.scrollTo({top:0,behavior:'smooth'})});
 $('schedulePrev').addEventListener('click',()=>{scheduleWeekStart.setDate(scheduleWeekStart.getDate()-7);scheduleSelectedDate=dateKey(scheduleWeekStart);renderSchedule()});
 $('scheduleNext').addEventListener('click',()=>{scheduleWeekStart.setDate(scheduleWeekStart.getDate()+7);scheduleSelectedDate=dateKey(scheduleWeekStart);renderSchedule()});
