@@ -18,7 +18,7 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 </head>
 <body>
 <div class="wrap">
-<header class="top"><div class="brand"><button class="logo" id="menuToggle" type="button" aria-label="開啟主選單／個人頭貼" aria-expanded="false" aria-controls="sideMenu"><span id="headerAvatarFallback">🌱</span><img id="headerAvatarImage" alt="個人頭貼" hidden></button><div><div class="eyebrow">MY YEAR, ONE STEP AT A TIME</div><h1>向著標竿竭力追求</h1><div class="muted">在每一天的行動中與主同行</div></div></div><button class="year countdown-trigger" id="countdownOpenBtn" type="button" aria-haspopup="dialog" aria-controls="countdownModal"><span class="countdown-year">2026</span><span class="countdown-label">倒數天數</span><strong id="countdownValue">設定日期</strong></button></header>
+<header class="top"><div class="brand"><button class="logo" id="menuToggle" type="button" aria-label="開啟主選單／個人頭貼" aria-expanded="false" aria-controls="sideMenu"><span id="headerAvatarFallback">🌱</span><img id="headerAvatarImage" alt="個人頭貼" hidden></button><div><div class="eyebrow">MY YEAR, ONE STEP AT A TIME</div><h1>向著標竿竭力追求</h1><div class="muted">在每一天的行動中與主同行</div></div></div><button class="year countdown-trigger" id="countdownOpenBtn" type="button" aria-haspopup="dialog" aria-controls="countdownModal"><span class="countdown-year">2026</span><span class="countdown-label" id="countdownLabel">倒數天數</span><strong id="countdownValue">設定日期</strong></button></header>
 <div class="menu-backdrop" id="menuBackdrop" hidden></div>
 <aside class="side-menu" id="sideMenu" aria-label="主選單" hidden>
  <div class="menu-head"><div class="menu-title">👤 個人選單</div><button class="mini" id="menuClose" type="button" aria-label="關閉選單">✕</button></div>
@@ -65,7 +65,7 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 <div class="panel"><div class="sectionhead"><h2>📖 真理</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn secondary edit-toggle" type="button" data-edit-page="truth" aria-pressed="false">編輯</button><button class="btn" type="button" data-add-record="truth">＋ 新增紀錄</button></div></div><p class="subpage-intro">收集真理追求、經節、讀經心得與信息摘要。這裡的真理紀錄與上方書報閱讀紀錄分開保存、分開編輯。</p><form class="record-form" id="form-truth" hidden><input name="title" maxlength="120" placeholder="紀錄標題，例如：羅馬書第八章" required><textarea name="body" maxlength="5000" placeholder="記錄經節、亮光、心得或追求進度（選填）"></textarea><div class="dialog-actions"><button class="btn secondary" type="button" data-cancel-record="truth">取消</button><button class="btn" type="submit">儲存紀錄</button></div></form><div class="record-list" id="records-truth"></div></div></section>
 <div class="cloud-state" id="cloudStatus">登入後開始同步</div></div></div>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="dialog"><h2 id="modalTitle">新增年度目標</h2><label for="goalName">目標名稱</label><input id="goalName" maxlength="100" placeholder="例如：每週禱研背講"><label for="goalCategory">分類</label><select id="goalCategory"><option>生活</option><option>閱讀</option><option>學習</option><option>服事</option><option>健康</option><option>其他</option></select><label for="goalTarget">目標數量（沒有數量目標可填 1）</label><input id="goalTarget" type="number" min="1" max="100000" value="1"><div class="dialog-actions"><button class="btn secondary" id="cancelBtn">取消</button><button class="btn" id="createBtn">新增</button></div><div class="notice">例如「讀完十本書報」可設定數量 10，之後用 +1 記錄進度。</div></div></div>
-<div class="modal" id="countdownModal" role="dialog" aria-modal="true" aria-labelledby="countdownModalTitle"><div class="dialog"><h2 id="countdownModalTitle">設定 2026 倒數日期</h2><p class="muted">選擇你想倒數的日期，首頁會自動顯示剩餘天數。</p><label for="countdownDateInput">倒數目標日期</label><input id="countdownDateInput" type="date" min="2026-01-01"><div class="dialog-actions"><button class="btn secondary" id="countdownCancelBtn" type="button">取消</button><button class="btn" id="countdownSaveBtn" type="button">儲存日期</button></div><div class="notice">日期可以隨時重新設定；儲存後會同步至你的雲端紀錄。</div></div></div>
+<div class="modal" id="countdownModal" role="dialog" aria-modal="true" aria-labelledby="countdownModalTitle"><div class="dialog"><h2 id="countdownModalTitle">編輯倒數項目</h2><p class="muted">可以自訂首頁顯示的名稱，也可以設定或更改倒數日期。</p><label for="countdownNameInput">自訂名稱</label><input id="countdownNameInput" type="text" maxlength="24" placeholder="例如：年度目標、受浸目標、活動倒數" required><label for="countdownDateInput">倒數目標日期</label><input id="countdownDateInput" type="date" min="2026-01-01"><div class="dialog-actions"><button class="btn secondary" id="countdownCancelBtn" type="button">取消</button><button class="btn" id="countdownSaveBtn" type="button">儲存日期</button></div><div class="notice">日期可以隨時重新設定；儲存後會同步至你的雲端紀錄。</div></div></div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
@@ -103,7 +103,8 @@ const freshState=()=>({
   tabRecords:emptyTabRecords(),
   shepherds:[],
   baptizedPeople:[],
-  countdownDate:''
+  countdownDate:'',
+  countdownName:'倒數天數'
 });
 let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='';
 const serialize=value=>JSON.stringify({
@@ -114,7 +115,8 @@ const serialize=value=>JSON.stringify({
   tabRecords:value.tabRecords||emptyTabRecords(),
   shepherds:value.shepherds||[],
   baptizedPeople:value.baptizedPeople||[],
-  countdownDate:value.countdownDate||''
+  countdownDate:value.countdownDate||'',
+  countdownName:value.countdownName||'倒數天數'
 });
 function normalizeState(raw){
  const base=raw&&typeof raw==='object'?raw:{};
@@ -129,7 +131,8 @@ function normalizeState(raw){
   weekNote:String(base.weekNote||''),nextWeek:String(base.nextWeek||''),tabRecords,
   shepherds:Array.isArray(base.shepherds)?base.shepherds.map((s,i)=>({id:s.id??i+1,name:String(s.name||''),records:Array.isArray(s.records)?s.records.map((r,j)=>({id:r.id??(Date.now()+j),shepherdName:String(r.shepherdName||''),identity:String(r.identity||''),homeTime:String(r.homeTime||''),material:String(r.material||'')})):[{id:Date.now()+i,shepherdName:String(s.shepherdName||''),identity:String(s.identity||''),homeTime:String(s.homeTime||''),material:String(s.material||'')}],expanded:!!s.expanded})): [],
   baptizedPeople:Array.isArray(base.baptizedPeople)?base.baptizedPeople.map((p,i)=>({id:p.id??Date.now()+i,name:String(p.name||''),date:String(p.date||''),department:String(p.department||''),shepherd:String(p.shepherd||''),expanded:!!p.expanded})): [],
-  countdownDate:/^\d{4}-\d{2}-\d{2}$/.test(String(base.countdownDate||''))?String(base.countdownDate):''
+  countdownDate:/^\d{4}-\d{2}-\d{2}$/.test(String(base.countdownDate||''))?String(base.countdownDate):'',
+  countdownName:String(base.countdownName||'倒數天數').slice(0,24)
  };
 }
 function persist(){
@@ -309,6 +312,7 @@ function renderTabRecords(key){const el=$('records-'+key),records=(state.tabReco
 function renderAllTabRecords(){['service','church','truth'].forEach(renderTabRecords)}
 function renderCountdown(){
  const value=$('countdownValue');
+ $('countdownLabel').textContent=state.countdownName||'倒數天數';
  const date=String(state.countdownDate||'');
  if(!date){value.textContent='設定日期';return}
  const [year,month,day]=date.split('-').map(Number);
@@ -320,13 +324,17 @@ function renderCountdown(){
 }
 $('countdownOpenBtn').addEventListener('click',()=>{
  $('countdownDateInput').value=state.countdownDate||'';
+ $('countdownNameInput').value=state.countdownName||'倒數天數';
  $('countdownModal').classList.add('open');
 });
 $('countdownCancelBtn').addEventListener('click',()=>$('countdownModal').classList.remove('open'));
 $('countdownModal').addEventListener('click',e=>{if(e.target===$('countdownModal'))$('countdownModal').classList.remove('open')});
 $('countdownSaveBtn').addEventListener('click',()=>{
  const date=$('countdownDateInput').value;
+ const name=$('countdownNameInput').value.trim();
+ if(!name){alert('請輸入倒數名稱。');$('countdownNameInput').focus();return}
  if(!date){alert('請先選擇倒數日期。');return}
+ state.countdownName=name.slice(0,24);
  state.countdownDate=date;
  persist();
  renderCountdown();
