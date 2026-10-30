@@ -934,8 +934,8 @@ function renderSchedule(){
  const weekTimeLabels=Array.from({length:weekSlotCount+1},(_,i)=>{const m=weekVisibleStart+i*30;return `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`});
  const weekDays=Array.from({length:7},(_,dayIndex)=>{const d=new Date(start);d.setDate(start.getDate()+dayIndex);const key=dateKey(d),events=scheduleEventsForDate(key).map(e=>{const [sh,sm]=e.start.split(':').map(Number),[eh,em]=e.end.split(':').map(Number),a=sh*60+sm,b=eh*60+em;if(b<=weekVisibleStart||a>=weekVisibleEnd)return null;return {...e,_from:Math.max(0,Math.min(weekSlotCount-1,Math.floor((a-weekVisibleStart)/30))),_to:Math.max(1,Math.min(weekSlotCount,Math.ceil((b-weekVisibleStart)/30)))}}).filter(Boolean).sort((a,b)=>a._from-b._from||a._to-b._to);
   const laneEnds=[];events.forEach(ev=>{let lane=laneEnds.findIndex(end=>end<=ev._from);if(lane<0){lane=laneEnds.length;laneEnds.push(0)}laneEnds[lane]=ev._to;ev._lane=lane});
-  const addSlots=weekTimeLabels.map((t,i)=>`<button class="schedule-week-add" type="button" data-schedule-add="${t}" data-event-date="${key}" aria-label="新增 ${t} 安排">＋</button>`).join('');
-  const eventCards=events.map(ev=>{const c=scheduleCategory(ev.category);return `<article class="schedule-event schedule-week-event ${ev.done?'is-done':''}" style="--event-color:${c.color};grid-row:${ev._from+1}/${ev._to+1};grid-column:${ev._lane+1}" data-schedule-open="${ev.id}" data-origin="${ev._origin}" data-event-date="${key}" tabindex="0" role="button" aria-label="開啟並編輯 ${esc(ev.plan||'未命名安排')}"><div class="schedule-event-main"><div class="schedule-plan-column"><strong class="schedule-event-plan">${esc(ev.plan||'未命名安排')}</strong><span class="schedule-event-category">${ev.start}–${ev.end} · ${esc(ev.category||'其他')}</span></div><div class="schedule-result-column"><div class="schedule-result-row"><label class="schedule-result-check" aria-label="完成勾選"><input type="checkbox" data-schedule-entry-done="${ev.id}" data-origin="${ev._origin}" data-occurrence-date="${key}" ${ev.done?'checked':''}></label><input class="schedule-result-text" type="text" maxlength="500" value="${esc(ev.result||'')}" placeholder="結果" data-schedule-entry-result="${ev.id}" data-origin="${ev._origin}" data-occurrence-date="${key}" aria-label="結果紀錄"></div></div></div></article>`}).join('');
+  const addSlots=weekTimeLabels.slice(0,-1).map((t,i)=>`<button class="schedule-week-add" type="button" data-schedule-add="${t}" data-event-date="${key}" aria-label="新增 ${t} 安排">＋</button>`).join('');
+  const eventCards=events.map(ev=>{const c=scheduleCategory(ev.category);return `<article class="schedule-event schedule-week-event ${ev.done?'is-done':''}" style="--event-color:${c.color};grid-row:${ev._from+1}/${ev._to+1};grid-column:${ev._lane+1}"><div class="schedule-event-main"><div class="schedule-plan-column" data-schedule-open="${ev.id}" data-origin="${ev._origin}" data-event-date="${key}" tabindex="0" role="button" aria-label="開啟並編輯 ${esc(ev.plan||'未命名安排')}"><strong class="schedule-event-plan">${esc(ev.plan||'未命名安排')}</strong><span class="schedule-event-category">${ev.start}–${ev.end} · ${esc(ev.category||'其他')}</span></div><div class="schedule-result-column"><div class="schedule-result-row"><label class="schedule-result-check" aria-label="完成勾選"><input type="checkbox" data-schedule-entry-done="${ev.id}" data-origin="${ev._origin}" data-occurrence-date="${key}" ${ev.done?'checked':''}></label><input class="schedule-result-text" type="text" maxlength="500" value="${esc(ev.result||'')}" placeholder="結果" data-schedule-entry-result="${ev.id}" data-origin="${ev._origin}" data-occurrence-date="${key}" aria-label="結果紀錄"></div></div></div></article>`}).join('');
   return `<section class="schedule-week-day-column"><header><strong>${['週一','週二','週三','週四','週五','週六','週日'][dayIndex]}<br>${d.getMonth()+1}/${d.getDate()}</strong><button class="schedule-add" data-schedule-add="${key}" type="button" aria-label="新增安排">＋</button></header><div class="schedule-week-day-track" style="--week-lanes:${Math.max(1,laneEnds.length)}">${addSlots}${eventCards}</div></section>`;
  }).join('');
  $('scheduleWeekOverview').innerHTML=`<div class="schedule-week-scroll"><div class="schedule-week-board"><div class="schedule-week-corner">時間</div>${weekDays}<div class="schedule-week-time-labels">${weekTimeLabels.map(t=>`<time>${t}</time>`).join('')}</div></div></div>`;
@@ -965,7 +965,7 @@ function openScheduleCategories(){renderScheduleCategories();$('scheduleCategory
 function renderScheduleCategories(){$('scheduleCategoryList').innerHTML=scheduleCategories().map((c,i)=>`<div class="schedule-category-row"><span class="schedule-category-swatch" style="background:${c.color}"></span><input class="schedule-category-name" type="text" maxlength="24" value="${esc(c.name)}" data-category-name="${i}" aria-label="分類名稱"><input type="color" value="${c.color}" data-category-color="${i}" aria-label="${esc(c.name)}顏色"><button class="mini" data-category-delete="${i}" type="button" ${scheduleCategories().length<=1?'disabled':''}>刪除</button></div>`).join('')}
 function closeScheduleCategories(){$('scheduleCategoryModal').classList.remove('open');$('scheduleCategoryModal').hidden=true}
 function renderScheduleStats(){const week=[];for(let i=0;i<7;i++){const d=new Date(scheduleWeekStart);d.setDate(d.getDate()+i);week.push(...scheduleEventsForDate(dateKey(d)))}const grouped={};week.forEach(e=>{const c=e.category||'其他';grouped[c]??={total:0,done:0,items:{}};grouped[c].total++;if(e.done)grouped[c].done++;grouped[c].items[e.plan||'未命名安排']=(grouped[c].items[e.plan||'未命名安排']||0)+1});$('scheduleStatsContent').innerHTML=Object.entries(grouped).length?Object.entries(grouped).map(([name,v])=>{const c=scheduleCategory(name);return `<div class="schedule-stat-group"><div class="schedule-stat-head"><span class="schedule-category-swatch" style="background:${c.color}"></span><strong>${esc(name)}</strong><b>${v.total} 項 · 完成 ${v.done}</b></div>${Object.entries(v.items).map(([item,count])=>`<div class="schedule-stat-item"><span>${esc(item)}</span><span>${count} 次</span></div>`).join('')}</div>`}).join(''):'<p class="empty">本週尚無安排可供統計。</p>'}
-function handleScheduleClick(e){if(e.target.closest('[data-schedule-entry-result],[data-schedule-entry-done]'))return;const dayBtn=e.target.closest('[data-schedule-day]');if(dayBtn){scheduleSelectedDate=dayBtn.dataset.scheduleDay;renderSchedule();return}const add=e.target.closest('[data-schedule-add]');if(add){if(add.dataset.scheduleAdd.includes('-'))openScheduleEntry(add.dataset.scheduleAdd);else{const addDate=add.dataset.eventDate||scheduleSelectedDate;openScheduleEntry(addDate);$('scheduleStartInput').value=add.dataset.scheduleAdd;$('scheduleEndInput').value=addMinutes(add.dataset.scheduleAdd,60)}return}const edit=e.target.closest('[data-schedule-entry-edit],[data-schedule-week-edit],[data-schedule-open]');if(edit){openScheduleEntry(edit.dataset.eventDate||scheduleSelectedDate,edit.dataset.scheduleEntryEdit||edit.dataset.scheduleWeekEdit||edit.dataset.scheduleOpen,edit.dataset.origin);return}const del=e.target.closest('[data-schedule-entry-delete]');if(del){const found=findScheduleEvent(del.dataset.scheduleEntryDelete,del.dataset.origin);if(found){found.day.slots[found.slot]=found.day.slots[found.slot].filter(x=>String(x.id)!==String(del.dataset.scheduleEntryDelete));if(!found.day.slots[found.slot].length)delete found.day.slots[found.slot];persist();renderSchedule()}return}const noteDel=e.target.closest('[data-schedule-note-delete]');if(noteDel){const day=scheduleDayData(scheduleSelectedDate);day.notes=day.notes.filter(n=>String(n.id)!==String(noteDel.dataset.scheduleNoteDelete));persist();renderSchedule();return}}
+function handleScheduleClick(e){if(e.target.closest('.schedule-result-row,[data-schedule-entry-result],[data-schedule-entry-done]')){e.stopPropagation();return;}const dayBtn=e.target.closest('[data-schedule-day]');if(dayBtn){scheduleSelectedDate=dayBtn.dataset.scheduleDay;renderSchedule();return}const add=e.target.closest('[data-schedule-add]');if(add){if(add.dataset.scheduleAdd.includes('-'))openScheduleEntry(add.dataset.scheduleAdd);else{const addDate=add.dataset.eventDate||scheduleSelectedDate;openScheduleEntry(addDate);$('scheduleStartInput').value=add.dataset.scheduleAdd;$('scheduleEndInput').value=addMinutes(add.dataset.scheduleAdd,60)}return}const edit=e.target.closest('[data-schedule-entry-edit],[data-schedule-week-edit],[data-schedule-open]');if(edit){openScheduleEntry(edit.dataset.eventDate||scheduleSelectedDate,edit.dataset.scheduleEntryEdit||edit.dataset.scheduleWeekEdit||edit.dataset.scheduleOpen,edit.dataset.origin);return}const del=e.target.closest('[data-schedule-entry-delete]');if(del){const found=findScheduleEvent(del.dataset.scheduleEntryDelete,del.dataset.origin);if(found){found.day.slots[found.slot]=found.day.slots[found.slot].filter(x=>String(x.id)!==String(del.dataset.scheduleEntryDelete));if(!found.day.slots[found.slot].length)delete found.day.slots[found.slot];persist();renderSchedule()}return}const noteDel=e.target.closest('[data-schedule-note-delete]');if(noteDel){const day=scheduleDayData(scheduleSelectedDate);day.notes=day.notes.filter(n=>String(n.id)!==String(noteDel.dataset.scheduleNoteDelete));persist();renderSchedule();return}}
 function handleScheduleChange(e){const resultInput=e.target.closest('[data-schedule-entry-result]');if(resultInput){const occurrence=scheduleOccurrence(resultInput.dataset.occurrenceDate||scheduleSelectedDate,resultInput.dataset.origin,resultInput.dataset.scheduleEntryResult);occurrence.result=resultInput.value;persist();return}const nameInput=e.target.closest('[data-category-name]');if(nameInput){const index=Number(nameInput.dataset.categoryName),oldName=scheduleCategories()[index]?.name,newName=nameInput.value.trim();if(!newName){nameInput.value=oldName;return}if(scheduleCategories().some((c,i)=>i!==index&&c.name===newName)){alert('這個分類名稱已經存在。');nameInput.value=oldName;return}scheduleCategories()[index].name=newName;Object.values(state.weeklySchedule||{}).forEach(day=>Object.values(day.slots||{}).forEach(list=>(list||[]).forEach(item=>{if(item.category===oldName)item.category=newName})));persist();renderScheduleCategories();renderSchedule();return}const color=e.target.closest('[data-category-color]');if(color){scheduleCategories()[Number(color.dataset.categoryColor)].color=color.value;persist();renderScheduleCategories();renderSchedule();return}const remove=e.target.closest('[data-category-delete]');if(remove){scheduleCategories().splice(Number(remove.dataset.categoryDelete),1);persist();renderScheduleCategories();renderSchedule();return}const entry=e.target.closest('[data-schedule-entry-done]');if(entry){const occurrence=scheduleOccurrence(entry.dataset.occurrenceDate||scheduleSelectedDate,entry.dataset.origin,entry.dataset.scheduleEntryDone);occurrence.done=entry.checked;const card=entry.closest('.schedule-event');if(card)card.classList.toggle('is-done',entry.checked);persist();return}const note=e.target.closest('[data-schedule-note-done]');if(note){const item=scheduleDayData(scheduleSelectedDate).notes.find(n=>String(n.id)===String(note.dataset.scheduleNoteDone));if(item){item.done=note.checked;persist();renderSchedule()}}}
 function renderCountdown(){
  const value=$('countdownValue');
@@ -1268,6 +1268,76 @@ const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);s
  .schedule-agenda-table .schedule-result-row{grid-template-columns:17px minmax(0,1fr)!important;gap:3px!important}
  .schedule-agenda-table .schedule-result-text{font-size:11px!important;padding:4px 3px!important}
  .schedule-week-board{grid-template-columns:43px repeat(7,minmax(116px,1fr));min-width:855px}
+}
+</style>
+
+<style id="schedule-week-final-interaction-fix">
+/* 整週總覽：每個 30 分鐘是一個實際格線；跨時段行程由 grid-row 自動完整跨格 */
+.schedule-week-day-track{
+  grid-template-rows:repeat(36,38px)!important;
+  grid-auto-rows:38px!important;
+  row-gap:0!important;
+  column-gap:0!important;
+}
+.schedule-week-add{
+  border:0!important;
+  border-bottom:1px solid var(--line)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  outline-offset:-2px;
+  background:transparent!important;
+}
+.schedule-week-day-column header .schedule-add,
+.schedule-week-day-column header button.schedule-add{
+  width:26px!important;height:26px!important;min-height:26px!important;
+  flex:0 0 26px!important;padding:0!important;
+  border:0!important;border-radius:0!important;
+  box-shadow:none!important;background:transparent!important;
+  appearance:none!important;-webkit-appearance:none!important;
+}
+.schedule-week-event{
+  align-self:stretch!important;justify-self:stretch!important;
+  height:100%!important;min-height:0!important;margin:0!important;
+  padding:0!important;border:0!important;border-radius:0!important;
+  overflow:hidden!important;background:transparent!important;
+  pointer-events:auto!important;
+}
+.schedule-week-event .schedule-event-main{
+  display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  grid-template-areas:"plan result"!important;gap:0!important;
+  width:100%!important;height:100%!important;min-height:100%!important;
+  align-items:stretch!important;
+}
+.schedule-week-event .schedule-plan-column,
+.schedule-week-event .schedule-result-column{
+  display:flex!important;box-sizing:border-box!important;
+  width:100%!important;max-width:100%!important;height:100%!important;
+  min-height:100%!important;margin:0!important;border:0!important;
+  border-radius:0!important;overflow:hidden!important;
+}
+.schedule-week-event .schedule-plan-column{
+  grid-area:plan!important;
+  background:color-mix(in srgb,var(--event-color) 60%,transparent)!important;
+  border-right:1px solid color-mix(in srgb,#52606a 35%,transparent)!important;
+  cursor:pointer!important;pointer-events:auto!important;
+}
+.schedule-week-event .schedule-result-column{
+  grid-area:result!important;
+  background:color-mix(in srgb,var(--event-color) 30%,transparent)!important;
+  justify-content:center!important;pointer-events:auto!important;
+}
+.schedule-week-event .schedule-result-row,
+.schedule-week-event .schedule-result-check,
+.schedule-week-event .schedule-result-text{
+  pointer-events:auto!important;
+}
+.schedule-week-event .schedule-result-text{
+  touch-action:auto!important;user-select:text!important;-webkit-user-select:text!important;
+  -webkit-appearance:none!important;appearance:none!important;
+}
+@media(max-width:620px){
+  .schedule-week-event .schedule-plan-column,.schedule-week-event .schedule-result-column{padding:3px 4px!important}
+  .schedule-week-event .schedule-result-text{font-size:9px!important}
 }
 </style>
 </body>
