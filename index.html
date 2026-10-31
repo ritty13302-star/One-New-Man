@@ -2465,3 +2465,51 @@ body.dark-night .journey-stack-dots span.active{background:var(--green,#8d9f91)!
 body.dark-night .journey-stack-dots small{color:#c2c6ca!important}
 
 </style>
+
+
+<style id="final-journey-todo-overflow-fix">
+/* 最終修正：滑動提示區不加外框；卡片顏色嚴格裁切在圓角內 */
+.journey-stack{
+  background:transparent!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  padding:0!important;
+  overflow:visible!important;
+}
+#journeyWidget,#todoWidget{
+  box-sizing:border-box!important;
+  border-radius:19px!important;
+  overflow:hidden!important;
+  clip-path:inset(0 round 19px)!important;
+  background-image:none!important;
+  background-color:var(--card,#fff)!important;
+  border:1px solid var(--line,#dfe3e8)!important;
+  isolation:isolate!important;
+}
+#journeyWidget::before,#journeyWidget::after,#todoWidget::before,#todoWidget::after{
+  border-radius:inherit!important;
+  overflow:hidden!important;
+}
+.journey-stack-dots{
+  background:transparent!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+  padding:8px 0 0!important;
+}
+body.dark-night .journey-stack{background:transparent!important;border:0!important;box-shadow:none!important}
+body.dark-night #journeyWidget,body.dark-night #todoWidget{
+  background-image:none!important;
+  background-color:#383b3f!important;
+  border-color:#50545a!important;
+  color:var(--ink,#f1f2f4)!important;
+  border-radius:19px!important;
+  clip-path:inset(0 round 19px)!important;
+}
+body.dark-night .journey-stack-dots{background:transparent!important;border:0!important;box-shadow:none!important}
+body.dark-night .journey-stack-dots span{background:#555a60!important}
+body.dark-night .journey-stack-dots span.active{background:var(--green,#8d9f91)!important}
+</style>
