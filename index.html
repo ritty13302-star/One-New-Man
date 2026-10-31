@@ -1737,6 +1737,14 @@ body.dark-night .todo-open-modal-btn{background:#607d68!important;color:#fff!imp
 body.dark-night .todo-count-badge{background:#50555b!important;color:#f1f2f4!important}
 @media(max-width:420px){.todo-list{max-height:92px}.todo-widget{padding:16px!important}}
 </style>
+
+<style id="journey-todo-hidden-fix">
+/* 確保切換小工具時，未選取的面板完全隱藏，不會堆疊在另一個面板下方 */
+.journey-widget[hidden],
+.todo-widget[hidden]{display:none!important}
+.journey-stack{position:relative}
+</style>
+
 </body>
 </html>
 
