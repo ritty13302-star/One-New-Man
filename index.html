@@ -2165,6 +2165,44 @@ body.dark-night .todo-count-badge{
 
 </style>
 
+
+<style id="deep-night-card-edge-final-fix">
+/* 深夜模式最終裁切：小工具背景不得延伸到下方滑動指示區 */
+.journey-stack, body.dark-night .journey-stack{
+  display:flex!important; flex-direction:column!important; gap:0!important;
+  background:transparent!important; background-image:none!important;
+  border:0!important; outline:0!important; box-shadow:none!important;
+  border-radius:0!important; padding:0!important; overflow:visible!important;
+}
+#journeyWidget, #todoWidget,
+body.dark-night #journeyWidget, body.dark-night #todoWidget{
+  position:relative!important; flex:0 0 auto!important;
+  box-sizing:border-box!important;
+  border-radius:19px!important;
+  overflow:hidden!important; overflow:clip!important;
+  contain:paint!important; isolation:isolate!important;
+  background-clip:padding-box!important; background-image:none!important;
+  -webkit-mask-image:-webkit-radial-gradient(white, black)!important;
+}
+body.dark-night #journeyWidget, body.dark-night #todoWidget{
+  background:#383b3f!important;
+  border:1px solid #50545a!important;
+  box-shadow:none!important;
+}
+/* 內部裝飾與偽元素也不得越過卡片圓角 */
+#journeyWidget::before, #journeyWidget::after,
+#todoWidget::before, #todoWidget::after{
+  border-radius:inherit!important; clip-path:inset(0 round 19px)!important;
+}
+/* 切換指示區完全獨立、透明且無框，不承接卡片背景 */
+.journey-stack-dots, body.dark-night .journey-stack-dots{
+  position:relative!important; z-index:0!important;
+  background:transparent!important; background-image:none!important;
+  border:0!important; outline:0!important; box-shadow:none!important;
+  border-radius:0!important; padding:8px 0 0!important;
+}
+</style>
+
 </body>
 </html>
 
