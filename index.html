@@ -542,12 +542,12 @@ body.dark-night .todo-empty{color:#b9bec4}
 <div id="appContent" class="auth-hidden">
 <nav class="nav-tabs" id="mainNavTabs" aria-label="主要分頁" role="tablist"><button class="nav-tab active" type="button" data-page="target" role="tab" aria-selected="true">🎯 目標</button><button class="nav-tab" type="button" data-page="service" role="tab" aria-selected="false">🤝 事奉</button><button class="nav-tab" type="button" data-page="church" role="tab" aria-selected="false">🌿 召會</button><button class="nav-tab" type="button" data-page="truth" role="tab" aria-selected="false">📖 真理</button></nav>
 <section id="page-target" class="page-panel" role="tabpanel">
-<section class="journey-stack" data-block-id="target-hero" aria-label="年度旅程小工具">
- <div class="journey-stack-tabs"><button type="button" class="journey-stack-tab active" data-journey-stack="journey" aria-pressed="true">🌱 年度旅程</button><button type="button" class="journey-stack-tab" data-journey-stack="todo" aria-pressed="false">☑️ 代辦事項 <span id="todoCountBadge" class="todo-count-badge">0</span></button></div>
+<section class="journey-stack" data-block-id="target-hero" aria-label="年度旅程與代辦事項小工具">
  <section class="journey-widget" id="journeyWidget"><small>我的年度旅程</small><h2>今天也向前一步。</h2><div class="journey-progress-label"><span>年度目標完成率</span><strong id="totalText">0%</strong></div><div class="progressline"><span id="totalBar"></span></div><div class="journey-widget-foot">一點一點累積，向目標前進</div></section>
- <section class="journey-widget todo-widget" id="todoWidget" hidden><div class="todo-widget-heading"><div><small>MY TO-DO</small><h2>代辦事項</h2></div><span class="todo-widget-icon">☑</span></div><p class="todo-widget-subtitle">提醒自己，還有哪些事情尚未完成。</p><form id="todoAddForm" class="todo-add-form"><input id="todoInput" type="text" maxlength="160" placeholder="新增一件待辦事項…" aria-label="新增代辦事項" required><button type="submit" aria-label="新增代辦事項">＋</button></form><div id="todoList" class="todo-list"></div><div id="todoEmpty" class="todo-empty">目前沒有待辦事項，享受清爽的一天吧！</div></section>
- <div class="journey-stack-dots"><span class="active" data-journey-dot="journey"></span><span data-journey-dot="todo"></span><small>左右切換小工具</small></div>
+ <section class="journey-widget todo-widget" id="todoWidget" hidden><div class="todo-widget-heading"><div><small>MY TO-DO</small><h2>代辦事項 <span id="todoCountBadge" class="todo-count-badge">0</span></h2></div></div><p class="todo-widget-subtitle">提醒自己，還有哪些事情尚未完成。</p><button id="openTodoModal" type="button" class="todo-open-modal-btn">＋ 新增待辦事項</button><div id="todoList" class="todo-list"></div><div id="todoEmpty" class="todo-empty">目前沒有待辦事項，享受清爽的一天吧！</div></section>
+ <div class="journey-stack-dots" aria-hidden="true"><span class="active" data-journey-dot="journey"></span><span data-journey-dot="todo"></span><small>左右滑動切換小工具</small></div>
  </section>
+<div class="todo-modal-backdrop" id="todoModal" hidden><section class="todo-modal" role="dialog" aria-modal="true" aria-labelledby="todoModalTitle"><div class="todo-modal-head"><h3 id="todoModalTitle">新增待辦事項</h3><button type="button" id="closeTodoModal" class="todo-modal-close" aria-label="關閉">×</button></div><form id="todoAddForm" class="todo-modal-form"><label for="todoInput">代辦事項</label><input id="todoInput" type="text" maxlength="160" placeholder="請輸入待辦事項" required><label for="todoCategory">分類</label><select id="todoCategory"><option value="個人">個人</option><option value="事奉">事奉</option><option value="召會">召會</option><option value="真理">真理</option><option value="生活">生活</option><option value="其他">其他</option></select><label for="todoDueDate">完成時間</label><input id="todoDueDate" type="date" required><div class="todo-modal-actions"><button type="button" id="cancelTodoModal" class="btn secondary">取消</button><button type="submit" class="btn">新增待辦事項</button></div></form></section></div>
 <section class="stats" data-block-id="target-stats"><div class="stat"><div class="ico">🎯</div><strong id="activeCount">0</strong><div class="muted">進行中目標</div></div><div class="stat"><div class="ico">🌿</div><strong id="doneCount">0</strong><div class="muted">已完成目標</div></div><div class="stat"><div class="ico">📚</div><strong id="bookCount">0/0</strong><div class="muted">完成書報</div></div></section>
 <section data-block-id="target-goals"><div class="sectionhead"><h2>我的年度目標</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn" id="addBtn">＋ 新增目標</button></div></div><div class="goal-list" id="goalList"></div></section>
 <section class="two" data-block-id="target-week-review"><div class="panel week"><h2>🗓️ 本週回顧</h2><p class="muted" style="margin-bottom:10px">這週做了什麼？下週想往哪裡前進？</p><label for="weekNote">本週記錄</label><textarea id="weekNote" placeholder="例如：完成兩次讀書進度、關心一位朋友……"></textarea><label for="nextWeek">下週想做的事</label><textarea id="nextWeek" style="min-height:85px" placeholder="寫下下一步的小行動"></textarea><button class="btn" id="saveWeek">儲存本週紀錄</button><div id="savedMsg" class="notice" aria-live="polite"></div></div></section>
@@ -1695,14 +1695,24 @@ body.dark-night #page-target .goal::after {
 (()=>{
  const $=id=>document.getElementById(id); const key='v8_journey_todo_v1'; let items=[];
  try{items=JSON.parse(localStorage.getItem(key)||'[]');if(!Array.isArray(items))items=[]}catch(_){items=[]}
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const save=()=>{try{localStorage.setItem(key,JSON.stringify(items))}catch(_){}};
- function render(){const list=$('todoList'),empty=$('todoEmpty'),badge=$('todoCountBadge');if(!list)return;const pending=items.filter(x=>!x.done).length;if(badge)badge.textContent=String(pending);list.innerHTML=items.map(x=>`<label class="todo-item ${x.done?'done':''}"><input type="checkbox" data-todo-check="${x.id}" ${x.done?'checked':''}><span>${String(x.text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</span><button class="todo-delete" type="button" data-todo-delete="${x.id}" aria-label="刪除事項">×</button></label>`).join('');if(empty)empty.hidden=items.length>0;}
- function show(which){const todo=which==='todo';$('journeyWidget').hidden=todo;$('todoWidget').hidden=!todo;document.querySelectorAll('[data-journey-stack]').forEach(b=>{const active=b.dataset.journeyStack===which;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active))});document.querySelectorAll('[data-journey-dot]').forEach(d=>d.classList.toggle('active',d.dataset.journeyDot===which));}
- document.querySelectorAll('[data-journey-stack]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.journeyStack)));
- const form=$('todoAddForm');if(form)form.addEventListener('submit',e=>{e.preventDefault();const input=$('todoInput'),text=input.value.trim();if(!text)return;items.unshift({id:Date.now(),text,done:false});input.value='';save();render()});
+ function render(){const list=$('todoList'),empty=$('todoEmpty'),badge=$('todoCountBadge');if(!list)return;
+ const pending=items.filter(x=>!x.done).length;if(badge)badge.textContent=String(pending);
+ const sorted=[...items].sort((a,b)=>{if(!!a.done!==!!b.done)return a.done?1:-1;const ad=a.date||'9999-12-31',bd=b.date||'9999-12-31';return ad.localeCompare(bd)});
+ list.innerHTML=sorted.map(x=>`<div class="todo-item ${x.done?'done':''}"><input type="checkbox" data-todo-check="${x.id}" ${x.done?'checked':''} aria-label="標記完成"><div class="todo-item-main"><span>${esc(x.text)}</span><span class="todo-meta">${esc(x.category||'其他')} · 完成時間：${esc(x.date||'未設定')}</span></div><button class="todo-delete" type="button" data-todo-delete="${x.id}" aria-label="刪除事項">×</button></div>`).join('');
+ if(empty)empty.hidden=items.length>0;}
+ function show(which){const todo=which==='todo';$('journeyWidget').hidden=todo;$('todoWidget').hidden=!todo;document.querySelectorAll('[data-journey-dot]').forEach(d=>d.classList.toggle('active',d.dataset.journeyDot===which));}
+ const stack=document.querySelector('.journey-stack');let showingTodo=false,startX=null;
+ if(stack){stack.addEventListener('touchstart',e=>{if(e.target.closest('button,input,select,textarea'))return;startX=e.touches[0].clientX},{passive:true});stack.addEventListener('touchend',e=>{if(startX===null)return;const dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>45){showingTodo=dx<0;show(showingTodo?'todo':'journey')}startX=null},{passive:true});stack.addEventListener('click',e=>{if(e.target.closest('.journey-widget')&&!e.target.closest('button,input,select,textarea')){showingTodo=!showingTodo;show(showingTodo?'todo':'journey')}})}
+ const modal=$('todoModal'),form=$('todoAddForm');
+ function openModal(){modal.hidden=false;$('todoInput').focus()}
+ function closeModal(){modal.hidden=true;form.reset()}
+ $('openTodoModal')?.addEventListener('click',openModal);$('closeTodoModal')?.addEventListener('click',closeModal);$('cancelTodoModal')?.addEventListener('click',closeModal);
+ modal?.addEventListener('click',e=>{if(e.target===modal)closeModal()});
+ if(form)form.addEventListener('submit',e=>{e.preventDefault();const text=$('todoInput').value.trim(),category=$('todoCategory').value,date=$('todoDueDate').value;if(!text||!date)return;items.push({id:Date.now(),text,category,date,done:false});save();render();closeModal();show('todo');showingTodo=true});
  const list=$('todoList');if(list)list.addEventListener('change',e=>{const id=Number(e.target.dataset.todoCheck);if(!id)return;const item=items.find(x=>x.id===id);if(item)item.done=e.target.checked;save();render()});
- if(list)list.addEventListener('click',e=>{const b=e.target.closest('[data-todo-delete]');if(!b)return;e.preventDefault();items=items.filter(x=>x.id!==Number(b.dataset.todoDelete));save();render()});
- let startX=null;const stack=document.querySelector('.journey-stack');if(stack){stack.addEventListener('touchstart',e=>{startX=e.touches[0].clientX},{passive:true});stack.addEventListener('touchend',e=>{if(startX===null)return;const dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>45){const showingTodo=!$('todoWidget').hidden;show(dx<0?(showingTodo?'todo':'todo'):(showingTodo?'journey':'journey'))}startX=null},{passive:true})}
+ if(list)list.addEventListener('click',e=>{const b=e.target.closest('[data-todo-delete]');if(!b)return;items=items.filter(x=>x.id!==Number(b.dataset.todoDelete));save();render()});
  render();
 })();
 </script>
@@ -1788,4 +1798,34 @@ body.dark-night .target-picker {
   color: #f0f1f2 !important;
   border-color: #5a5f66 !important;
 }
+</style>
+
+<style id="journey-todo-revision">
+.journey-stack-tabs{display:none!important}
+.journey-stack{background:var(--panel,#f4f6f8);color:var(--ink);border-radius:24px}
+.journey-widget{background:var(--panel,#f4f6f8);color:var(--ink);border:1px solid var(--line,#dfe3e8)}
+.journey-widget .progressline{background:var(--line,#dfe3e8)}
+.journey-widget .progressline span{background:var(--accent,#607d68)}
+.journey-widget-foot,.todo-widget-subtitle{color:var(--muted,#7a8088)}
+.todo-widget{background:var(--panel,#f4f6f8);color:var(--ink)}
+.todo-count-badge{font-size:12px;padding:2px 7px;border-radius:99px;background:var(--line,#dfe3e8);color:var(--ink)}
+.todo-open-modal-btn{width:100%;border:1px solid var(--line,#dfe3e8);border-radius:12px;padding:11px 14px;margin:0 0 12px;background:var(--accent,#607d68);color:white;font-weight:750}
+.todo-item{background:var(--card,#fff);color:var(--ink);border:1px solid var(--line,#dfe3e8);display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:start}
+.todo-item .todo-item-main{display:flex;flex-direction:column;gap:4px;min-width:0}
+.todo-item .todo-meta{font-size:12px;color:var(--muted,#7a8088);font-weight:500}
+.todo-item input{margin-top:2px}
+.todo-modal-backdrop{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.52);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box}
+.todo-modal-backdrop[hidden]{display:none!important}
+.todo-modal{width:min(100%,430px);max-height:90vh;overflow:auto;background:var(--panel,#fff);color:var(--ink,#20242a);border:1px solid var(--line,#dfe3e8);border-radius:20px;padding:20px;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.todo-modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.todo-modal-head h3{margin:0;font-size:20px}
+.todo-modal-close{border:0;background:var(--line,#eee);color:var(--ink);width:34px;height:34px;border-radius:50%;font-size:24px}
+.todo-modal-form{display:grid;gap:8px}
+.todo-modal-form label{font-size:13px;font-weight:700;margin-top:5px}
+.todo-modal-form input,.todo-modal-form select{width:100%;min-width:0;box-sizing:border-box;padding:11px;border:1px solid var(--line,#dfe3e8);border-radius:11px;background:var(--card,#fff);color:var(--ink)}
+.todo-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+body.dark-night .journey-stack,body.dark-night .journey-widget,body.dark-night .todo-widget{background:#383b3f!important;color:var(--ink)!important;border-color:#50545a!important}
+body.dark-night .todo-item,body.dark-night .todo-modal{background:#383b3f!important;color:var(--ink)!important;border-color:#50545a!important}
+body.dark-night .todo-modal-form input,body.dark-night .todo-modal-form select{background:#45494e!important;color:var(--ink)!important;border-color:#555a60!important}
+body.dark-night .todo-open-modal-btn{background:#607d68!important}
 </style>
