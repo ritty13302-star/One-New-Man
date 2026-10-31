@@ -2203,6 +2203,35 @@ body.dark-night #journeyWidget, body.dark-night #todoWidget{
 }
 </style>
 
+
+<style id="journey-stack-dark-bleed-root-fix">
+/* 根因修正：深夜模式的外層 .journey-stack 不能有整塊底色；只讓目前顯示的卡片有背景 */
+html body.dark-night #page-target .journey-stack,
+html body.dark-night .page-panel#page-target .journey-stack,
+html body.dark-night .journey-stack[data-block-id="target-hero"]{
+  background:transparent!important;background-color:transparent!important;background-image:none!important;
+  border:0!important;outline:0!important;box-shadow:none!important;border-radius:0!important;
+  -webkit-mask-image:none!important;mask-image:none!important;
+}
+html body.dark-night #page-target .journey-stack::before,
+html body.dark-night #page-target .journey-stack::after,
+html body.dark-night .journey-stack[data-block-id="target-hero"]::before,
+html body.dark-night .journey-stack[data-block-id="target-hero"]::after{
+  content:none!important;display:none!important;background:transparent!important;box-shadow:none!important;border:0!important;
+}
+html body.dark-night #page-target .journey-stack-dots,
+html body.dark-night .journey-stack[data-block-id="target-hero"] .journey-stack-dots{
+  background:transparent!important;background-color:transparent!important;background-image:none!important;
+  border:0!important;outline:0!important;box-shadow:none!important;border-radius:0!important;
+}
+/* 只有卡片本身保留圓角底色，與下方指示區徹底分離 */
+html body.dark-night #page-target #journeyWidget,
+html body.dark-night #page-target #todoWidget{
+  background-color:#383b3f!important;background-image:none!important;
+  border:1px solid #50545a!important;border-radius:19px!important;
+  overflow:hidden!important;clip-path:inset(0 round 19px)!important;
+}
+</style>
 </body>
 </html>
 
