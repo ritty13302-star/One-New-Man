@@ -1592,4 +1592,46 @@ const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);s
 .schedule-agenda-table .schedule-add{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:100%!important;min-height:42px!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;color:var(--muted)!important;font-size:25px!important;font-weight:400!important;line-height:1!important;appearance:none!important;-webkit-appearance:none!important}
 .schedule-agenda-table .schedule-empty-cell{padding:0!important;border:0!important;background:transparent!important}
 @media(max-width:620px){.schedule-agenda-table .schedule-time-head,.schedule-agenda-table tbody th{width:52px!important;font-size:10px!important}.schedule-result-fill{gap:4px!important;padding:5px 3px!important}.schedule-result-check{flex-basis:18px!important;width:18px!important;min-width:18px!important}.schedule-result-check input{width:17px!important;height:17px!important;min-width:17px!important}.schedule-result-text{min-height:34px!important;padding:5px 3px!important;font-size:11px!important}.schedule-add{border:0!important;border-radius:0!important;box-shadow:none!important}}
+
+/* 深夜模式補強：年度目標卡片、真理周次控制與時間表工具按鈕統一灰階 */
+body.dark-night .goal,
+body.dark-night .goal-list > *,
+body.dark-night [data-block-id^="target-"] .stat,
+body.dark-night [data-block-id^="target-"] .goal,
+body.dark-night .weekly-week-picker,
+body.dark-night .weekly-week-picker strong,
+body.dark-night .weekly-week-arrow,
+body.dark-night .schedule-menu-toggle,
+body.dark-night .schedule-card-head #scheduleNotesToggle,
+body.dark-night #scheduleNotesToggle {
+  background-color: #45494e !important;
+  border-color: #5a5f66 !important;
+  color: #f0f1f2 !important;
+}
+body.dark-night .goal { background-color: #383b3f !important; }
+body.dark-night .goal .mini,
+body.dark-night .weekly-week-arrow,
+body.dark-night .schedule-menu-toggle,
+body.dark-night #scheduleNotesToggle {
+  background-color: #45494e !important;
+  color: #f0f1f2 !important;
+  border-color: #5a5f66 !important;
+}
+body.dark-night .schedule-menu-toggle span { background-color: #f0f1f2 !important; }
+body.dark-night .weekly-week-picker { border-radius: 12px; padding: 5px; }
+body.dark-night .weekly-week-picker strong { border: 0 !important; }
+body.dark-night .goal .goalbar { background-color: #292b2e !important; }
+body.dark-night .goal .goal-title,
+body.dark-night .goal .goal-meta { color: #f0f1f2 !important; }
+/* 「選擇目標／奉召會真理」相關選擇框及目標頁內所有表面 */
+body.dark-night select,
+body.dark-night [role="combobox"],
+body.dark-night .goal-select,
+body.dark-night .target-select,
+body.dark-night .goal-picker,
+body.dark-night .target-picker {
+  background-color: #45494e !important;
+  color: #f0f1f2 !important;
+  border-color: #5a5f66 !important;
+}
 </style>
