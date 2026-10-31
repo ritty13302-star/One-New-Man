@@ -410,6 +410,48 @@ body.dark-night .nav-tab.active {
 }
 body.dark-night .nav-tab.active { background-color:#45494e !important; }
 
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 
 <style id="schedule-independent-columns-fix">
@@ -448,6 +490,48 @@ body.dark-night .nav-tab.active { background-color:#45494e !important; }
  .schedule-result-check input{width:18px!important;height:18px!important;min-width:18px!important}
  .schedule-result-text{min-height:34px!important;padding:5px 4px!important;font-size:11px!important}
 }
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 
 
@@ -497,6 +581,48 @@ body.dark-night .todo-add-form input{background:#303439;color:#f1f2f4;border-col
 body.dark-night .todo-item{background:#303439;color:#f1f2f4}
 body.dark-night .todo-empty{color:#b9bec4}
 @media(max-width:420px){.service-date-time-row{grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:8px}.service-date-time-field input{font-size:13px;padding:8px 5px}.journey-widget,.todo-widget{padding:16px}}
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 </head>
 <body>
@@ -1519,6 +1645,48 @@ const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);s
  .schedule-result-row{grid-template-columns:17px minmax(0,1fr)!important;gap:4px!important}
  .schedule-result-text{font-size:11px!important;padding:5px 4px!important}
 }
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 
 <style>
@@ -1532,6 +1700,48 @@ const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);s
 .schedule-result-text:focus{background:#ffffffa8!important}
 .schedule-result-check input{cursor:pointer}
 @media(max-width:620px){.schedule-event-main{gap:0 5px!important}.schedule-plan-column,.schedule-result-column{padding:7px 5px!importantbackground:color-mix(in srgb,var(--event-color) 70%,#fff);overflow:hidden;}}
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 <style id="schedule-layout-fix">
 /* 計劃／結果欄位：各佔一半，並恢復表單觸控 */
@@ -1583,6 +1793,48 @@ const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);s
  .schedule-agenda-table .schedule-result-text{font-size:11px!important;padding:4px 3px!important}
  .schedule-week-board{grid-template-columns:43px repeat(7,minmax(116px,1fr));min-width:855px}
 }
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 
 <style id="schedule-week-final-interaction-fix">
@@ -1653,6 +1905,48 @@ const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);s
   .schedule-week-event .schedule-plan-column,.schedule-week-event .schedule-result-column{padding:3px 4px!important}
   .schedule-week-event .schedule-result-text{font-size:9px!important}
 }
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 
 <style id="night-goal-rounded-overflow-fix">
@@ -1688,6 +1982,48 @@ body.dark-night #page-target .goal::before,
 body.dark-night #page-target .goal::after {
   border-radius: inherit !important;
 }
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 
 
@@ -1736,6 +2072,48 @@ body.dark-night .todo-item{background:#45494e!important;color:var(--ink)!importa
 body.dark-night .todo-open-modal-btn{background:#607d68!important;color:#fff!important;border-color:#607d68!important}
 body.dark-night .todo-count-badge{background:#50555b!important;color:#f1f2f4!important}
 @media(max-width:420px){.todo-list{max-height:92px}.todo-widget{padding:16px!important}}
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 
 <style id="journey-todo-hidden-fix">
@@ -1743,6 +2121,48 @@ body.dark-night .todo-count-badge{background:#50555b!important;color:#f1f2f4!imp
 .journey-widget[hidden],
 .todo-widget[hidden]{display:none!important}
 .journey-stack{position:relative}
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 
 </body>
@@ -1827,6 +2247,48 @@ body.dark-night .target-picker {
   color: #f0f1f2 !important;
   border-color: #5a5f66 !important;
 }
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
 
 <style id="journey-todo-revision">
@@ -1904,4 +2366,46 @@ body.dark-night .journey-stack-tab.active{background:#607d68;border-color:#607d6
 @media(max-width:420px){
   #todoList.todo-list{height:auto;max-height:none;min-height:0}
 }
+
+/* 深夜模式與主題色修正：切換指示、卡片圓角與背景裁切 */
+body.dark-night .journey-stack{
+  background:var(--bg,#292b2e)!important;
+  border:1px solid var(--line,#50545a)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  isolation:isolate;
+}
+body.dark-night .journey-widget,
+body.dark-night .todo-widget{
+  border-radius:19px!important;
+  overflow:hidden!important;
+  background:var(--card,#383b3f)!important;
+  border:1px solid var(--line,#50545a)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+body.dark-night .journey-stack-dots span{
+  background:var(--line,#555a60)!important;
+}
+body.dark-night .journey-stack-dots span.active{
+  background:var(--green,#8d9f91)!important;
+}
+body.dark-night .journey-widget .progressline span,
+body.dark-night .todo-open-modal-btn,
+body.dark-night .todo-add-form button{
+  background:var(--green,#607d68)!important;
+  border-color:var(--green,#607d68)!important;
+}
+body.dark-night .todo-item{
+  border-radius:12px!important;
+  background:var(--bg,#303338)!important;
+  border-color:var(--line,#50545a)!important;
+}
+body.dark-night .todo-count-badge{
+  background:var(--pale,#45494e)!important;
+  color:var(--ink,#f1f2f4)!important;
+}
+.journey-stack-dots span{background:var(--line,#aeb5bc)!important}
+.journey-stack-dots span.active{background:var(--green,#607d68)!important}
+.journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
+
 </style>
