@@ -1646,7 +1646,18 @@ body.dark-night #scheduleNotesToggle {
   border-color: #5a5f66 !important;
   color: #f0f1f2 !important;
 }
-body.dark-night .goal { background-color: #383b3f !important; }
+body.dark-night .goal {
+  background-color: #383b3f !important;
+  background-clip: padding-box !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+}
+
+body.dark-night .goal .goal-top,
+body.dark-night .goal .goal-main,
+body.dark-night .goal .goal-actions {
+  background: transparent !important;
+}
 body.dark-night .goal .mini,
 body.dark-night .weekly-week-arrow,
 body.dark-night .schedule-menu-toggle,
