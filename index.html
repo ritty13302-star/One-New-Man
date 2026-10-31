@@ -1601,6 +1601,42 @@ const app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);s
   .schedule-week-event .schedule-result-text{font-size:9px!important}
 }
 </style>
+
+<style id="night-goal-rounded-overflow-fix">
+/* 修正深夜模式年度目標區域：結構容器保持透明，灰色只套用在真正的圓角卡片內 */
+body.dark-night #page-target section[data-block-id="target-stats"],
+body.dark-night #page-target section[data-block-id="target-goals"],
+body.dark-night #page-target .stats,
+body.dark-night #page-target .goal-list,
+body.dark-night #page-target section[data-block-id="target-week-review"],
+body.dark-night #page-target .two {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+body.dark-night #page-target .stat,
+body.dark-night #page-target .goal {
+  background: #383b3f !important;
+  background-color: #383b3f !important;
+  color: #f0f1f2 !important;
+  border: 1px solid #50545a !important;
+  border-radius: 24px !important;
+  overflow: hidden !important;
+  background-clip: padding-box !important;
+  box-sizing: border-box !important;
+}
+body.dark-night #page-target .goal-list {
+  display: grid !important;
+  gap: 10px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+body.dark-night #page-target .goal::before,
+body.dark-night #page-target .goal::after {
+  border-radius: inherit !important;
+}
+</style>
+
 </body>
 </html>
 
