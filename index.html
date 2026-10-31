@@ -1879,4 +1879,21 @@ body.dark-night .journey-stack-tab.active{background:#607d68;border-color:#607d6
 
 /* 讓「代辦事項」與「我的年度旅程」小工具外框高度一致 */
 #journeyWidget, #todoWidget{height:190px;min-height:190px;box-sizing:border-box}
+
+/* 代辦清單依照框框內可用高度顯示，超出的項目仍可上下滑動 */
+#todoWidget{display:flex;flex-direction:column;min-height:0}
+#todoWidget .todo-widget-heading{flex:0 0 auto}
+#todoList.todo-list{
+  flex:1 1 auto;
+  min-height:0;
+  height:auto;
+  max-height:none;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+}
+@media(max-width:420px){
+  #todoList.todo-list{height:auto;max-height:none;min-height:0}
+}
 </style>
