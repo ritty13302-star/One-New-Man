@@ -372,6 +372,44 @@ body.dark-night button:not(.theme-choice):not(.theme-dot){color:inherit}body.dar
 body.dark-night .panel,body.dark-night .card,body.dark-night .goal-card,body.dark-night .service-section,body.dark-night .record-card,body.dark-night .book-row,body.dark-night .weekly-home-group-chart-card,body.dark-night .weekly-home-group-rule-group,body.dark-night .side-menu,body.dark-night .modal-card,body.dark-night .dialog,body.dark-night .bible-chapter-progress-panel,body.dark-night .shepherd-panel,body.dark-night .care-record,body.dark-night .profile-card,body.dark-night .list-card{background:#383b3f!important;color:var(--ink)!important}
 body.dark-night .weekly-home-group-name:focus,body.dark-night .year,body.dark-night .font-choice,body.dark-night .theme-choice,body.dark-night .profile-name-row input,body.dark-night input:not([type=checkbox]):not([type=radio]),body.dark-night textarea,body.dark-night select{background:#45494e!important;color:var(--ink)!important}
 body.dark-night [style*="background:#fff"],body.dark-night [style*="background: #fff"],body.dark-night [style*="background:white"],body.dark-night [style*="background: white"],body.dark-night [style*="background-color:#fff"],body.dark-night [style*="background-color: #fff"]{background:#383b3f!important;color:var(--ink)!important}
+
+/* 深夜模式補強：年度目標卡片、分頁底欄與相關控制鈕統一灰階 */
+body.dark-night #page-target .hero,
+body.dark-night #page-target .panel,
+body.dark-night #page-target .goal,
+body.dark-night #page-target .goal-card,
+body.dark-night #page-target .two,
+body.dark-night #page-target .stat-card,
+body.dark-night #page-target .progress-card,
+body.dark-night #page-target [data-block-id],
+body.dark-night #page-target .goal-list,
+body.dark-night #page-target .goal-item {
+  background-color:#383b3f !important;
+  color:#f0f1f2 !important;
+  border-color:#50545a !important;
+}
+body.dark-night .weekly-week-picker .weekly-week-arrow,
+body.dark-night .weekly-home-group-toolbar [data-home-group-week-nav],
+body.dark-night .weekly-home-group-edit-icon,
+body.dark-night #scheduleNotesToggle,
+body.dark-night .schedule-card-head button {
+  background-color:#45494e !important;
+  color:#f0f1f2 !important;
+  border:1px solid #5a5f66 !important;
+  box-shadow:none !important;
+}
+body.dark-night .nav-tabs {
+  background-color:#383b3f !important;
+  border-color:#50545a !important;
+}
+body.dark-night .nav-tab,
+body.dark-night .nav-tab.active {
+  background-color:#383b3f !important;
+  color:#f0f1f2 !important;
+  border-color:#50545a !important;
+}
+body.dark-night .nav-tab.active { background-color:#45494e !important; }
+
 </style>
 
 <style id="schedule-independent-columns-fix">
