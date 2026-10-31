@@ -612,6 +612,25 @@ const bibleAll=[...bibleOld,...bibleNew].map(([name,chapters],i)=>({key:`b${i}`,
 const normalizeBibleState=(raw={})=>({completed:raw.completed&&typeof raw.completed==='object'?raw.completed:{},startDate:String(raw.startDate||''),endDate:String(raw.endDate||''),cycles:Array.isArray(raw.cycles)?raw.cycles:[],readCounts:{old:Math.max(0,Number(raw.readCounts?.old)||0),new:Math.max(0,Number(raw.readCounts?.new)||0)},readHistory:Array.isArray(raw.readHistory)?raw.readHistory:[],overview:raw.overview&&typeof raw.overview==='object'?raw.overview:{},manuscripts:raw.manuscripts&&typeof raw.manuscripts==='object'?raw.manuscripts:{}});
 const bibleOpenBooks=new Set();
 function bibleStats(){const b=normalizeBibleState(state.bible),total=bibleAll.reduce((n,x)=>n+x.chapters,0),done=bibleAll.reduce((n,x)=>n+(Array.isArray(b.completed[x.key])?b.completed[x.key].length:0),0);return {total,done,pct:Math.round(done/total*100)}}
+function defaultHomeGroupTrafficSettings(){
+ const rule=(weeks,types=['home','small','sunday'])=>({weeks,types:[...types]});
+ return {S:{green:rule(1),yellow:rule(2),red:rule(4)},F:{green:rule(1),yellow:rule(2),red:rule(4)}};
+}
+function normalizeHomeGroupTrafficSettings(raw){
+ const defaults=defaultHomeGroupTrafficSettings(),source=raw&&typeof raw==='object'?raw:{};
+ const out={};
+ ['S','F'].forEach(id=>{
+  out[id]={};
+  ['green','yellow','red'].forEach(color=>{
+   const candidate=source[id]?.[color]&&typeof source[id][color]==='object'?source[id][color]:{};
+   const n=Number(candidate.weeks);
+   const fallback=defaults[id][color];
+   const types=Array.isArray(candidate.types)?candidate.types.filter(t=>['home','small','sunday'].includes(t)):fallback.types;
+   out[id][color]={weeks:Number.isFinite(n)?Math.max(0,Math.min(52,Math.floor(n))):fallback.weeks,types:[...new Set(types)]};
+  });
+ });
+ return out;
+}
 const freshState=()=>({
   goals:starterGoals.map(g=>({...g})),
   books:starterBooks.map(b=>({...b})),
