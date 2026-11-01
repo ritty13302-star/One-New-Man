@@ -452,6 +452,7 @@ body.dark-night .todo-count-badge{
 .journey-stack-dots span.active{background:var(--green,#607d68)!important}
 .journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
 
+.page-block-move [data-page-block-delete]{color:#b42318}.page-block-restore-controls{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center;font-size:12px}
 </style>
 
 <style id="schedule-independent-columns-fix">
@@ -887,6 +888,7 @@ const freshState=()=>({
   countdownDate:'',
   countdownName:'倒數天數',
   pageBlockOrder:{},
+  pageBlockHidden:{},
   weeklySchedule:{},
   scheduleCategories:[{name:'靈修',color:'#8aa58c'},{name:'工作',color:'#7d9fc2'},{name:'學習',color:'#c5a16b'},{name:'服事',color:'#b58ebd'},{name:'生活',color:'#d58e83'},{name:'其他',color:'#9aa0a6'}],
   lifeReading:{completed:{},completedAt:{},plan:{mode:'date',startDate:'',deadline:'',weeklyTarget:''}},
@@ -1415,17 +1417,19 @@ function applyPageBlockOrder(){
   const page=$(id);if(!page)return;
   const order=Array.isArray(state.pageBlockOrder?.[key])?state.pageBlockOrder[key]:[];
   const blocks=[...page.children].filter(el=>el.dataset.blockId);
+  const hidden=new Set(Array.isArray(state.pageBlockHidden?.[key])?state.pageBlockHidden[key]:[]);
+  blocks.forEach(block=>{block.hidden=hidden.has(block.dataset.blockId)});
   order.forEach(blockId=>{const block=blocks.find(el=>el.dataset.blockId===blockId);if(block)page.appendChild(block)});
  });
 }
 function refreshPageBlockEditControls(){
  Object.entries(pageBlockPages).forEach(([key,id])=>{
   const page=$(id);if(!page)return;
-  [...page.children].filter(el=>el.dataset.blockId).forEach((block,index,arr)=>{
+  [...page.children].filter(el=>el.dataset.blockId&&!el.hidden).forEach((block,index,arr)=>{
    let controls=block.querySelector(':scope > .page-block-move');
    if(!editModes[key]){controls?.remove();block.classList.remove('page-block-edit');return}
    block.classList.add('page-block-edit');
-   if(!controls){controls=document.createElement('div');controls.className='page-block-move';controls.innerHTML='<button class="move-btn" type="button" data-page-block-move="up" aria-label="區塊往上移">↑</button><button class="move-btn" type="button" data-page-block-move="down" aria-label="區塊往下移">↓</button>';block.prepend(controls)}
+   if(!controls){controls=document.createElement('div');controls.className='page-block-move';controls.innerHTML='<button class="move-btn" type="button" data-page-block-move="up" aria-label="區塊往上移">↑</button><button class="move-btn" type="button" data-page-block-move="down" aria-label="區塊往下移">↓</button><button class="move-btn" type="button" data-page-block-delete aria-label="刪除此區塊" title="刪除此區塊">✕</button>';block.prepend(controls)}
    const up=controls.querySelector('[data-page-block-move="up"]'),down=controls.querySelector('[data-page-block-move="down"]');
    up.disabled=index===0;down.disabled=index===arr.length-1;
   });
@@ -1518,7 +1522,7 @@ $('createBtn').onclick=()=>{const name=$('goalName').value.trim(),target=Math.fl
 $('saveWeek').onclick=()=>{state.weekNote=$('weekNote').value;state.nextWeek=$('nextWeek').value;persist();$('savedMsg').textContent='已儲存並同步 ✓';setTimeout(()=>$('savedMsg').textContent='',2200)};
 $('weekNote').addEventListener('input',()=>{state.weekNote=$('weekNote').value;persist()});$('nextWeek').addEventListener('input',()=>{state.nextWeek=$('nextWeek').value;persist()});
 function activePageKey(){return document.querySelector('.nav-tab[data-page].active')?.dataset.page||'target'}
-function refreshPageEditToolbar(){const key=activePageKey(),toggle=$('pageEditToggle'),bookToggle=$('bookEditToggle');toggle.textContent=editModes[key]?'完成編輯':'編輯區塊';toggle.setAttribute('aria-pressed',String(!!editModes[key]));bookToggle.textContent=editModes.books?'完成':'編輯書報';bookToggle.setAttribute('aria-pressed',String(!!editModes.books))}
+function refreshPageEditToolbar(){const key=activePageKey(),toggle=$('pageEditToggle'),bookToggle=$('bookEditToggle');toggle.textContent=editModes[key]?'完成編輯':'編輯區塊';toggle.setAttribute('aria-pressed',String(!!editModes[key]));bookToggle.textContent=editModes.books?'完成':'編輯書報';bookToggle.setAttribute('aria-pressed',String(!!editModes.books));let restore=$('pageBlockRestoreControls');if(!restore){restore=document.createElement('div');restore.id='pageBlockRestoreControls';restore.className='page-block-restore-controls';toggle.parentElement.appendChild(restore)}restore.replaceChildren();const hidden=state.pageBlockHidden?.[key]||[];if(editModes[key]&&hidden.length){const label=document.createElement('span');label.textContent='已隱藏區塊：';restore.appendChild(label);hidden.forEach(blockId=>{const b=document.createElement('button');b.type='button';b.className='btn secondary';b.textContent=`恢復：${blockId}`;b.addEventListener('click',()=>{state.pageBlockHidden[key]=state.pageBlockHidden[key].filter(x=>x!==blockId);persist();applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()});restore.appendChild(b)})}}
 $('pageEditToggle').addEventListener('click',()=>{const key=activePageKey();editModes[key]=!editModes[key];if(key==='target')renderGoals();if(key==='service')renderShepherdList();if(['service','church','truth'].includes(key))renderTabRecords(key);refreshPageBlockEditControls();refreshPageEditToolbar()});
 $('bookEditToggle').addEventListener('click',()=>{editModes.books=!editModes.books;renderBooks();refreshPageEditToolbar()});
 document.querySelectorAll('.nav-tab[data-page]').forEach(tab=>tab.addEventListener('click',()=>{const page=tab.dataset.page;document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{const active=t===tab;t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-'+page);$('serviceQuickFab').hidden=page!=='service';refreshPageEditToolbar()}));
@@ -1544,10 +1548,12 @@ $('weeklyPrayerPanel').addEventListener('change',e=>{
  state.weeklyPrayerStudy[index]=input.checked;syncWeeklyPrayerGoal();persist();renderWeeklyPrayerStudy();renderGoals()
 });
 document.addEventListener('click',e=>{
+ const del=e.target.closest('[data-page-block-delete]');
+ if(del){const block=del.closest('[data-block-id]'),page=block?.parentElement;if(!block||!page)return;const pageKey=Object.entries(pageBlockPages).find(([,id])=>$(id)===page)?.[0];if(!pageKey||!editModes[pageKey])return;const label=block.querySelector('h2,h3,h4')?.textContent?.trim()||'這個區塊';if(!confirm(`確定要隱藏「${label}」嗎？可在之後恢復。`))return;state.pageBlockHidden=state.pageBlockHidden||{};state.pageBlockHidden[pageKey]=[...new Set([...(state.pageBlockHidden[pageKey]||[]),block.dataset.blockId])];block.hidden=true;persist();refreshPageBlockEditControls();return}
  const control=e.target.closest('[data-page-block-move]');if(!control)return;
  const block=control.closest('[data-block-id]'),page=block?.parentElement;if(!block||!page)return;
  const pageKey=Object.entries(pageBlockPages).find(([,id])=>$(id)===page)?.[0];if(!pageKey||!editModes[pageKey])return;
- const blocks=[...page.children].filter(el=>el.dataset.blockId),index=blocks.indexOf(block),dir=control.dataset.pageBlockMove==='up'?-1:1,next=blocks[index+dir];
+ const blocks=[...page.children].filter(el=>el.dataset.blockId&&!el.hidden),index=blocks.indexOf(block),dir=control.dataset.pageBlockMove==='up'?-1:1,next=blocks[index+dir];
  if(!next)return;
  if(dir<0)page.insertBefore(block,next);else page.insertBefore(next,block);
  state.pageBlockOrder=state.pageBlockOrder||{};state.pageBlockOrder[pageKey]=[...page.children].filter(el=>el.dataset.blockId).map(el=>el.dataset.blockId);
