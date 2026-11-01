@@ -1537,7 +1537,7 @@ $('weekNote').addEventListener('input',()=>{state.weekNote=$('weekNote').value;p
 function activePageKey(){return document.querySelector('.nav-tab[data-page].active')?.dataset.page||'target'}
 function refreshPageEditToolbar(){const key=activePageKey(),toggle=$('pageEditToggle'),bookToggle=$('bookEditToggle');toggle.textContent=editModes[key]?'完成編輯':'編輯區塊';toggle.setAttribute('aria-pressed',String(!!editModes[key]));bookToggle.textContent=editModes.books?'完成':'編輯書報';bookToggle.setAttribute('aria-pressed',String(!!editModes.books));let restore=$('pageBlockRestoreControls');if(!restore){restore=document.createElement('div');restore.id='pageBlockRestoreControls';restore.className='page-block-restore-controls';toggle.parentElement.appendChild(restore)}restore.replaceChildren();const hidden=state.pageBlockHidden?.[key]||[];if(isPageBlockEditOn(key)&&hidden.length){const label=document.createElement('span');label.textContent='已隱藏區塊：';restore.appendChild(label);hidden.forEach(blockId=>{const b=document.createElement('button');b.type='button';b.className='btn secondary';b.textContent=`恢復：${blockId}`;b.addEventListener('click',()=>{state.pageBlockHidden[key]=state.pageBlockHidden[key].filter(x=>x!==blockId);persist();applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()});restore.appendChild(b)})}}
 $('pageEditToggle').addEventListener('click',()=>{const key=activePageKey();editModes[key]=!editModes[key];if(key==='target')renderGoals();if(key==='service')renderShepherdList();if(['service','church','truth'].includes(key))renderTabRecords(key);refreshPageBlockEditControls();refreshPageEditToolbar()});
-$('goalBlockEditToggle').addEventListener('click',()=>{targetBlockEditMode=!targetBlockEditMode;$('goalBlockEditToggle').setAttribute('aria-pressed',String(targetBlockEditMode));$('goalBlockEditToggle').title=targetBlockEditMode?'完成區塊編輯':'編輯年度目標區塊';refreshPageBlockEditControls();refreshPageEditToolbar()});
+$('goalBlockEditToggle').addEventListener('click',()=>{targetBlockEditMode=!targetBlockEditMode;$('goalBlockEditToggle').setAttribute('aria-pressed',String(targetBlockEditMode));$('goalBlockEditToggle').title=targetBlockEditMode?'完成目標編輯':'編輯年度目標小區塊';$('goalBlockEditToggle').classList.toggle('active',targetBlockEditMode);$('goalList')?.classList.toggle('goal-list-block-edit-mode',targetBlockEditMode);refreshPageBlockEditControls();refreshPageEditToolbar()});
 $('bookEditToggle').addEventListener('click',()=>{editModes.books=!editModes.books;renderBooks();refreshPageEditToolbar()});
 document.querySelectorAll('.nav-tab[data-page]').forEach(tab=>tab.addEventListener('click',()=>{const page=tab.dataset.page;document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{const active=t===tab;t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-'+page);$('serviceQuickFab').hidden=page!=='service';refreshPageEditToolbar()}));
 ['service','church','truth'].forEach(key=>{const form=$('form-'+key);document.querySelector(`[data-add-record="${key}"]`).addEventListener('click',()=>{form.hidden=false;form.querySelector('input[name="title"]').focus()});document.querySelector(`[data-cancel-record="${key}"]`).addEventListener('click',()=>{form.reset();form.hidden=true});form.addEventListener('submit',e=>{e.preventDefault();const title=form.elements.title.value.trim(),body=form.elements.body.value.trim();if(!title){alert('請輸入紀錄標題');return}if(!state.tabRecords)state.tabRecords=emptyTabRecords();state.tabRecords[key].unshift({id:Date.now(),title,body,createdAt:new Date().toISOString()});persist();renderTabRecords(key);form.reset();form.hidden=true})});
@@ -1573,7 +1573,7 @@ document.addEventListener('click',e=>{
  state.pageBlockOrder=state.pageBlockOrder||{};state.pageBlockOrder[pageKey]=[...page.children].filter(el=>el.dataset.blockId).map(el=>el.dataset.blockId);
  persist();refreshPageBlockEditControls();
 });
-document.addEventListener('click',e=>{const b=e.target.closest('[data-move]');if(!b)return;const type=b.dataset.move,dir=Number(b.dataset.dir),i=Number(b.dataset.index);if(!dir||!Number.isInteger(i))return;let arr,renderFn;if(type==='goal'&&editModes.target){arr=state.goals;renderFn=renderGoals}else if(type==='shepherd'&&editModes.service){arr=state.shepherds;renderFn=renderShepherdList}else if(type==='care'){const person=state.shepherds.find(s=>Number(s.id)===Number(b.dataset.shepherdId));arr=person?.records;renderFn=renderShepherdList}else if(type==='book'&&editModes.books){arr=state.books;renderFn=renderBooks}else if(type==='record'&&editModes[b.dataset.key]){arr=state.tabRecords[b.dataset.key];renderFn=()=>renderTabRecords(b.dataset.key)}if(!arr||i<0||i>=arr.length)return;const j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];persist();renderFn();if(type==='book')renderGoals()});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-move]');if(!b)return;const type=b.dataset.move,dir=Number(b.dataset.dir),i=Number(b.dataset.index);if(!dir||!Number.isInteger(i))return;let arr,renderFn;if(type==='goal'&&(editModes.target||targetBlockEditMode)){arr=state.goals;renderFn=renderGoals}else if(type==='shepherd'&&editModes.service){arr=state.shepherds;renderFn=renderShepherdList}else if(type==='care'){const person=state.shepherds.find(s=>Number(s.id)===Number(b.dataset.shepherdId));arr=person?.records;renderFn=renderShepherdList}else if(type==='book'&&editModes.books){arr=state.books;renderFn=renderBooks}else if(type==='record'&&editModes[b.dataset.key]){arr=state.tabRecords[b.dataset.key];renderFn=()=>renderTabRecords(b.dataset.key)}if(!arr||i<0||i>=arr.length)return;const j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];persist();renderFn();if(type==='book')renderGoals()});
 document.addEventListener('click',e=>{const btn=e.target.closest('[data-delete-record]');if(!btn)return;const key=btn.dataset.deleteRecord;if(!editModes[key])return;const id=Number(btn.dataset.recordId);if(confirm('確定刪除這筆紀錄？')){state.tabRecords[key]=state.tabRecords[key].filter(r=>Number(r.id)!==id);persist();renderTabRecords(key)}});
 // 主選單、主題與字體大小：偏好保存在本機，重新開啟仍會保留。
 const themeMap={
@@ -2068,9 +2068,7 @@ body.dark-night .todo-count-badge{
  const sorted=[...items].sort((a,b)=>{if(!!a.done!==!!b.done)return a.done?1:-1;const ad=a.date||'9999-12-31',bd=b.date||'9999-12-31';return ad.localeCompare(bd)});
  list.innerHTML=sorted.map(x=>`<div class="todo-item ${x.done?'done':''}"><input type="checkbox" data-todo-check="${x.id}" ${x.done?'checked':''} aria-label="標記完成"><div class="todo-item-main"><span>${esc(x.text)}</span><span class="todo-meta">${esc(x.category||'其他')} · 完成時間：${esc(x.date||'未設定')}</span></div><button class="todo-delete" type="button" data-todo-delete="${x.id}" aria-label="刪除事項">×</button></div>`).join('');
  if(empty)empty.hidden=items.length>0;}
- function show(which){const todo=which==='todo';$('journeyWidget').hidden=todo;$('todoWidget').hidden=!todo;document.querySelectorAll('[data-journey-dot]').forEach(d=>d.classList.toggle('active',d.dataset.journeyDot===which));}
- const stack=document.querySelector('.journey-stack');let showingTodo=false,startX=null;
- if(stack){stack.addEventListener('touchstart',e=>{if(e.target.closest('button,input,select,textarea'))return;startX=e.touches[0].clientX},{passive:true});stack.addEventListener('touchend',e=>{if(startX===null)return;const dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>45){showingTodo=dx<0;show(showingTodo?'todo':'journey')}startX=null},{passive:true});stack.addEventListener('click',e=>{if(e.target.closest('.journey-widget')&&!e.target.closest('button,input,select,textarea')){showingTodo=!showingTodo;show(showingTodo?'todo':'journey')}})}
+ function show(which){const todo=which==='todo';const journey=$('journeyWidget'),todoWidget=$('todoWidget');if(journey){journey.hidden=todo;journey.style.setProperty('display',todo?'none':'block','important')}if(todoWidget){todoWidget.hidden=!todo;todoWidget.style.setProperty('display',todo?'block':'none','important')}document.querySelectorAll('[data-journey-dot]').forEach(d=>{const active=d.dataset.journeyDot===which;d.classList.toggle('active',active);d.setAttribute('aria-current',active?'true':'false')});}
  const modal=$('todoModal'),form=$('todoAddForm');
  function openModal(){modal.hidden=false;$('todoInput').focus()}
  function closeModal(){modal.hidden=true;form.reset()}
@@ -2659,5 +2657,55 @@ body.dark-night .journey-stack-dots span.active{background:var(--green,#8d9f91)!
     });
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initJourneyWidgetSwitch);else initJourneyWidgetSwitch();
+})();
+</script>
+
+
+<style id="goal-card-edit-mode-fix">
+/* 年度目標旁的筆圖示只控制目標卡片（如「帶30位…」「讀完十本…」） */
+#goalList .goal .delete-x, #goalList .goal .move-controls{display:none!important}
+#goalList.goal-list-block-edit-mode .goal .delete-x{display:flex!important}
+#goalList.goal-list-block-edit-mode .goal .move-controls{display:flex!important}
+#goalBlockEditToggle.active{background:var(--green,#607d68)!important;color:#fff!important}
+</style>
+<script id="journey-swipe-final-controller">
+(function(){
+ function init(){
+  const stack=document.querySelector('.journey-stack');
+  const journey=document.getElementById('journeyWidget');
+  const todo=document.getElementById('todoWidget');
+  if(!stack||!journey||!todo||stack.dataset.finalSwitch==='1')return;
+  stack.dataset.finalSwitch='1';
+  let current='journey',sx=null,sy=null,tracking=false;
+  function show(which){
+   current=which==='todo'?'todo':'journey';
+   [[journey,current==='journey'],[todo,current==='todo']].forEach(([el,visible])=>{
+    el.hidden=!visible;
+    if(visible)el.style.removeProperty('display');else el.style.setProperty('display','none','important');
+   });
+   document.querySelectorAll('[data-journey-dot]').forEach(dot=>{
+    const active=dot.dataset.journeyDot===current;
+    dot.classList.toggle('active',active);dot.setAttribute('aria-current',active?'true':'false');
+   });
+  }
+  show('journey');
+  const ignored='button,input,select,textarea,a,label,[contenteditable="true"]';
+  stack.addEventListener('pointerdown',e=>{
+   if(e.pointerType==='mouse'||e.target.closest(ignored)){tracking=false;return;}
+   sx=e.clientX;sy=e.clientY;tracking=true;
+  },{passive:true});
+  stack.addEventListener('pointerup',e=>{
+   if(!tracking||sx===null)return;const dx=e.clientX-sx,dy=e.clientY-sy;
+   if(Math.abs(dx)>35&&Math.abs(dx)>Math.abs(dy)*1.15)show(dx<0?'todo':'journey');
+   tracking=false;sx=sy=null;
+  },{passive:true});
+  stack.addEventListener('pointercancel',()=>{tracking=false;sx=sy=null},{passive:true});
+  document.querySelectorAll('[data-journey-dot]').forEach(dot=>{
+   dot.style.cursor='pointer';dot.setAttribute('role','button');dot.setAttribute('tabindex','0');
+   dot.addEventListener('click',()=>show(dot.dataset.journeyDot));
+   dot.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show(dot.dataset.journeyDot)}});
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
