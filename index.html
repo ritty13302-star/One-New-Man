@@ -1545,36 +1545,71 @@ $('pageEditToggle').addEventListener('click',()=>{const key=activePageKey();edit
 
 /* 單一年度目標向左滑，顯示 iOS 風格編輯／隱藏／刪除操作 */
 const goalSwipeStyle=document.createElement('style');
-goalSwipeStyle.textContent=`#goalList .goal{position:relative;touch-action:pan-y;overflow:hidden; -webkit-user-select:none;user-select:none}#goalList .goal-swipe-actions{position:absolute;right:10px;top:10px;z-index:8;display:none;gap:6px;align-items:center;pointer-events:auto}#goalList .goal .goal-swipe-actions button{display:flex!important;position:static!important;min-width:64px;height:42px;border:0;border-radius:0;padding:0 12px;font-size:14px;font-weight:700;align-items:center;justify-content:center;color:#fff!important}#goalList .goal .goal-swipe-edit{background:#c8c8ce!important;color:#fff!important}#goalList .goal .goal-swipe-hide{background:#ff9500!important;color:#fff!important}#goalList .goal .delete-x{background:#ff3b30!important;color:#fff!important;width:auto!important}#goalList .goal.swipe-actions-open .goal-swipe-actions{display:flex!important}#goalList .goal.swipe-actions-open .goal-top{padding-top:56px}#goalList .goal.swipe-actions-open{outline:1px solid var(--green,#607d68);outline-offset:1px}#goalList .goal-swipe-actions button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}.hidden-annual-goals-panel{margin-top:10px}.hidden-annual-goals-panel summary{cursor:pointer;color:var(--muted,#718096);font-size:13px;padding:8px}.hidden-annual-goal-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px;border-top:1px solid var(--line,#e2e8f0)}.hidden-annual-goal-row span{overflow-wrap:anywhere}`;
+goalSwipeStyle.textContent=`#goalList .goal{position:relative;touch-action:pan-y;overflow:hidden; -webkit-user-select:none;user-select:none}#goalList .goal-swipe-actions{position:absolute;right:10px;top:10px;z-index:8;display:none;gap:6px;align-items:center;pointer-events:auto}#goalList .goal .goal-swipe-actions button{display:flex!important;position:static!important;min-width:64px;height:42px;border:0;border-radius:0;padding:0 12px;font-size:14px;font-weight:700;align-items:center;justify-content:center;color:#fff!important}#goalList .goal .goal-swipe-edit{background:#c8c8ce!important;color:#fff!important}#goalList .goal .goal-swipe-hide{background:#ff9500!important;color:#fff!important}#goalList .goal .delete-x{background:#ff3b30!important;color:#fff!important;width:auto!important}#goalList .goal.swipe-actions-open .goal-swipe-actions{display:flex!important;position:absolute!important;right:8px!important;top:8px!important;z-index:30!important;background:var(--card,#fff)!important}#goalList .goal.swipe-actions-open .goal-top{padding-top:56px}#goalList .goal.swipe-actions-open{outline:1px solid var(--green,#607d68);outline-offset:1px}#goalList .goal-swipe-actions button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}.hidden-annual-goals-panel{margin-top:10px}.hidden-annual-goals-panel summary{cursor:pointer;color:var(--muted,#718096);font-size:13px;padding:8px}.hidden-annual-goal-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px;border-top:1px solid var(--line,#e2e8f0)}.hidden-annual-goal-row span{overflow-wrap:anywhere}`;
 document.head.appendChild(goalSwipeStyle);
 let goalTouchStart=null;
 const goalSwipeRoot=$('goalList');
-function closeGoalSwipeActions(except=null){goalSwipeRoot.querySelectorAll('.goal.swipe-actions-open').forEach(card=>{if(card!==except)card.classList.remove('swipe-actions-open')})}
-function handleGoalSwipeEnd(x,y){
- if(!goalTouchStart)return;
- const dx=x-goalTouchStart.x,dy=y-goalTouchStart.y,card=goalTouchStart.card;
- if(Math.abs(dx)>=24&&Math.abs(dx)>Math.abs(dy)*1.15){
-   if(dx<0){closeGoalSwipeActions(card);card.classList.add('swipe-actions-open')}
-   else card.classList.remove('swipe-actions-open');
- }
- goalTouchStart=null;
+function closeGoalSwipeActions(except=null){
+  goalSwipeRoot.querySelectorAll('.goal.swipe-actions-open').forEach(card=>{
+    if(card!==except) card.classList.remove('swipe-actions-open');
+  });
+}
+function finishGoalSwipe(x,y){
+  if(!goalTouchStart)return;
+  const start=goalTouchStart;
+  const dx=x-start.x, dy=y-start.y;
+  if(Math.abs(dx)>=22 && Math.abs(dx)>Math.abs(dy)*1.15){
+    if(dx<0){
+      closeGoalSwipeActions(start.card);
+      start.card.classList.add('swipe-actions-open');
+    } else {
+      start.card.classList.remove('swipe-actions-open');
+    }
+  }
+  goalTouchStart=null;
+}
+function beginGoalSwipe(card,x,y){
+  if(!card)return;
+  goalTouchStart={card,x,y};
 }
 goalSwipeRoot.addEventListener('touchstart',e=>{
- const card=e.target.closest('.goal');
- if(!card||e.target.closest('.goal-swipe-actions,button,input,select,textarea,label,a')){goalTouchStart=null;return}
- const t=e.touches[0];goalTouchStart={x:t.clientX,y:t.clientY,card};
-},{passive:true});
-goalSwipeRoot.addEventListener('touchend',e=>{if(e.changedTouches.length){const t=e.changedTouches[0];handleGoalSwipeEnd(t.clientX,t.clientY)}},{passive:true});
-goalSwipeRoot.addEventListener('touchcancel',()=>{goalTouchStart=null},{passive:true});
-/* Pointer fallback for iOS Safari and trackpads; avoid duplicate touch handling. */
+  const card=e.target.closest('.goal');
+  if(!card || e.target.closest('.goal-swipe-actions,button,input,select,textarea,label,a')) {
+    goalTouchStart=null; return;
+  }
+  const t=e.touches[0];
+  beginGoalSwipe(card,t.clientX,t.clientY);
+},{passive:true,capture:true});
+goalSwipeRoot.addEventListener('touchmove',e=>{
+  if(!goalTouchStart || !e.touches.length)return;
+  const t=e.touches[0], dx=t.clientX-goalTouchStart.x, dy=t.clientY-goalTouchStart.y;
+  if(Math.abs(dx)>14 && Math.abs(dx)>Math.abs(dy)*1.2){
+    if(dx<0){
+      closeGoalSwipeActions(goalTouchStart.card);
+      goalTouchStart.card.classList.add('swipe-actions-open');
+    } else {
+      goalTouchStart.card.classList.remove('swipe-actions-open');
+    }
+  }
+},{passive:true,capture:true});
+goalSwipeRoot.addEventListener('touchend',e=>{
+  if(e.changedTouches.length){
+    const t=e.changedTouches[0];
+    finishGoalSwipe(t.clientX,t.clientY);
+  }
+},{passive:true,capture:true});
+goalSwipeRoot.addEventListener('touchcancel',()=>{goalTouchStart=null},{passive:true,capture:true});
+/* 非觸控裝置以滑鼠拖曳作為備援；iPhone 由 touch events 處理 */
 goalSwipeRoot.addEventListener('pointerdown',e=>{
- if(e.pointerType==='touch')return;
- const card=e.target.closest('.goal');
- if(!card||e.target.closest('.goal-swipe-actions,button,input,select,textarea,label,a')){goalTouchStart=null;return}
- goalTouchStart={x:e.clientX,y:e.clientY,card,pointer:true};
+  if(e.pointerType==='touch')return;
+  const card=e.target.closest('.goal');
+  if(!card || e.target.closest('.goal-swipe-actions,button,input,select,textarea,label,a')){goalTouchStart=null;return;}
+  beginGoalSwipe(card,e.clientX,e.clientY);
 });
-goalSwipeRoot.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'&&goalTouchStart?.pointer)handleGoalSwipeEnd(e.clientX,e.clientY)});
-goalSwipeRoot.addEventListener('pointercancel',()=>{if(goalTouchStart?.pointer)goalTouchStart=null});
+goalSwipeRoot.addEventListener('pointerup',e=>{
+  if(e.pointerType!=='touch' && goalTouchStart)finishGoalSwipe(e.clientX,e.clientY);
+});
+goalSwipeRoot.addEventListener('pointercancel',()=>{goalTouchStart=null});
 $('goalList').addEventListener('click',e=>{const hide=e.target.closest('[data-goal-hide]');if(hide){const goal=state.goals.find(g=>Number(g.id)===Number(hide.dataset.goalHide));if(!goal)return;goal.hidden=true;persist();renderGoals();return}const restore=e.target.closest('[data-goal-restore]');if(restore){const goal=state.goals.find(g=>Number(g.id)===Number(restore.dataset.goalRestore));if(!goal)return;goal.hidden=false;persist();renderGoals();return}const edit=e.target.closest('[data-goal-edit]');if(edit){const goal=state.goals.find(g=>Number(g.id)===Number(edit.dataset.goalEdit));if(!goal)return;const name=prompt('編輯年度目標名稱：',goal.name);if(name===null)return;if(!name.trim()){alert('目標名稱不能空白');return}const targetText=prompt('目標數量（至少 1）：',String(goal.target));if(targetText===null)return;const target=Math.floor(Number(targetText));if(!Number.isFinite(target)||target<1){alert('目標數量請輸入至少 1 的數字');return}goal.name=name.trim().slice(0,100);goal.target=target;goal.current=Math.min(Math.max(0,Number(goal.current)||0),target);persist();renderGoals();return}if(!e.target.closest('button')){$('goalList').querySelectorAll('.goal.swipe-actions-open').forEach(c=>c.classList.remove('swipe-actions-open'))}});
 
 $('bookEditToggle').addEventListener('click',()=>{editModes.books=!editModes.books;renderBooks();refreshPageEditToolbar()});
