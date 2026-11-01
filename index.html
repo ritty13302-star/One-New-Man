@@ -1573,6 +1573,8 @@ function closeGoalSwipeActions(except=null){
 function finishGoalSwipe(x,y){
   if(!goalTouchStart)return;
   const start=goalTouchStart;
+  if(!Number.isFinite(x))x=Number.isFinite(start.lastX)?start.lastX:start.x;
+  if(!Number.isFinite(y))y=Number.isFinite(start.lastY)?start.lastY:start.y;
   const dx=x-start.x, dy=y-start.y;
   if(Math.abs(dx)>=22 && Math.abs(dx)>Math.abs(dy)*1.15){
     if(dx<0){
@@ -1587,7 +1589,7 @@ function finishGoalSwipe(x,y){
 }
 function beginGoalSwipe(card,x,y){
   if(!card)return;
-  goalTouchStart={card,x,y};
+  goalTouchStart={card,x,y,lastX:x,lastY:y};
 }
 goalSwipeRoot.addEventListener('touchstart',e=>{
   const card=e.target.closest('.goal');
@@ -1598,17 +1600,11 @@ goalSwipeRoot.addEventListener('touchstart',e=>{
   beginGoalSwipe(card,t.clientX,t.clientY);
 },{passive:true,capture:true});
 goalSwipeRoot.addEventListener('touchmove',e=>{
+  /* 滑動過程只記錄手勢，不即時切換顯示狀態；避免按鈕閃現或卡片重排 */
   if(!goalTouchStart || !e.touches.length)return;
-  const t=e.touches[0], dx=t.clientX-goalTouchStart.x, dy=t.clientY-goalTouchStart.y;
-  if(Math.abs(dx)>14 && Math.abs(dx)>Math.abs(dy)*1.2){
-    if(dx<0){
-      closeGoalSwipeActions(goalTouchStart.card);
-      goalTouchStart.card.classList.add('swipe-actions-open');
-      goalSwipeJustOpenedAt=Date.now();
-    } else {
-      goalTouchStart.card.classList.remove('swipe-actions-open');
-    }
-  }
+  const t=e.touches[0];
+  goalTouchStart.lastX=t.clientX;
+  goalTouchStart.lastY=t.clientY;
 },{passive:true,capture:true});
 goalSwipeRoot.addEventListener('touchend',e=>{
   if(e.changedTouches.length){
