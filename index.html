@@ -1503,7 +1503,7 @@ $('page-service').addEventListener('click',e=>{
  if(delRecord){const sid=Number(delRecord.dataset.deleteCareRecord),rid=Number(delRecord.dataset.recordId),person=state.shepherds.find(s=>Number(s.id)===sid);if(person&&confirm('確定刪除這筆牧養紀錄？')){person.records=person.records.filter(r=>Number(r.id)!==rid);editingCareRecords.delete(`${sid}:${rid}`);persist();renderShepherdList();refreshShepherdGoalDisplay()}return}
  const delShepherd=e.target.closest('[data-delete-shepherd]');
  if(delShepherd){if(!editModes.service)return;const id=Number(delShepherd.dataset.deleteShepherd);if(confirm('確定刪除這位姊妹的牧養紀錄？')){state.shepherds=state.shepherds.filter(s=>Number(s.id)!==id);persist();renderShepherdList();refreshShepherdGoalDisplay()}return}
- const b=e.target.closest('button[data-act]');if(!b)return;const g=state.goals.find(x=>x.id===Number(b.dataset.id));if(!g)return;if(b.dataset.act==='plus')g.current=Math.min(g.target,g.current+1);if(b.dataset.act==='minus')g.current=Math.max(0,g.current-1);if(b.dataset.act==='delete'&&editModes.target&&confirm('確定刪除此目標？'))state.goals=state.goals.filter(x=>x.id!==g.id);persist();renderGoals();
+ const b=e.target.closest('button[data-act]');if(!b)return;const g=state.goals.find(x=>x.id===Number(b.dataset.id));if(!g)return;if(b.dataset.act==='plus')g.current=Math.min(g.target,g.current+1);if(b.dataset.act==='minus')g.current=Math.max(0,g.current-1);if(b.dataset.act==='delete'&&confirm('確定刪除此目標？')){state.goals=state.goals.filter(x=>x.id!==g.id);persist();renderGoals();return}if(b.dataset.act==='plus')persist();if(b.dataset.act==='minus')persist();renderGoals();
 });
 $('page-service').addEventListener('click',e=>{
  const toggle=e.target.closest('[data-baptized-toggle]');if(toggle){const person=state.baptizedPeople.find(p=>Number(p.id)===Number(toggle.dataset.baptizedToggle));if(person){person.expanded=!person.expanded;renderBaptizedList();persist()}return}
@@ -2608,3 +2608,45 @@ body.dark-night .journey-stack-dots{background:transparent!important;border:0!im
 body.dark-night .journey-stack-dots span{background:#555a60!important}
 body.dark-night .journey-stack-dots span.active{background:var(--green,#8d9f91)!important}
 </style>
+
+<style id="journey-stack-single-widget-fix">
+/* 手機小工具一次只顯示一頁；強制尊重 hidden，避免舊版 display 樣式讓兩頁同時出現 */
+.journey-stack > .journey-widget[hidden],
+.journey-stack > #journeyWidget[hidden],
+.journey-stack > #todoWidget[hidden] { display: none !important; }
+.journey-stack > .journey-widget:not([hidden]) { display: block !important; }
+.journey-stack { touch-action: pan-y; }
+.journey-stack-dots { user-select: none; -webkit-user-select: none; }
+</style>
+<script id="journey-stack-single-widget-init">
+(function(){
+  function initJourneyWidgetSwitch(){
+    const journey=document.getElementById('journeyWidget');
+    const todo=document.getElementById('todoWidget');
+    const stack=document.querySelector('.journey-stack');
+    if(!journey||!todo||!stack)return;
+    // 初始只顯示年度旅程頁，待辦事項透過左右滑動切換。
+    if(!journey.dataset.switchReady){
+      journey.dataset.switchReady='1';
+      journey.hidden=false;
+      todo.hidden=true;
+      let startX=null, startY=null;
+      stack.addEventListener('touchstart',function(e){
+        if(e.touches.length!==1 || e.target.closest('button,input,select,textarea,a,label')){startX=null;startY=null;return;}
+        startX=e.touches[0].clientX; startY=e.touches[0].clientY;
+      },{passive:true});
+      stack.addEventListener('touchend',function(e){
+        if(startX===null||!e.changedTouches.length)return;
+        const dx=e.changedTouches[0].clientX-startX;
+        const dy=e.changedTouches[0].clientY-startY;
+        if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)*1.2){
+          const showTodo=dx<0; todo.hidden=!showTodo; journey.hidden=showTodo;
+          stack.querySelectorAll('[data-journey-dot]').forEach(function(dot){dot.classList.toggle('active',dot.dataset.journeyDot===(showTodo?'todo':'journey'));});
+        }
+        startX=null;startY=null;
+      },{passive:true});
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initJourneyWidgetSwitch);else initJourneyWidgetSwitch();
+})();
+</script>
