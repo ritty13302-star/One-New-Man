@@ -1248,6 +1248,21 @@ function renderGoals(){
  let hiddenPanel=$('hiddenAnnualGoalsPanel');
  if(!hiddenPanel){hiddenPanel=document.createElement('div');hiddenPanel.id='hiddenAnnualGoalsPanel';hiddenPanel.className='hidden-annual-goals-panel';el.insertAdjacentElement('afterend',hiddenPanel)}
  hiddenPanel.innerHTML=hiddenGoals.length?`<details><summary>已隱藏的年度目標（${hiddenGoals.length}）</summary><div class="hidden-annual-goals-list">${hiddenGoals.map(g=>`<div class="hidden-annual-goal-row"><span>${esc(g.name)}</span><button type="button" class="mini" data-goal-restore="${g.id}">恢復顯示</button></div>`).join('')}</div></details>`:'';
+ if(!hiddenPanel.dataset.restoreHandlerBound){
+   hiddenPanel.dataset.restoreHandlerBound='1';
+   hiddenPanel.addEventListener('click',e=>{
+     const restore=e.target.closest('[data-goal-restore]');
+     if(!restore)return;
+     e.preventDefault();
+     e.stopPropagation();
+     const goal=state.goals.find(g=>String(g.id)===String(restore.dataset.goalRestore));
+     if(!goal)return;
+     goal.hidden=false;
+     persist();
+     renderGoals();
+   });
+ }
+
  const total=state.goals.length?Math.round(state.goals.reduce((s,g)=>s+pct(g),0)/state.goals.length):0;
  $('totalText').textContent=total+'%';$('totalBar').style.width=total+'%';$('activeCount').textContent=state.goals.filter(g=>g.current<g.target).length;$('doneCount').textContent=state.goals.filter(g=>g.current>=g.target).length;
  renderShepherdList();
