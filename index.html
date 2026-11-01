@@ -670,9 +670,9 @@ body.dark-night .todo-count-badge{
 <nav class="nav-tabs" id="mainNavTabs" aria-label="主要分頁" role="tablist"><button class="nav-tab active" type="button" data-page="target" role="tab" aria-selected="true">🎯 目標</button><button class="nav-tab" type="button" data-page="service" role="tab" aria-selected="false">🤝 事奉</button><button class="nav-tab" type="button" data-page="church" role="tab" aria-selected="false">🌿 召會</button><button class="nav-tab" type="button" data-page="truth" role="tab" aria-selected="false">📖 真理</button></nav>
 <section id="page-target" class="page-panel" role="tabpanel">
 <section class="journey-stack" data-block-id="target-hero" aria-label="年度旅程與代辦事項小工具">
- <section class="journey-widget" id="journeyWidget"><small>我的年度旅程</small><h2>今天也向前一步。</h2><div class="journey-progress-label"><span>年度目標完成率</span><strong id="totalText">0%</strong></div><div class="progressline"><span id="totalBar"></span></div><div class="journey-widget-foot">一點一點累積，向目標前進</div></section>
- <section class="journey-widget todo-widget" id="todoWidget" hidden><div class="todo-widget-heading"><div><small>MY TO-DO</small><h2>代辦事項 <span id="todoCountBadge" class="todo-count-badge">0</span></h2></div><button id="openTodoModal" type="button" class="todo-open-modal-btn" aria-label="新增待辦事項" title="新增待辦事項">＋</button></div><div id="todoList" class="todo-list"></div><div id="todoEmpty" class="todo-empty">目前沒有待辦事項，享受清爽的一天吧！</div></section>
- <div class="journey-stack-dots" aria-hidden="true"><span class="active" data-journey-dot="journey"></span><span data-journey-dot="todo"></span><small>左右滑動切換小工具</small></div>
+ <section class="journey-widget" id="journeyWidget" data-block-id="target-journey-widget"><small>我的年度旅程</small><h2>今天也向前一步。</h2><div class="journey-progress-label"><span>年度目標完成率</span><strong id="totalText">0%</strong></div><div class="progressline"><span id="totalBar"></span></div><div class="journey-widget-foot">一點一點累積，向目標前進</div></section>
+ <section class="journey-widget todo-widget" id="todoWidget" data-block-id="target-todo-widget" hidden><div class="todo-widget-heading"><div><small>MY TO-DO</small><h2>代辦事項 <span id="todoCountBadge" class="todo-count-badge">0</span></h2></div><button id="openTodoModal" type="button" class="todo-open-modal-btn" aria-label="新增待辦事項" title="新增待辦事項">＋</button></div><div id="todoList" class="todo-list"></div><div id="todoEmpty" class="todo-empty">目前沒有待辦事項，享受清爽的一天吧！</div></section>
+ <div class="journey-stack-dots" data-block-id="target-journey-dots" aria-hidden="true"><span class="active" data-journey-dot="journey"></span><span data-journey-dot="todo"></span><small>左右滑動切換小工具</small></div>
  </section>
 <div class="todo-modal-backdrop" id="todoModal" hidden><section class="todo-modal" role="dialog" aria-modal="true" aria-labelledby="todoModalTitle"><div class="todo-modal-head"><h3 id="todoModalTitle">新增待辦事項</h3><button type="button" id="closeTodoModal" class="todo-modal-close" aria-label="關閉">×</button></div><form id="todoAddForm" class="todo-modal-form"><label for="todoInput">代辦事項</label><input id="todoInput" type="text" maxlength="160" placeholder="請輸入待辦事項" required><label for="todoCategory">分類</label><select id="todoCategory"><option value="個人">個人</option><option value="事奉">事奉</option><option value="召會">召會</option><option value="真理">真理</option><option value="生活">生活</option><option value="其他">其他</option></select><label for="todoDueDate">完成時間</label><input id="todoDueDate" type="date" required><div class="todo-modal-actions"><button type="button" id="cancelTodoModal" class="btn secondary">取消</button><button type="submit" class="btn">新增待辦事項</button></div></form></section></div>
 <section class="stats" data-block-id="target-stats"><div class="stat"><div class="ico">🎯</div><strong id="activeCount">0</strong><div class="muted">進行中目標</div></div><div class="stat"><div class="ico">🌿</div><strong id="doneCount">0</strong><div class="muted">已完成目標</div></div><div class="stat"><div class="ico">📚</div><strong id="bookCount">0/0</strong><div class="muted">完成書報</div></div></section>
@@ -1419,6 +1419,9 @@ function applyPageBlockOrder(){
   const blocks=[...page.children].filter(el=>el.dataset.blockId);
   const hidden=new Set(Array.isArray(state.pageBlockHidden?.[key])?state.pageBlockHidden[key]:[]);
   blocks.forEach(block=>{block.hidden=hidden.has(block.dataset.blockId)});
+  if(key==='target'){
+   [...page.querySelectorAll('.journey-stack [data-block-id]')].forEach(block=>{if(block.parentElement!==page)block.hidden=hidden.has(block.dataset.blockId)});
+  }
   order.forEach(blockId=>{const block=blocks.find(el=>el.dataset.blockId===blockId);if(block)page.appendChild(block)});
  });
 }
@@ -1433,6 +1436,15 @@ function refreshPageBlockEditControls(){
    const up=controls.querySelector('[data-page-block-move="up"]'),down=controls.querySelector('[data-page-block-move="down"]');
    up.disabled=index===0;down.disabled=index===arr.length-1;
   });
+  if(key==='target'){
+   const nested=[...page.querySelectorAll('.journey-stack [data-block-id]')].filter(block=>block.parentElement!==page);
+   nested.forEach(block=>{
+    let controls=block.querySelector(':scope > .page-block-move');
+    if(!editModes[key]){controls?.remove();block.classList.remove('page-block-edit');return}
+    block.classList.add('page-block-edit');
+    if(!controls){controls=document.createElement('div');controls.className='page-block-move';controls.innerHTML='<button class="move-btn" type="button" data-page-block-delete aria-label="隱藏此小區塊" title="隱藏此小區塊">✕</button>';block.prepend(controls)}
+   });
+  }
  });
 }
 function render(){renderCountdown();renderBooks();renderGoals();renderShepherdList();renderAllTabRecords();renderServiceEvangelismRecords();renderWeeklyHomeGroup();renderSchedule();renderLifeReading();$('weekNote').value=state.weekNote||'';$('nextWeek').value=state.nextWeek||'';applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()}
@@ -1549,7 +1561,7 @@ $('weeklyPrayerPanel').addEventListener('change',e=>{
 });
 document.addEventListener('click',e=>{
  const del=e.target.closest('[data-page-block-delete]');
- if(del){const block=del.closest('[data-block-id]'),page=block?.parentElement;if(!block||!page)return;const pageKey=Object.entries(pageBlockPages).find(([,id])=>$(id)===page)?.[0];if(!pageKey||!editModes[pageKey])return;const label=block.querySelector('h2,h3,h4')?.textContent?.trim()||'這個區塊';if(!confirm(`確定要隱藏「${label}」嗎？可在之後恢復。`))return;state.pageBlockHidden=state.pageBlockHidden||{};state.pageBlockHidden[pageKey]=[...new Set([...(state.pageBlockHidden[pageKey]||[]),block.dataset.blockId])];block.hidden=true;persist();refreshPageBlockEditControls();return}
+ if(del){const block=del.closest('[data-block-id]'),page=block?.closest('.page-panel');if(!block||!page)return;const pageKey=Object.entries(pageBlockPages).find(([,id])=>$(id)===page)?.[0];if(!pageKey||!editModes[pageKey])return;const label=block.querySelector('h2,h3,h4')?.textContent?.trim()||'這個區塊';if(!confirm(`確定要隱藏「${label}」嗎？可在之後恢復。`))return;state.pageBlockHidden=state.pageBlockHidden||{};state.pageBlockHidden[pageKey]=[...new Set([...(state.pageBlockHidden[pageKey]||[]),block.dataset.blockId])];block.hidden=true;persist();refreshPageBlockEditControls();refreshPageEditToolbar();return}
  const control=e.target.closest('[data-page-block-move]');if(!control)return;
  const block=control.closest('[data-block-id]'),page=block?.parentElement;if(!block||!page)return;
  const pageKey=Object.entries(pageBlockPages).find(([,id])=>$(id)===page)?.[0];if(!pageKey||!editModes[pageKey])return;
