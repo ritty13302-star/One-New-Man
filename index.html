@@ -676,7 +676,7 @@ body.dark-night .todo-count-badge{
  </section>
 <div class="todo-modal-backdrop" id="todoModal" hidden><section class="todo-modal" role="dialog" aria-modal="true" aria-labelledby="todoModalTitle"><div class="todo-modal-head"><h3 id="todoModalTitle">新增待辦事項</h3><button type="button" id="closeTodoModal" class="todo-modal-close" aria-label="關閉">×</button></div><form id="todoAddForm" class="todo-modal-form"><label for="todoInput">代辦事項</label><input id="todoInput" type="text" maxlength="160" placeholder="請輸入待辦事項" required><label for="todoCategory">分類</label><select id="todoCategory"><option value="個人">個人</option><option value="事奉">事奉</option><option value="召會">召會</option><option value="真理">真理</option><option value="生活">生活</option><option value="其他">其他</option></select><label for="todoDueDate">完成時間</label><input id="todoDueDate" type="date" required><div class="todo-modal-actions"><button type="button" id="cancelTodoModal" class="btn secondary">取消</button><button type="submit" class="btn">新增待辦事項</button></div></form></section></div>
 <section class="stats" data-block-id="target-stats"><div class="stat"><div class="ico">🎯</div><strong id="activeCount">0</strong><div class="muted">進行中目標</div></div><div class="stat"><div class="ico">🌿</div><strong id="doneCount">0</strong><div class="muted">已完成目標</div></div><div class="stat"><div class="ico">📚</div><strong id="bookCount">0/0</strong><div class="muted">完成書報</div></div></section>
-<section data-block-id="target-goals"><div class="sectionhead"><h2>我的年度目標</h2><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn" id="addBtn">＋ 新增目標</button></div></div><div class="goal-list" id="goalList"></div></section>
+<section data-block-id="target-goals"><div class="sectionhead"><div class="goal-title-with-edit"><h2>我的年度目標</h2><button class="goal-block-edit-btn" id="goalBlockEditToggle" type="button" aria-label="編輯年度目標區塊" title="編輯年度目標區塊" aria-pressed="false">✎</button></div><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn" id="addBtn">＋ 新增目標</button></div></div><div class="goal-list" id="goalList"></div></section>
 <section class="two" data-block-id="target-week-review"><div class="panel week"><h2>🗓️ 本週回顧</h2><p class="muted" style="margin-bottom:10px">這週做了什麼？下週想往哪裡前進？</p><label for="weekNote">本週記錄</label><textarea id="weekNote" placeholder="例如：完成兩次讀書進度、關心一位朋友……"></textarea><label for="nextWeek">下週想做的事</label><textarea id="nextWeek" style="min-height:85px" placeholder="寫下下一步的小行動"></textarea><button class="btn" id="saveWeek">儲存本週紀錄</button><div id="savedMsg" class="notice" aria-live="polite"></div></div></section>
 <div class="footer" data-block-id="target-footer">已透過 Firebase 雲端同步。請使用同一個 Google 帳號在不同裝置登入。</div></section>
 <section id="page-service" class="page-panel subpage" role="tabpanel" hidden>
@@ -983,6 +983,8 @@ function persist(){
 }
 function pct(g){return Math.min(100,Math.round(g.current/Math.max(1,g.target)*100))}
 const editModes={target:false,service:false,church:false,books:false,truth:false};
+let targetBlockEditMode=false;
+function isPageBlockEditOn(key){return key==='target'?(!!editModes.target||targetBlockEditMode):!!editModes[key];}
 let baptismGoalSettingsOpen=false,bookGoalSettingsOpen=false,sistersConferenceSettingsOpen=false;
 let selectedPrayerWeek=Math.min(52,Math.max(1,getISOWeekInfo().week));
 let weeklyPrayerHistoryExpanded=false;
@@ -1429,7 +1431,7 @@ function refreshPageBlockEditControls(){
   const page=$(id);if(!page)return;
   [...page.children].filter(el=>el.dataset.blockId&&!el.hidden).forEach((block,index,arr)=>{
    let controls=block.querySelector(':scope > .page-block-move');
-   if(!editModes[key]){controls?.remove();block.classList.remove('page-block-edit');return}
+   if(!isPageBlockEditOn(key)){controls?.remove();block.classList.remove('page-block-edit');return}
    block.classList.add('page-block-edit');
    if(!controls){controls=document.createElement('div');controls.className='page-block-move';controls.innerHTML='<button class="move-btn" type="button" data-page-block-move="up" aria-label="區塊往上移">↑</button><button class="move-btn" type="button" data-page-block-move="down" aria-label="區塊往下移">↓</button><button class="move-btn" type="button" data-page-block-delete aria-label="刪除此區塊" title="刪除此區塊">✕</button>';block.prepend(controls)}
    const up=controls.querySelector('[data-page-block-move="up"]'),down=controls.querySelector('[data-page-block-move="down"]');
@@ -1439,7 +1441,7 @@ function refreshPageBlockEditControls(){
    const nested=[...page.querySelectorAll('.journey-stack [data-block-id]')].filter(block=>block.parentElement!==page);
    nested.forEach(block=>{
     let controls=block.querySelector(':scope > .page-block-move');
-    if(!editModes[key]){controls?.remove();block.classList.remove('page-block-edit');return}
+    if(!isPageBlockEditOn(key)){controls?.remove();block.classList.remove('page-block-edit');return}
     block.classList.add('page-block-edit');
     if(!controls){controls=document.createElement('div');controls.className='page-block-move';controls.innerHTML='<button class="move-btn" type="button" data-page-block-delete aria-label="隱藏此小區塊" title="隱藏此小區塊">✕</button>';block.prepend(controls)}
    });
@@ -1503,7 +1505,7 @@ $('page-service').addEventListener('click',e=>{
  if(delRecord){const sid=Number(delRecord.dataset.deleteCareRecord),rid=Number(delRecord.dataset.recordId),person=state.shepherds.find(s=>Number(s.id)===sid);if(person&&confirm('確定刪除這筆牧養紀錄？')){person.records=person.records.filter(r=>Number(r.id)!==rid);editingCareRecords.delete(`${sid}:${rid}`);persist();renderShepherdList();refreshShepherdGoalDisplay()}return}
  const delShepherd=e.target.closest('[data-delete-shepherd]');
  if(delShepherd){if(!editModes.service)return;const id=Number(delShepherd.dataset.deleteShepherd);if(confirm('確定刪除這位姊妹的牧養紀錄？')){state.shepherds=state.shepherds.filter(s=>Number(s.id)!==id);persist();renderShepherdList();refreshShepherdGoalDisplay()}return}
- const b=e.target.closest('button[data-act]');if(!b)return;const g=state.goals.find(x=>x.id===Number(b.dataset.id));if(!g)return;if(b.dataset.act==='plus')g.current=Math.min(g.target,g.current+1);if(b.dataset.act==='minus')g.current=Math.max(0,g.current-1);if(b.dataset.act==='delete'&&editModes.target&&confirm('確定刪除此目標？'))state.goals=state.goals.filter(x=>x.id!==g.id);persist();renderGoals();
+ const b=e.target.closest('button[data-act]');if(!b)return;const g=state.goals.find(x=>x.id===Number(b.dataset.id));if(!g)return;if(b.dataset.act==='plus')g.current=Math.min(g.target,g.current+1);if(b.dataset.act==='minus')g.current=Math.max(0,g.current-1);if(b.dataset.act==='delete'&&confirm('確定刪除此目標？')){state.goals=state.goals.filter(x=>x.id!==g.id);persist();renderGoals();return}if(b.dataset.act==='plus')persist();if(b.dataset.act==='minus')persist();renderGoals();
 });
 $('page-service').addEventListener('click',e=>{
  const toggle=e.target.closest('[data-baptized-toggle]');if(toggle){const person=state.baptizedPeople.find(p=>Number(p.id)===Number(toggle.dataset.baptizedToggle));if(person){person.expanded=!person.expanded;renderBaptizedList();persist()}return}
@@ -1533,8 +1535,9 @@ $('createBtn').onclick=()=>{const name=$('goalName').value.trim(),target=Math.fl
 $('saveWeek').onclick=()=>{state.weekNote=$('weekNote').value;state.nextWeek=$('nextWeek').value;persist();$('savedMsg').textContent='已儲存並同步 ✓';setTimeout(()=>$('savedMsg').textContent='',2200)};
 $('weekNote').addEventListener('input',()=>{state.weekNote=$('weekNote').value;persist()});$('nextWeek').addEventListener('input',()=>{state.nextWeek=$('nextWeek').value;persist()});
 function activePageKey(){return document.querySelector('.nav-tab[data-page].active')?.dataset.page||'target'}
-function refreshPageEditToolbar(){const key=activePageKey(),toggle=$('pageEditToggle'),bookToggle=$('bookEditToggle');toggle.textContent=editModes[key]?'完成編輯':'編輯區塊';toggle.setAttribute('aria-pressed',String(!!editModes[key]));bookToggle.textContent=editModes.books?'完成':'編輯書報';bookToggle.setAttribute('aria-pressed',String(!!editModes.books));let restore=$('pageBlockRestoreControls');if(!restore){restore=document.createElement('div');restore.id='pageBlockRestoreControls';restore.className='page-block-restore-controls';toggle.parentElement.appendChild(restore)}restore.replaceChildren();const hidden=state.pageBlockHidden?.[key]||[];if(editModes[key]&&hidden.length){const label=document.createElement('span');label.textContent='已隱藏區塊：';restore.appendChild(label);hidden.forEach(blockId=>{const b=document.createElement('button');b.type='button';b.className='btn secondary';b.textContent=`恢復：${blockId}`;b.addEventListener('click',()=>{state.pageBlockHidden[key]=state.pageBlockHidden[key].filter(x=>x!==blockId);persist();applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()});restore.appendChild(b)})}}
+function refreshPageEditToolbar(){const key=activePageKey(),toggle=$('pageEditToggle'),bookToggle=$('bookEditToggle');toggle.textContent=editModes[key]?'完成編輯':'編輯區塊';toggle.setAttribute('aria-pressed',String(!!editModes[key]));bookToggle.textContent=editModes.books?'完成':'編輯書報';bookToggle.setAttribute('aria-pressed',String(!!editModes.books));let restore=$('pageBlockRestoreControls');if(!restore){restore=document.createElement('div');restore.id='pageBlockRestoreControls';restore.className='page-block-restore-controls';toggle.parentElement.appendChild(restore)}restore.replaceChildren();const hidden=state.pageBlockHidden?.[key]||[];if(isPageBlockEditOn(key)&&hidden.length){const label=document.createElement('span');label.textContent='已隱藏區塊：';restore.appendChild(label);hidden.forEach(blockId=>{const b=document.createElement('button');b.type='button';b.className='btn secondary';b.textContent=`恢復：${blockId}`;b.addEventListener('click',()=>{state.pageBlockHidden[key]=state.pageBlockHidden[key].filter(x=>x!==blockId);persist();applyPageBlockOrder();refreshPageBlockEditControls();refreshPageEditToolbar()});restore.appendChild(b)})}}
 $('pageEditToggle').addEventListener('click',()=>{const key=activePageKey();editModes[key]=!editModes[key];if(key==='target')renderGoals();if(key==='service')renderShepherdList();if(['service','church','truth'].includes(key))renderTabRecords(key);refreshPageBlockEditControls();refreshPageEditToolbar()});
+$('goalBlockEditToggle').addEventListener('click',()=>{targetBlockEditMode=!targetBlockEditMode;$('goalBlockEditToggle').setAttribute('aria-pressed',String(targetBlockEditMode));$('goalBlockEditToggle').title=targetBlockEditMode?'完成區塊編輯':'編輯年度目標區塊';refreshPageBlockEditControls();refreshPageEditToolbar()});
 $('bookEditToggle').addEventListener('click',()=>{editModes.books=!editModes.books;renderBooks();refreshPageEditToolbar()});
 document.querySelectorAll('.nav-tab[data-page]').forEach(tab=>tab.addEventListener('click',()=>{const page=tab.dataset.page;document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{const active=t===tab;t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-'+page);$('serviceQuickFab').hidden=page!=='service';refreshPageEditToolbar()}));
 ['service','church','truth'].forEach(key=>{const form=$('form-'+key);document.querySelector(`[data-add-record="${key}"]`).addEventListener('click',()=>{form.hidden=false;form.querySelector('input[name="title"]').focus()});document.querySelector(`[data-cancel-record="${key}"]`).addEventListener('click',()=>{form.reset();form.hidden=true});form.addEventListener('submit',e=>{e.preventDefault();const title=form.elements.title.value.trim(),body=form.elements.body.value.trim();if(!title){alert('請輸入紀錄標題');return}if(!state.tabRecords)state.tabRecords=emptyTabRecords();state.tabRecords[key].unshift({id:Date.now(),title,body,createdAt:new Date().toISOString()});persist();renderTabRecords(key);form.reset();form.hidden=true})});
@@ -1560,10 +1563,10 @@ $('weeklyPrayerPanel').addEventListener('change',e=>{
 });
 document.addEventListener('click',e=>{
  const del=e.target.closest('[data-page-block-delete]');
- if(del){const block=del.closest('[data-block-id]'),page=block?.closest('.page-panel');if(!block||!page)return;const pageKey=Object.entries(pageBlockPages).find(([,id])=>$(id)===page)?.[0];if(!pageKey||!editModes[pageKey])return;const label=block.querySelector('h2,h3,h4')?.textContent?.trim()||'這個區塊';if(!confirm(`確定要隱藏「${label}」嗎？可在之後恢復。`))return;state.pageBlockHidden=state.pageBlockHidden||{};state.pageBlockHidden[pageKey]=[...new Set([...(state.pageBlockHidden[pageKey]||[]),block.dataset.blockId])];block.hidden=true;persist();refreshPageBlockEditControls();refreshPageEditToolbar();return}
+ if(del){const block=del.closest('[data-block-id]'),page=block?.closest('.page-panel');if(!block||!page)return;const pageKey=Object.entries(pageBlockPages).find(([,id])=>$(id)===page)?.[0];if(!pageKey||!isPageBlockEditOn(pageKey))return;const label=block.querySelector('h2,h3,h4')?.textContent?.trim()||'這個區塊';if(!confirm(`確定要隱藏「${label}」嗎？可在之後恢復。`))return;state.pageBlockHidden=state.pageBlockHidden||{};state.pageBlockHidden[pageKey]=[...new Set([...(state.pageBlockHidden[pageKey]||[]),block.dataset.blockId])];block.hidden=true;persist();refreshPageBlockEditControls();refreshPageEditToolbar();return}
  const control=e.target.closest('[data-page-block-move]');if(!control)return;
  const block=control.closest('[data-block-id]'),page=block?.parentElement;if(!block||!page)return;
- const pageKey=Object.entries(pageBlockPages).find(([,id])=>$(id)===page)?.[0];if(!pageKey||!editModes[pageKey])return;
+ const pageKey=Object.entries(pageBlockPages).find(([,id])=>$(id)===page)?.[0];if(!pageKey||!isPageBlockEditOn(pageKey))return;
  const blocks=[...page.children].filter(el=>el.dataset.blockId&&!el.hidden),index=blocks.indexOf(block),dir=control.dataset.pageBlockMove==='up'?-1:1,next=blocks[index+dir];
  if(!next)return;
  if(dir<0)page.insertBefore(block,next);else page.insertBefore(next,block);
@@ -2608,3 +2611,53 @@ body.dark-night .journey-stack-dots{background:transparent!important;border:0!im
 body.dark-night .journey-stack-dots span{background:#555a60!important}
 body.dark-night .journey-stack-dots span.active{background:var(--green,#8d9f91)!important}
 </style>
+
+<style id="journey-stack-single-widget-fix">
+/* 手機小工具一次只顯示一頁；強制尊重 hidden，避免舊版 display 樣式讓兩頁同時出現 */
+.journey-stack > .journey-widget[hidden],
+.journey-stack > #journeyWidget[hidden],
+.journey-stack > #todoWidget[hidden] { display: none !important; }
+.journey-stack > .journey-widget:not([hidden]) { display: block !important; }
+.journey-stack { touch-action: pan-y; }
+.journey-stack > .journey-widget[hidden], .journey-stack > #journeyWidget[hidden], .journey-stack > #todoWidget[hidden] { display:none !important; }
+.journey-stack-dots { user-select: none; -webkit-user-select: none; }
+</style>
+<script id="journey-stack-single-widget-init">
+(function(){
+  function initJourneyWidgetSwitch(){
+    const journey=document.getElementById('journeyWidget');
+    const todo=document.getElementById('todoWidget');
+    const stack=document.querySelector('.journey-stack');
+    if(!journey||!todo||!stack||stack.dataset.switchReady==='1')return;
+    stack.dataset.switchReady='1';
+    let current='journey', startX=null, startY=null;
+    function show(which){
+      current=which==='todo'?'todo':'journey';
+      journey.hidden=current!=='journey';
+      todo.hidden=current!=='todo';
+      stack.querySelectorAll('[data-journey-dot]').forEach(function(dot){
+        const active=dot.dataset.journeyDot===current;
+        dot.classList.toggle('active',active);
+        dot.setAttribute('aria-current',active?'true':'false');
+      });
+    }
+    show('journey');
+    stack.addEventListener('touchstart',function(e){
+      if(e.touches.length!==1||e.target.closest('button,input,select,textarea,a,label')){startX=null;startY=null;return;}
+      startX=e.touches[0].clientX;startY=e.touches[0].clientY;
+    },{passive:true});
+    stack.addEventListener('touchend',function(e){
+      if(startX===null||!e.changedTouches.length)return;
+      const dx=e.changedTouches[0].clientX-startX,dy=e.changedTouches[0].clientY-startY;
+      if(Math.abs(dx)>=35&&Math.abs(dx)>Math.abs(dy)*1.15)show(dx<0?'todo':'journey');
+      startX=null;startY=null;
+    },{passive:true});
+    stack.querySelectorAll('[data-journey-dot]').forEach(function(dot){
+      dot.style.cursor='pointer';dot.setAttribute('role','button');
+      dot.setAttribute('aria-label',dot.dataset.journeyDot==='todo'?'切換到代辦事項':'切換到我的年度旅程');
+      dot.addEventListener('click',function(){show(dot.dataset.journeyDot);});
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initJourneyWidgetSwitch);else initJourneyWidgetSwitch();
+})();
+</script>
