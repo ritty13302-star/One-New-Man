@@ -893,7 +893,7 @@ const freshState=()=>({
   lifeReading:{completed:{},completedAt:{},plan:{mode:'date',startDate:'',deadline:'',weeklyTarget:''}},
   bible:{completed:{},startDate:'',endDate:'',cycles:[],readCounts:{old:0,new:0},readHistory:[],overview:{},manuscripts:{}}
 });
-let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='';
+let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,saveInFlight=false,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='';
 const editingCareRecords=new Set();
 const managingCareRecords=new Set();
 let homeGroupHideEditMode=false;
@@ -975,10 +975,13 @@ function persist(){
  if(!currentUser||applyingRemote)return;
  clearTimeout(saveTimer);setCloudStatus('有變更，準備同步…');
  saveTimer=setTimeout(async()=>{
+  saveTimer=null;
   const data=normalizeState(state),serialized=serialize(data);
   if(serialized===lastSerialized){setCloudStatus('已同步至雲端');return}
+  saveInFlight=true;
   try{await setDoc(doc(db,'users',currentUser.uid,'appData','main'),{...data,updatedAt:serverTimestamp()});lastSerialized=serialized;setCloudStatus('已同步至雲端 ✓')}
   catch(error){console.error(error);setCloudStatus('同步失敗，請確認網路與 Firebase 設定');setStatus('雲端儲存失敗：'+friendlyError(error),true)}
+  finally{saveInFlight=false}
  },450);
 }
 function pct(g){return Math.min(100,Math.round(g.current/Math.max(1,g.target)*100))}
@@ -1482,6 +1485,8 @@ function showApp(user){
   if(!currentUser||currentUser.uid!==user.uid)return;
   if(!snap.exists()){const initial=freshState();try{await setDoc(ref,{...initial,updatedAt:serverTimestamp()});lastSerialized=serialize(initial);state=normalizeState(initial);render();setCloudStatus('已建立新的雲端紀錄 ✓')}catch(error){setStatus('無法建立雲端資料：'+friendlyError(error),true);setCloudStatus('同步失敗')}return}
   const rawData=snap.data(),remote=normalizeState(rawData),serialized=serialize(remote),rawSerialized=serialize(rawData);
+  // 避免 iPhone Safari 隱藏目標後，雲端較舊的快照在本機儲存完成前覆蓋新狀態。
+  if(saveTimer!==null||saveInFlight){setCloudStatus('正在儲存最新變更…');return}
   if(serialized!==lastSerialized){
    const active=document.activeElement;
    const editingCareField=active&&($('goalList').contains(active)||$('baptizedList')?.contains(active)||$('shepherdListPanel')?.contains(active)||$('churchSaintsList')?.contains(active)||$('weeklyHomeGroupTable')?.contains(active))&&(active.matches('[data-shepherd-field], [data-record-field], [data-baptized-field], [data-church-saint-field], [data-baptism-goal-setting], [data-annual-goal-setting], [data-home-group-name], [data-home-group-identity]'));
