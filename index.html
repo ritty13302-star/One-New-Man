@@ -1703,7 +1703,38 @@ function printScheduleForMobile(){
   const styles=Array.from(document.querySelectorAll('style')).map(el=>el.outerHTML).join('');
   const links=Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(el=>el.outerHTML).join('');
   printWin.document.open();
-  printWin.document.write(`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${links}${styles}<title>本週時間表</title><style>body{background:#fff!important;color:#111!important;margin:0;padding:12px;font-family:Arial,"Noto Sans TC",sans-serif}.schedule-print-document{display:block!important;position:static!important;width:100%!important}.schedule-print-day{break-inside:avoid;page-break-inside:avoid}@media print{@page{size:A4 landscape;margin:5mm}body{padding:0}.schedule-print-day{break-inside:avoid;page-break-inside:avoid}}</style></head><body><main id="schedulePrintDocument" class="schedule-print-document">${content}</main><script>window.addEventListener('load',function(){setTimeout(function(){try{window.focus();window.print()}catch(e){}},500)});<\/script></body></html>`);
+  printWin.document.write(`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${links}${styles}<title>本週時間表</title><style>body{background:#fff!important;color:#111!important;margin:0;padding:12px;font-family:Arial,"Noto Sans TC",sans-serif}.schedule-print-document{display:block!important;position:static!important;width:100%!important}.schedule-print-day{break-inside:avoid;page-break-inside:avoid}@media print{@page{size:A4 landscape;margin:5mm}body{padding:0}.schedule-print-day{break-inside:avoid;page-break-inside:avoid}}</style></head><body><main id="schedulePrintDocument" class="schedule-print-document">${content}</main><script>window.addEventListener('load',function(){setTimeout(function(){try{window.focus();window.print()}catch(e){}},500)});<\/script>
+<style id="todo-stable-scroll-v5">
+/* 待辦清單固定在小工具內捲動，避免舊版重複規則造成跳動 */
+#todoWidget{display:flex!important;flex-direction:column!important;min-height:190px!important;height:190px!important;overflow:hidden!important}
+#todoWidget .todo-widget-heading{flex:0 0 auto!important}
+#todoList.todo-list{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;gap:7px!important;min-height:0!important;height:auto!important;max-height:none!important;overflow-y:scroll!important;overflow-x:hidden!important;position:relative!important;overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scroll-behavior:auto!important;overflow-anchor:none!important;}
+#todoList .todo-item{flex:0 0 auto!important;min-height:42px!important}
+#todoList .todo-delete{position:relative;z-index:3;touch-action:manipulation!important}
+</style>
+<script id="todo-stable-scroll-v5-script">
+(function(){
+ const list=document.getElementById('todoList');
+ if(!list||list.dataset.stableScrollV5==='1')return;
+ list.dataset.stableScrollV5='1';
+ // Keep the parent swipe recognizer from claiming a vertical gesture begun in the list.
+ ['touchstart','touchmove','touchend','touchcancel'].forEach(type=>list.addEventListener(type,function(e){
+   if(type==='touchmove' && e.touches && e.touches.length===1){
+     // Do not preventDefault: native iOS scrolling must remain enabled.
+   }
+   e.stopPropagation();
+ },{passive:true,capture:true}));
+ // Restore scroll position after content-changing events only, not during scrolling.
+ let savedTop=0;
+ list.addEventListener('scroll',()=>{savedTop=list.scrollTop},{passive:true});
+ const observer=new MutationObserver(()=>{
+   if(Math.abs(list.scrollTop-savedTop)>1) list.scrollTop=savedTop;
+ });
+ observer.observe(list,{childList:true,subtree:false});
+})();
+</script>
+
+</body></html>`);
   printWin.document.close();
   return;
  }
@@ -2377,6 +2408,37 @@ html body.dark-night #page-target #todoWidget{
   stack.addEventListener('touchcancel',function(){tracking=false;sx=sy=null;},{passive:true});
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
+
+<style id="todo-stable-scroll-v5">
+/* 待辦清單固定在小工具內捲動，避免舊版重複規則造成跳動 */
+#todoWidget{display:flex!important;flex-direction:column!important;min-height:190px!important;height:190px!important;overflow:hidden!important}
+#todoWidget .todo-widget-heading{flex:0 0 auto!important}
+#todoList.todo-list{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;gap:7px!important;min-height:0!important;height:auto!important;max-height:none!important;overflow-y:scroll!important;overflow-x:hidden!important;position:relative!important;overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;scroll-behavior:auto!important;overflow-anchor:none!important;}
+#todoList .todo-item{flex:0 0 auto!important;min-height:42px!important}
+#todoList .todo-delete{position:relative;z-index:3;touch-action:manipulation!important}
+</style>
+<script id="todo-stable-scroll-v5-script">
+(function(){
+ const list=document.getElementById('todoList');
+ if(!list||list.dataset.stableScrollV5==='1')return;
+ list.dataset.stableScrollV5='1';
+ // Keep the parent swipe recognizer from claiming a vertical gesture begun in the list.
+ ['touchstart','touchmove','touchend','touchcancel'].forEach(type=>list.addEventListener(type,function(e){
+   if(type==='touchmove' && e.touches && e.touches.length===1){
+     // Do not preventDefault: native iOS scrolling must remain enabled.
+   }
+   e.stopPropagation();
+ },{passive:true,capture:true}));
+ // Restore scroll position after content-changing events only, not during scrolling.
+ let savedTop=0;
+ list.addEventListener('scroll',()=>{savedTop=list.scrollTop},{passive:true});
+ const observer=new MutationObserver(()=>{
+   if(Math.abs(list.scrollTop-savedTop)>1) list.scrollTop=savedTop;
+ });
+ observer.observe(list,{childList:true,subtree:false});
 })();
 </script>
 
