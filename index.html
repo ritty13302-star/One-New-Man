@@ -1630,7 +1630,7 @@ $('scheduleDays').addEventListener('click',handleScheduleClick);$('scheduleAgend
 /* 修正：編輯結果與勾選時不重新繪製整張時間表，避免焦點／捲動位置跳動 */
 function saveScheduleResultFromField(field){const occurrence=scheduleOccurrence(field.dataset.occurrenceDate||scheduleSelectedDate,field.dataset.origin,field.dataset.scheduleEntryResult);occurrence.result=field.value;persist()}
 ['scheduleAgenda','scheduleWeekOverview'].forEach(id=>{const root=$(id);root.addEventListener('pointerdown',e=>{if(e.target.closest('[data-schedule-entry-result],[data-schedule-entry-done]'))e.stopPropagation()},true);root.addEventListener('click',e=>{if(e.target.closest('[data-schedule-entry-result],[data-schedule-entry-done]'))e.stopPropagation()},true);root.addEventListener('input',e=>{const field=e.target.closest('[data-schedule-entry-result]');if(field)saveScheduleResultFromField(field)},true);root.addEventListener('change',e=>{const field=e.target.closest('[data-schedule-entry-done]');if(!field)return;const occurrence=scheduleOccurrence(field.dataset.occurrenceDate||scheduleSelectedDate,field.dataset.origin,field.dataset.scheduleEntryDone);occurrence.done=field.checked;persist()},true)});
-$('scheduleAgenda').addEventListener('change',handleScheduleChange);$('scheduleWeekOverview').addEventListener('change',handleScheduleChange);$('scheduleNotes').addEventListener('change',handleScheduleChange);$('scheduleCategoryList').addEventListener('change',handleScheduleChange);$('scheduleCategoryList').addEventListener('click',handleScheduleChange);$('scheduleCategoryList').addEventListener('input',e=>{const color=e.target.closest('[data-category-color]');if(color){const row=color.closest('.schedule-category-row');const swatch=row?.querySelector('.schedule-category-swatch');if(swatch)swatch.style.background=color.value;}});$('scheduleCategoryList').addEventListener('focusout',e=>{const input=e.target.closest('[data-category-name]');if(input){handleScheduleChange({target:input});}});
+$('scheduleAgenda').addEventListener('change',handleScheduleChange);$('scheduleWeekOverview').addEventListener('change',handleScheduleChange);$('scheduleNotes').addEventListener('change',handleScheduleChange);$('scheduleCategoryList').addEventListener('change',handleScheduleChange);$('scheduleCategoryList').addEventListener('click',handleScheduleChange);$('scheduleCategoryList').addEventListener('input',e=>{const color=e.target.closest('[data-category-color]');if(color){const row=color.closest('.schedule-category-row');const swatch=row?.querySelector('.schedule-category-swatch');if(swatch)swatch.style.background=color.value;return}const name=e.target.closest('[data-category-name]');if(name){name.dataset.draftName=name.value;}});$('scheduleCategoryList').addEventListener('focusout',e=>{const input=e.target.closest('[data-category-name]');if(input){handleScheduleChange({target:input});}});
 $('scheduleNoteForm').addEventListener('submit',e=>{e.preventDefault();const input=$('scheduleNoteInput'),text=input.value.trim();if(!text)return;scheduleDayData(scheduleSelectedDate).notes.push({id:Date.now(),text,done:false});input.value='';persist();renderSchedule()});
 $('scheduleNotesToggle').addEventListener('click',()=>{scheduleNotesExpanded=!scheduleNotesExpanded;renderSchedule()});
 $('scheduleRepeatInput').addEventListener('change',syncScheduleRepeatEndFields);$('scheduleRepeatEndMode').addEventListener('change',syncScheduleRepeatEndFields);$('scheduleRepeatEndDate').addEventListener('change',()=>{if($('scheduleRepeatEndDate').value&&$('scheduleRepeatEndDate').value< (scheduleEditing?.origin||scheduleSelectedDate))$('scheduleRepeatEndDate').value=scheduleEditing?.origin||scheduleSelectedDate});$('scheduleEntryCancel').addEventListener('click',closeScheduleEntry);$('scheduleEntryClose').addEventListener('click',closeScheduleEntry);$('scheduleEntrySave').addEventListener('click',saveScheduleEntry);$('scheduleEntryDelete').addEventListener('click',()=>{if(!scheduleEditing?.id)return;const found=findScheduleEvent(scheduleEditing.id,scheduleEditing.origin);if(!found){closeScheduleEntry();return}if((found.item.repeat||'none')!=='none'){$('scheduleDeleteModal').classList.add('open');schedulePendingDelete={id:scheduleEditing.id,origin:scheduleEditing.origin};return}if(!confirm('確定只刪除此行程嗎？'))return;removeScheduleSeriesItem(found);closeScheduleEntry();persist();renderSchedule()});
@@ -2281,6 +2281,42 @@ html body.dark-night #page-target #todoWidget{
 </style>
 <style id="home-group-manual-order-controls">.weekly-home-group-order-controls{display:inline-flex;gap:3px;flex:0 0 auto}.weekly-home-group-order-controls .move-btn{width:24px;height:24px;font-size:13px}.weekly-home-group-name-wrap{gap:5px}</style>
 <script>renderChurchCareTable();</script>
+
+<style id="todo-list-touch-scroll-fix">
+/* 修正 iPhone 上代辦清單的上下滑動；清單內的手勢不應觸發外層左右切換 */
+#todoWidget{display:flex!important;flex-direction:column;min-height:0}
+#todoWidget .todo-widget-heading{flex:0 0 auto}
+#todoList.todo-list{flex:1 1 auto;min-height:0;height:auto;max-height:none;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y!important;pointer-events:auto}
+#todoList .todo-item{flex:0 0 auto}
+</style>
+<script id="todo-list-touch-scroll-gesture-fix">
+(function(){
+ function init(){
+  const list=document.getElementById('todoList');
+  const stack=document.querySelector('.journey-stack');
+  if(!list||!stack||stack.dataset.todoScrollFix==='1')return;
+  stack.dataset.todoScrollFix='1';
+  let sx=null,sy=null,tracking=false;
+  stack.addEventListener('touchstart',function(e){
+   if(e.target.closest('#todoList')){tracking=false;sx=sy=null;return;}
+   if(e.touches.length!==1||e.target.closest('button,input,select,textarea,a,label')){tracking=false;sx=sy=null;return;}
+   sx=e.touches[0].clientX;sy=e.touches[0].clientY;tracking=true;
+  },{passive:true});
+  stack.addEventListener('touchend',function(e){
+   if(!tracking||sx===null||!e.changedTouches.length)return;
+   const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+   if(Math.abs(dx)>=35&&Math.abs(dx)>Math.abs(dy)*1.15){
+    const todo=document.getElementById('todoWidget'),journey=document.getElementById('journeyWidget');
+    if(todo&&journey){const showTodo=dx<0;todo.hidden=!showTodo;journey.hidden=showTodo;todo.style.setProperty('display',showTodo?'flex':'none','important');journey.style.setProperty('display',showTodo?'none':'block','important');document.querySelectorAll('[data-journey-dot]').forEach(d=>{const active=d.dataset.journeyDot===(showTodo?'todo':'journey');d.classList.toggle('active',active);d.setAttribute('aria-current',active?'true':'false');});}
+   }
+   tracking=false;sx=sy=null;
+  },{passive:true});
+  stack.addEventListener('touchcancel',function(){tracking=false;sx=sy=null;},{passive:true});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
 </body>
 </html>
 
@@ -2729,3 +2765,10 @@ body.dark-night .journey-stack-dots span.active{background:var(--green,#8d9f91)!
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
+
+<style>
+/* 分類名稱與顏色在手機上保持可編輯 */
+#scheduleCategoryModal .dialog, #scheduleCategoryList, .schedule-category-row, .schedule-category-row input, #scheduleCategoryForm { pointer-events:auto; }
+#scheduleCategoryList .schedule-category-name { min-width:0; user-select:text; -webkit-user-select:text; touch-action:manipulation; }
+#scheduleCategoryList input[type="color"] { cursor:pointer; touch-action:manipulation; }
+</style>
