@@ -918,7 +918,7 @@ const freshState=()=>({
   lifeReading:{completed:{},completedAt:{},plan:{mode:'date',startDate:'',deadline:'',weeklyTarget:''}},
   bible:{completed:{},startDate:'',endDate:'',cycles:[],readCounts:{old:0,new:0},readHistory:[],overview:{},manuscripts:{}}
 });
-let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='';
+let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='',pendingLocalWrite=false;
 const editingCareRecords=new Set();
 const managingCareRecords=new Set();
 let homeGroupHideEditMode=false;
@@ -998,12 +998,17 @@ function normalizeState(raw){
 }
 function persist(){
  if(!currentUser||applyingRemote)return;
+ // 一旦本機資料有變更，就先保護它；避免雲端舊快照在 debounce／寫入期間覆蓋本機新資料。
+ pendingLocalWrite=true;
  clearTimeout(saveTimer);setCloudStatus('有變更，準備同步…');
  saveTimer=setTimeout(async()=>{
   const data=normalizeState(state),serialized=serialize(data);
-  if(serialized===lastSerialized){setCloudStatus('已同步至雲端');return}
-  try{await setDoc(doc(db,'users',currentUser.uid,'appData','main'),{...data,updatedAt:serverTimestamp()});lastSerialized=serialized;setCloudStatus('已同步至雲端 ✓')}
-  catch(error){console.error(error);setCloudStatus('同步失敗，請確認網路與 Firebase 設定');setStatus('雲端儲存失敗：'+friendlyError(error),true)}
+  if(serialized===lastSerialized){pendingLocalWrite=false;setCloudStatus('已同步至雲端');return}
+  try{
+   await setDoc(doc(db,'users',currentUser.uid,'appData','main'),{...data,updatedAt:serverTimestamp()});
+   lastSerialized=serialized;pendingLocalWrite=false;setCloudStatus('已同步至雲端 ✓');
+  }
+  catch(error){console.error(error);pendingLocalWrite=false;setCloudStatus('同步失敗，請確認網路與 Firebase 設定');setStatus('雲端儲存失敗：'+friendlyError(error),true)}
  },450);
 }
 function pct(g){return Math.min(100,Math.round(g.current/Math.max(1,g.target)*100))}
@@ -1418,8 +1423,12 @@ function renderScheduleSubitemSelect(categoryName,selected=''){const category=sc
 $('scheduleCategoryInput').addEventListener('change',()=>renderScheduleSubitemSelect($('scheduleCategoryInput').value,''));
 function closeScheduleEntry(){$('scheduleEntryModal').classList.remove('open');$('scheduleEntryModal').hidden=true;scheduleEditing=null}
 function saveScheduleEntry(){if(!scheduleEditing)return;const plan=$('schedulePlanInput').value.trim(),start=$('scheduleStartInput').value,end=$('scheduleEndInput').value;if(!plan){alert('請輸入安排名稱。');return}if(!start||!end||end<=start){alert('結束時間必須晚於開始時間。');return}
+ // 儲存前保留頁面與整週橫向捲動位置，避免重繪時間表後畫面跳回頂端或跳到新行程。
+ const savedWindowY=window.scrollY,savedWindowX=window.scrollX,weekScroller=document.querySelector('#scheduleWeekOverview .schedule-week-scroll'),savedWeekLeft=weekScroller?weekScroller.scrollLeft:0;
  let origin=scheduleEditing.origin,entry=null;if(!/^\d{4}-\d{2}-\d{2}$/.test(String(origin||''))){origin=scheduleSelectedDate;scheduleEditing.origin=origin}if(scheduleEditing.id){const found=findScheduleEvent(scheduleEditing.id,origin);entry=found?.item;if(found){found.day.slots[found.slot]=found.day.slots[found.slot].filter(x=>String(x.id)!==String(scheduleEditing.id));if(!found.day.slots[found.slot].length)delete found.day.slots[found.slot]}}
- const day=scheduleDayData(origin),list=day.slots[start]||(day.slots[start]=[]);entry=entry||{id:Date.now(),done:false};const repeat=$('scheduleRepeatInput').value,repeatEndMode=$('scheduleRepeatEndMode').value,repeatUntil=repeat!=='none'&&repeatEndMode==='date'?$('scheduleRepeatEndDate').value:'';if(repeat!=='none'&&repeatEndMode==='date'&&!repeatUntil){alert('請選擇結束重複日期。');return}if(repeatUntil&&repeatUntil<origin){alert('結束重複日期不可早於開始日期。');return}Object.assign(entry,{plan,start,end,category:$('scheduleCategoryInput').value,subitem:$('scheduleSubitemInput').value||'',repeat,repeatUntil});list.push(entry);persist();closeScheduleEntry();renderSchedule();if(scheduleOverviewMode){const board=$('scheduleWeekOverview');if(board){const saved=board.querySelector(`[data-schedule-open="${entry.id}"][data-origin="${origin}"]`);if(saved)saved.scrollIntoView({block:'nearest',inline:'nearest',behavior:'auto'})}}}
+ const day=scheduleDayData(origin),list=day.slots[start]||(day.slots[start]=[]);entry=entry||{id:Date.now(),done:false};const repeat=$('scheduleRepeatInput').value,repeatEndMode=$('scheduleRepeatEndMode').value,repeatUntil=repeat!=='none'&&repeatEndMode==='date'?$('scheduleRepeatEndDate').value:'';if(repeat!=='none'&&repeatEndMode==='date'&&!repeatUntil){alert('請選擇結束重複日期。');return}if(repeatUntil&&repeatUntil<origin){alert('結束重複日期不可早於開始日期。');return}Object.assign(entry,{plan,start,end,category:$('scheduleCategoryInput').value,subitem:$('scheduleSubitemInput').value||'',repeat,repeatUntil});list.push(entry);persist();closeScheduleEntry();renderSchedule();
+ const newScroller=document.querySelector('#scheduleWeekOverview .schedule-week-scroll');if(newScroller)newScroller.scrollLeft=savedWeekLeft;window.scrollTo({left:savedWindowX,top:savedWindowY,behavior:'auto'});
+}
 function openScheduleCategories(){renderScheduleCategories();$('scheduleCategoryModal').hidden=false;$('scheduleCategoryModal').classList.add('open')}
 function renderScheduleCategories(){$('scheduleCategoryList').innerHTML=scheduleCategories().map((c,i)=>{if(!Array.isArray(c.items))c.items=[];return `<div class="schedule-category-row"><span class="schedule-category-swatch" style="background:${c.color}"></span><input class="schedule-category-name" type="text" maxlength="24" value="${esc(c.name)}" data-category-name="${i}" aria-label="分類名稱"><input type="color" value="${c.color}" data-category-color="${i}" aria-label="${esc(c.name)}顏色"><button class="mini" data-category-delete="${i}" type="button" ${scheduleCategories().length<=1?'disabled':''}>刪除</button><div class="schedule-subitems"><strong>子項目</strong>${c.items.map((item,j)=>`<div class="schedule-subitem-row"><span>${esc(item)}</span><button class="mini" type="button" data-subitem-delete="${i}" data-subitem-index="${j}">刪除</button></div>`).join('')}<form class="schedule-subitem-form" data-subitem-form="${i}"><input type="text" maxlength="40" placeholder="新增子項目" aria-label="${esc(c.name)}新增子項目" required><button class="mini" type="submit">＋新增子項目</button></form></div></div>`}).join('')}
 function closeScheduleCategories(){$('scheduleCategoryModal').classList.remove('open');$('scheduleCategoryModal').hidden=true}
@@ -1509,6 +1518,8 @@ function showApp(user){
   if(!currentUser||currentUser.uid!==user.uid)return;
   if(!snap.exists()){const initial=freshState();try{await setDoc(ref,{...initial,updatedAt:serverTimestamp()});lastSerialized=serialize(initial);state=normalizeState(initial);render();setCloudStatus('已建立新的雲端紀錄 ✓')}catch(error){setStatus('無法建立雲端資料：'+friendlyError(error),true);setCloudStatus('同步失敗')}return}
   const rawData=snap.data(),remote=normalizeState(rawData),serialized=serialize(remote),rawSerialized=serialize(rawData);
+  // 雲端快照若在本機新增／修改尚未完成同步時抵達，不能用舊資料整份覆蓋 state。
+  if(pendingLocalWrite){setCloudStatus('本機變更同步中…');return;}
   if(serialized!==lastSerialized){
    const active=document.activeElement;
    const editingCareField=active&&($('goalList').contains(active)||$('baptizedList')?.contains(active)||$('shepherdListPanel')?.contains(active)||$('churchSaintsList')?.contains(active)||$('weeklyHomeGroupTable')?.contains(active))&&(active.matches('[data-shepherd-field], [data-record-field], [data-baptized-field], [data-church-saint-field], [data-baptism-goal-setting], [data-annual-goal-setting], [data-home-group-name], [data-home-group-identity]'));
@@ -1521,7 +1532,7 @@ function showApp(user){
   setCloudStatus('已同步至雲端 ✓');
  },error=>{console.error(error);setStatus('讀取雲端失敗：'+friendlyError(error),true);setCloudStatus('同步失敗')});
 }
-function clearUser(){if(stopListening){stopListening();stopListening=null}clearTimeout(saveTimer);currentUser=null;avatarStoragePath='';renderHeaderAvatar('');$('avatarStatus').textContent='登入 Google 後可將頭貼儲存至雲端';state=freshState();lastSerialized='';document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{const active=t.dataset.page==='target';t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('#appContent > .page-panel').forEach(p=>p.hidden=p.id!=='page-target');renderAllTabRecords();applyPageBlockOrder();refreshPageBlockEditControls();$('serviceQuickFab').hidden=true;$('appContent').classList.add('auth-hidden');$('pageEditToolbar').classList.add('auth-hidden');$('pageEditToolbar').hidden=false;$('googleSignIn').classList.remove('auth-hidden');$('signOutBtn').classList.add('auth-hidden');$('authAvatar').textContent='☁️';$('authTitle').textContent='登入以同步你的年度紀錄';$('authSubtitle').textContent='使用 Google 帳號，在不同裝置繼續記錄';setStatus('尚未登入');setCloudStatus('登入後開始同步')}
+function clearUser(){if(stopListening){stopListening();stopListening=null}clearTimeout(saveTimer);pendingLocalWrite=false;currentUser=null;avatarStoragePath='';renderHeaderAvatar('');$('avatarStatus').textContent='登入 Google 後可將頭貼儲存至雲端';state=freshState();lastSerialized='';document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{const active=t.dataset.page==='target';t.classList.toggle('active',active);t.setAttribute('aria-selected',active?'true':'false')});document.querySelectorAll('#appContent > .page-panel').forEach(p=>p.hidden=p.id!=='page-target');renderAllTabRecords();applyPageBlockOrder();refreshPageBlockEditControls();$('serviceQuickFab').hidden=true;$('appContent').classList.add('auth-hidden');$('pageEditToolbar').classList.add('auth-hidden');$('pageEditToolbar').hidden=false;$('googleSignIn').classList.remove('auth-hidden');$('signOutBtn').classList.add('auth-hidden');$('authAvatar').textContent='☁️';$('authTitle').textContent='登入以同步你的年度紀錄';$('authSubtitle').textContent='使用 Google 帳號，在不同裝置繼續記錄';setStatus('尚未登入');setCloudStatus('登入後開始同步')}
 $('googleSignIn').addEventListener('click',async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(error){console.error(error);if(error.code==='auth/popup-blocked'){try{await signInWithRedirect(auth,new GoogleAuthProvider());return}catch(redirectError){setStatus(friendlyError(redirectError),true);return}}setStatus(friendlyError(error),true)}});
 $('signOutBtn').addEventListener('click',async()=>{try{await signOut(auth);clearUser()}catch(error){setStatus('登出失敗：'+friendlyError(error),true)}});
 $('goalList').addEventListener('click',e=>{const annualToggle=e.target.closest('[data-annual-goal-settings-toggle]');if(annualToggle){if(annualToggle.dataset.annualGoalSettingsToggle==='book')bookGoalSettingsOpen=!bookGoalSettingsOpen;else sistersConferenceSettingsOpen=!sistersConferenceSettingsOpen;renderGoals();return}const annualDone=e.target.closest('[data-annual-goal-settings-close]');if(annualDone){if(annualDone.dataset.annualGoalSettingsClose==='book')bookGoalSettingsOpen=false;else sistersConferenceSettingsOpen=false;renderGoals();return}if(e.target.closest('[data-baptism-goal-settings-toggle]')){baptismGoalSettingsOpen=!baptismGoalSettingsOpen;renderGoals();return}if(e.target.closest('[data-baptism-goal-settings-close]')){baptismGoalSettingsOpen=false;renderGoals();return}});
