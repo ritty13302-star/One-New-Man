@@ -457,6 +457,27 @@ body.dark-night .todo-count-badge{
 
 .church-care-table-wrap{width:100%;overflow-x:auto}.church-care-table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px;font-size:13px}.church-care-table th,.church-care-table td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}.church-care-table th{background:var(--pale);font-weight:750}.church-care-table th:first-child,.church-care-table td:first-child{text-align:left;position:sticky;left:0;background:var(--card);z-index:1}.church-care-table .care-person{min-width:145px}.church-care-table .care-person strong{display:block}.church-care-table .care-person small{display:block;color:var(--muted);margin-top:3px}.church-care-table input[type=checkbox]{width:19px;height:19px;accent-color:var(--green);cursor:pointer}.church-care-table tr:last-child td{border-bottom:0}
 
+
+/* 列印美化：平面安排、細框線、淡咖啡色日期標題；只顯示名稱與時間 */
+@media print {
+  .schedule-print-day > header {
+    background: #f5eee5 !important;
+    border: 1px solid #d8cabc !important;
+    border-bottom: 1px solid #d8cabc !important;
+    padding: 3px 2px !important;
+    margin: 0 !important;
+  }
+  .print-week-event {
+    box-shadow: none !important;
+    border: 0.5px solid #999 !important;
+    border-left: 0.5px solid #999 !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .print-week-event b, .print-week-event small { text-align: center !important; }
+}
+
 </style>
 
 <style id="schedule-independent-columns-fix">
