@@ -1704,6 +1704,21 @@ function printScheduleForMobile(){
   const links=Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map(el=>el.outerHTML).join('');
   printWin.document.open();
   printWin.document.write(`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${links}${styles}<title>本週時間表</title><style>body{background:#fff!important;color:#111!important;margin:0;padding:12px;font-family:Arial,"Noto Sans TC",sans-serif}.schedule-print-document{display:block!important;position:static!important;width:100%!important}.schedule-print-day{break-inside:avoid;page-break-inside:avoid}@media print{@page{size:A4 landscape;margin:5mm}body{padding:0}.schedule-print-day{break-inside:avoid;page-break-inside:avoid}}</style></head><body><main id="schedulePrintDocument" class="schedule-print-document">${content}</main><script>window.addEventListener('load',function(){setTimeout(function(){try{window.focus();window.print()}catch(e){}},500)});<\/script>
+
+<style id="todo-full-view-modal-style">
+.todo-view-modal{display:flex;flex-direction:column;width:min(100%,560px);height:min(82vh,760px);max-height:82vh;overflow:hidden}
+.todo-view-modal .todo-modal-head{flex:0 0 auto;align-items:flex-start}
+.todo-view-hint{margin:6px 0 0;font-size:13px;line-height:1.5;color:var(--muted,#7a8088)}
+.todo-view-list{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:8px;padding:2px 3px 8px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.todo-view-list .todo-item{flex:0 0 auto;min-height:48px;padding:10px;grid-template-columns:22px minmax(0,1fr) auto}
+.todo-view-list .todo-view-text{cursor:default;overflow-wrap:anywhere}
+.todo-view-list .todo-item-main{overflow-wrap:anywhere}
+.todo-view-list .todo-delete{min-width:32px;min-height:32px;touch-action:manipulation}
+.todo-view-empty{padding:16px;text-align:center}
+.todo-view-backdrop{z-index:10010}
+@media(max-width:480px){.todo-view-modal{width:100%;height:82vh;max-height:82vh;padding:16px}.todo-view-modal .todo-modal-head h3{font-size:19px}}
+</style>
+
 </body></html>`);
   printWin.document.close();
   return;
@@ -2134,19 +2149,29 @@ body.dark-night .todo-count-badge{
 </style>
 
 
+
+<div class="todo-modal-backdrop todo-view-backdrop" id="todoViewModal" hidden>
+ <section class="todo-modal todo-view-modal" role="dialog" aria-modal="true" aria-labelledby="todoViewTitle">
+  <div class="todo-modal-head"><div><h3 id="todoViewTitle">完整待辦事項</h3><p class="todo-view-hint">可在這裡勾選完成、刪除，或上下滑動查看全部項目。</p></div><button type="button" id="closeTodoView" class="todo-modal-close" aria-label="關閉">×</button></div>
+  <div id="todoViewList" class="todo-view-list"></div>
+  <div id="todoViewEmpty" class="todo-empty" hidden>目前沒有待辦事項，享受清爽的一天吧！</div>
+ </section>
+</div>
+
 <script id="journey-stack-todo-script">
 (()=>{
  const $=id=>document.getElementById(id); const key='v8_journey_todo_v1'; let items=[];
  try{items=JSON.parse(localStorage.getItem(key)||'[]');if(!Array.isArray(items))items=[]}catch(_){items=[]}
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const save=()=>{try{localStorage.setItem(key,JSON.stringify(items))}catch(_){}};
- function render(){const list=$('todoList'),empty=$('todoEmpty'),badge=$('todoCountBadge');if(!list)return;
- const previousScrollTop=list.scrollTop;
+ function render(){const list=$('todoList'),viewList=$('todoViewList'),empty=$('todoEmpty'),viewEmpty=$('todoViewEmpty'),badge=$('todoCountBadge');if(!list)return;
+ const previousScrollTop=list.scrollTop,viewScrollTop=viewList?viewList.scrollTop:0;
  const pending=items.filter(x=>!x.done).length;if(badge)badge.textContent=String(pending);
  const sorted=[...items].sort((a,b)=>{if(!!a.done!==!!b.done)return a.done?1:-1;const ad=a.date||'9999-12-31',bd=b.date||'9999-12-31';return ad.localeCompare(bd)});
- list.innerHTML=sorted.map(x=>`<div class="todo-item ${x.done?'done':''}"><input type="checkbox" data-todo-check="${x.id}" ${x.done?'checked':''} aria-label="標記完成"><div class="todo-item-main"><span>${esc(x.text)}</span><span class="todo-meta">${esc(x.category||'其他')} · 完成時間：${esc(x.date||'未設定')}</span></div><button class="todo-delete" type="button" data-todo-delete="${x.id}" aria-label="刪除事項">×</button></div>`).join('');
- list.scrollTop=previousScrollTop;
- if(empty)empty.hidden=items.length>0;}
+ const markup=sorted.map(x=>`<div class="todo-item ${x.done?'done':''}"><input type="checkbox" data-todo-check="${x.id}" ${x.done?'checked':''} aria-label="標記完成"><div class="todo-item-main"><span class="todo-view-text">${esc(x.text)}</span><span class="todo-meta">${esc(x.category||'其他')} · 完成時間：${esc(x.date||'未設定')}</span></div><button class="todo-delete" type="button" data-todo-delete="${x.id}" aria-label="刪除事項">×</button></div>`).join('');
+ list.innerHTML=markup;if(viewList)viewList.innerHTML=markup;
+ list.scrollTop=previousScrollTop;if(viewList)viewList.scrollTop=viewScrollTop;
+ if(empty)empty.hidden=items.length>0;if(viewEmpty)viewEmpty.hidden=items.length>0;}
  function show(which){const todo=which==='todo';const journey=$('journeyWidget'),todoWidget=$('todoWidget');if(journey){journey.hidden=todo;journey.style.setProperty('display',todo?'none':'block','important')}if(todoWidget){todoWidget.hidden=!todo;todoWidget.style.setProperty('display',todo?'block':'none','important')}document.querySelectorAll('[data-journey-dot]').forEach(d=>{const active=d.dataset.journeyDot===which;d.classList.toggle('active',active);d.setAttribute('aria-current',active?'true':'false')});}
  const modal=$('todoModal'),form=$('todoAddForm');
  function openModal(){modal.hidden=false;$('todoInput').focus()}
@@ -2159,7 +2184,14 @@ body.dark-night .todo-count-badge{
   ['touchstart','touchmove','touchend','touchcancel','pointerdown','pointerup'].forEach(type=>list.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
   list.addEventListener('change',e=>{const id=Number(e.target.dataset.todoCheck);if(!id)return;const item=items.find(x=>x.id===id);if(item)item.done=e.target.checked;save();render()});
   list.addEventListener('click',e=>{const b=e.target.closest('[data-todo-delete]');if(!b)return;e.preventDefault();e.stopPropagation();items=items.filter(x=>x.id!==Number(b.dataset.todoDelete));save();render()});
+  list.addEventListener('click',e=>{if(e.target.closest('button,input'))return;const main=e.target.closest('.todo-item-main');if(main){const view=$('todoViewModal');if(view)view.hidden=false;}});
  }
+ const viewModal=$('todoViewModal'),viewList=$('todoViewList');
+ $('closeTodoView')?.addEventListener('click',()=>{if(viewModal)viewModal.hidden=true});
+ viewModal?.addEventListener('click',e=>{if(e.target===viewModal)viewModal.hidden=true});
+ viewList?.addEventListener('change',e=>{const id=Number(e.target.dataset.todoCheck);if(!id)return;const item=items.find(x=>x.id===id);if(item)item.done=e.target.checked;save();render()});
+ viewList?.addEventListener('click',e=>{const b=e.target.closest('[data-todo-delete]');if(b){e.preventDefault();e.stopPropagation();items=items.filter(x=>x.id!==Number(b.dataset.todoDelete));save();render();}});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&viewModal&&!viewModal.hidden)viewModal.hidden=true;});
  render();
 })();
 </script>
