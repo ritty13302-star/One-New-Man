@@ -272,7 +272,7 @@ button,input,textarea,select{font:inherit}body{zoom:var(--ui-zoom)}.wrap{max-wid
 
 
 .schedule-menu-wrap{position:relative;flex:0 0 auto}.schedule-menu-toggle{width:44px;height:44px;border:1px solid var(--line);border-radius:12px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer}.schedule-menu-toggle span{display:block;width:21px;height:2px;border-radius:2px;background:var(--ink)}.schedule-tools-menu{position:absolute;right:0;top:52px;z-index:30;display:grid;min-width:220px;max-width:min(88vw,300px);padding:8px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 32px #17231c24;gap:5px}.schedule-tools-menu[hidden]{display:none}.schedule-tools-menu .mini{text-align:left;white-space:normal;padding:11px 12px;font-size:13px}.schedule-print-document{display:none}
-.schedule-print-week-board{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;align-items:start}.schedule-print-day{min-width:0;border:1px solid #999;padding:2px;background:#fff}.schedule-print-day>header{display:flex;justify-content:space-between;gap:2px;align-items:center;border-bottom:2px solid #555;padding:2px 1px;margin-bottom:0}.schedule-print-day>header h2{font-size:10px;margin:0}.schedule-print-day>header strong{font-size:9px}.print-week-times{display:grid}.print-week-time-row{display:grid;grid-template-columns:27px minmax(0,1fr);min-height:17px;border-bottom:1px solid #ddd}.print-week-time-row>time{font-size:6.5px;font-weight:700;color:#333;padding:2px 1px 0 0;border-right:1px solid #bbb;white-space:nowrap}.print-week-slot{min-width:0;padding:1px}.print-week-event{border:1px solid #ddd;border-left:2px solid;padding:1px 2px;overflow-wrap:anywhere;break-inside:avoid}.print-week-event b{display:block;font-size:6.5px;line-height:1.15}.print-week-event small{display:block;font-size:5.5px;line-height:1.15;margin-top:1px;color:#444}.print-week-event p{font-size:5.5px;margin:1px 0 0;line-height:1.15}
+.schedule-print-week-board{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;align-items:start}.schedule-print-day{min-width:0;border:1px solid #999;padding:2px;background:#fff}.schedule-print-day>header{display:flex;justify-content:space-between;gap:2px;align-items:center;border-bottom:2px solid #555;padding:2px 1px;margin-bottom:0}.schedule-print-day>header h2{font-size:10px;margin:0}.schedule-print-day>header strong{font-size:9px}.print-week-times{display:grid;grid-template-columns:27px minmax(0,1fr);grid-template-rows:repeat(var(--print-slot-count,37),17px);position:relative}.print-week-time-label{grid-column:1;font-size:6.5px;font-weight:700;color:#333;padding:2px 1px 0 0;border-right:1px solid #bbb;border-bottom:1px solid #ddd;white-space:nowrap;box-sizing:border-box}.print-week-event{min-width:0;min-height:0;z-index:1;border:1px solid #777;border-left:2px solid var(--event-color);padding:2px;overflow:hidden;overflow-wrap:anywhere;box-sizing:border-box;break-inside:avoid}.print-week-event b{display:block;font-size:6.5px;line-height:1.15}.print-week-event small{display:block;font-size:5.5px;line-height:1.15;margin-top:1px;color:#111}.print-week-event p{font-size:5.5px;margin:1px 0 0;line-height:1.15}
 @media(max-width:620px){.schedule-toolbar{display:flex;align-items:flex-start}.schedule-menu-wrap{margin-left:auto}.schedule-menu-toggle{width:40px;height:40px}}
 @media print{
  @page{size:A4 landscape;margin:5mm}
@@ -1363,15 +1363,25 @@ function renderSchedule(){
 }
 function buildSchedulePrintDocument(){
  const start=getMonday(scheduleWeekStart),names=['週一','週二','週三','週四','週五','週六','週日'];
- const times=[];for(let mins=5*60+30;mins<=23*60+30;mins+=30)times.push(`${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`);
+ const visibleStart=5*60+30,visibleEnd=23*60+30,slotMinutes=30;
+ const times=[];for(let mins=visibleStart;mins<=visibleEnd;mins+=slotMinutes)times.push(`${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`);
  const days=[];
  for(let dayIndex=0;dayIndex<7;dayIndex++){
   const d=new Date(start);d.setDate(start.getDate()+dayIndex);const key=dateKey(d);
   const events=scheduleEventsForDate(key).slice().sort((a,b)=>a.start.localeCompare(b.start)||a.end.localeCompare(b.end));
-  const byTime=new Map();
-  events.forEach(ev=>{const mins=Number(String(ev.start||'05:30').slice(0,2))*60+Number(String(ev.start||'05:30').slice(3,5));let slot=Math.round((mins-(5*60+30))/30);slot=Math.max(0,Math.min(times.length-1,slot));if(!byTime.has(slot))byTime.set(slot,[]);const c=scheduleCategory(ev.category);byTime.get(slot).push(`<article class="print-week-event" style="--event-color:${c.color};border-left-color:${c.color};background:color-mix(in srgb,${c.color} 15%,#fff)"><b>${esc(ev.plan||'未命名安排')}</b><small>${esc(ev.start)}–${esc(ev.end)} · ${esc(ev.category||'其他')}${ev.repeat&&ev.repeat!=='none'?'｜重複':''}${ev.done?'｜已完成':''}</small>${ev.result?`<p>${esc(ev.result)}</p>`:''}</article>`)});
-  const rows=times.map((t,i)=>`<div class="print-week-time-row"><time>${t}</time><div class="print-week-slot">${(byTime.get(i)||[]).join('')}</div></div>`).join('');
-  days.push(`<section class="schedule-print-day"><header><h2>${names[dayIndex]}</h2><strong>${d.getMonth()+1}/${d.getDate()}</strong></header><div class="print-week-times">${rows}</div></section>`);
+  const labels=times.map((t,i)=>`<time class="print-week-time-label" style="grid-row:${i+1}">${t}</time>`).join('');
+  const blocks=events.map(ev=>{
+   const toMin=t=>{const [h,m]=String(t||'').split(':').map(Number);return h*60+m};
+   const rawFrom=toMin(ev.start),rawTo=toMin(ev.end);
+   const from=Math.max(visibleStart,Math.min(visibleEnd,rawFrom));
+   const to=Math.max(from+slotMinutes,Math.min(visibleEnd,rawTo));
+   if(rawTo<=visibleStart||rawFrom>=visibleEnd)return '';
+   const rowStart=Math.floor((from-visibleStart)/slotMinutes)+1;
+   const rowSpan=Math.max(1,Math.ceil((to-from)/slotMinutes));
+   const c=scheduleCategory(ev.category);
+   return `<article class="print-week-event" style="grid-column:2;grid-row:${rowStart}/span ${rowSpan};--event-color:${c.color};background:${c.color};color:#111"><b>${esc(ev.plan||'未命名安排')}</b><small>${esc(ev.start)}–${esc(ev.end)}${ev.category?'｜'+esc(ev.category):''}${ev.repeat&&ev.repeat!=='none'?'｜重複':''}${ev.done?'｜已完成':''}</small>${ev.result?`<p>${esc(ev.result)}</p>`:''}</article>`;
+  }).join('');
+  days.push(`<section class="schedule-print-day"><header><h2>${names[dayIndex]}</h2><strong>${d.getMonth()+1}/${d.getDate()}</strong></header><div class="print-week-times" style="--print-slot-count:${times.length}">${labels}${blocks}</div></section>`);
  }
  const end=new Date(start);end.setDate(start.getDate()+6);
  $('schedulePrintDocument').innerHTML=`<div class="print-week-title"><h1>本週時間表｜整週總覽</h1><p>${start.getFullYear()}/${start.getMonth()+1}/${start.getDate()} – ${end.getFullYear()}/${end.getMonth()+1}/${end.getDate()}　｜　每日 05:30–23:30（每 30 分鐘一格）</p></div><div class="schedule-print-week-board">${days.join('')}</div>`;
