@@ -2140,9 +2140,11 @@ body.dark-night .todo-count-badge{
  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const save=()=>{try{localStorage.setItem(key,JSON.stringify(items))}catch(_){}};
  function render(){const list=$('todoList'),empty=$('todoEmpty'),badge=$('todoCountBadge');if(!list)return;
+ const previousScrollTop=list.scrollTop;
  const pending=items.filter(x=>!x.done).length;if(badge)badge.textContent=String(pending);
  const sorted=[...items].sort((a,b)=>{if(!!a.done!==!!b.done)return a.done?1:-1;const ad=a.date||'9999-12-31',bd=b.date||'9999-12-31';return ad.localeCompare(bd)});
  list.innerHTML=sorted.map(x=>`<div class="todo-item ${x.done?'done':''}"><input type="checkbox" data-todo-check="${x.id}" ${x.done?'checked':''} aria-label="標記完成"><div class="todo-item-main"><span>${esc(x.text)}</span><span class="todo-meta">${esc(x.category||'其他')} · 完成時間：${esc(x.date||'未設定')}</span></div><button class="todo-delete" type="button" data-todo-delete="${x.id}" aria-label="刪除事項">×</button></div>`).join('');
+ list.scrollTop=previousScrollTop;
  if(empty)empty.hidden=items.length>0;}
  function show(which){const todo=which==='todo';const journey=$('journeyWidget'),todoWidget=$('todoWidget');if(journey){journey.hidden=todo;journey.style.setProperty('display',todo?'none':'block','important')}if(todoWidget){todoWidget.hidden=!todo;todoWidget.style.setProperty('display',todo?'block':'none','important')}document.querySelectorAll('[data-journey-dot]').forEach(d=>{const active=d.dataset.journeyDot===which;d.classList.toggle('active',active);d.setAttribute('aria-current',active?'true':'false')});}
  const modal=$('todoModal'),form=$('todoAddForm');
@@ -2151,8 +2153,12 @@ body.dark-night .todo-count-badge{
  $('openTodoModal')?.addEventListener('click',openModal);$('closeTodoModal')?.addEventListener('click',closeModal);$('cancelTodoModal')?.addEventListener('click',closeModal);
  modal?.addEventListener('click',e=>{if(e.target===modal)closeModal()});
  if(form)form.addEventListener('submit',e=>{e.preventDefault();const text=$('todoInput').value.trim(),category=$('todoCategory').value,date=$('todoDueDate').value;if(!text||!date)return;items.push({id:Date.now(),text,category,date,done:false});save();render();closeModal();show('todo');showingTodo=true});
- const list=$('todoList');if(list)list.addEventListener('change',e=>{const id=Number(e.target.dataset.todoCheck);if(!id)return;const item=items.find(x=>x.id===id);if(item)item.done=e.target.checked;save();render()});
- if(list)list.addEventListener('click',e=>{const b=e.target.closest('[data-todo-delete]');if(!b)return;items=items.filter(x=>x.id!==Number(b.dataset.todoDelete));save();render()});
+ const list=$('todoList');if(list){
+  /* 待辦清單內的觸控與點擊不往外層滑動切換手勢傳遞，避免 iPhone 上誤切換或跳回頂端 */
+  ['touchstart','touchmove','touchend','touchcancel','pointerdown','pointerup'].forEach(type=>list.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
+  list.addEventListener('change',e=>{const id=Number(e.target.dataset.todoCheck);if(!id)return;const item=items.find(x=>x.id===id);if(item)item.done=e.target.checked;save();render()});
+  list.addEventListener('click',e=>{const b=e.target.closest('[data-todo-delete]');if(!b)return;e.preventDefault();e.stopPropagation();items=items.filter(x=>x.id!==Number(b.dataset.todoDelete));save();render()});
+ }
  render();
 })();
 </script>
