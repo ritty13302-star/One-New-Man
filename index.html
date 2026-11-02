@@ -1347,7 +1347,7 @@ function renderWeeklyPrayerStudy(){
  $('weeklyPrayerHistoryChevron').textContent=weeklyPrayerHistoryExpanded?'⌃':'⌄';
 }
 function renderAllTabRecords(){['service','church','truth'].forEach(renderTabRecords);renderChurchSaints();renderBaptizedList();renderWeeklyPrayerStudy()}
-let scheduleWeekStart=getMonday(new Date()),scheduleSelectedDate=dateKey(new Date()),scheduleNotesExpanded=true,scheduleEditing=null,scheduleOverviewMode=false,schedulePendingDelete=null;
+let scheduleWeekStart=getMonday(new Date()),scheduleSelectedDate=dateKey(new Date()),scheduleNotesExpanded=true,scheduleEditing=null,scheduleOverviewMode=typeof window!=='undefined'&&window.matchMedia('(min-width: 900px)').matches,schedulePendingDelete=null;
 const DEFAULT_SCHEDULE_CATEGORIES=[{name:'靈修',color:'#8aa58c'},{name:'工作',color:'#7d9fc2'},{name:'學習',color:'#c5a16b'},{name:'服事',color:'#b58ebd'},{name:'生活',color:'#d58e83'},{name:'其他',color:'#9aa0a6'}];
 function scheduleCategories(){if(!Array.isArray(state.scheduleCategories)||!state.scheduleCategories.length)state.scheduleCategories=DEFAULT_SCHEDULE_CATEGORIES.map(x=>({...x}));return state.scheduleCategories}
 function dateKey(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return `${y}-${m}-${day}`}
@@ -1400,7 +1400,10 @@ function buildSchedulePrintDocument(){
    const rowStart=Math.floor((from-visibleStart)/slotMinutes)+1;
    const rowSpan=Math.max(1,Math.ceil((to-from)/slotMinutes));
    const c=scheduleCategory(ev.category);
-   return `<article class="print-week-event" style="grid-column:2;grid-row:${rowStart}/span ${rowSpan};--event-color:${c.color};background:color-mix(in srgb,${c.color} 30%,transparent);color:#111"><b>${esc(ev.plan||'未命名安排')}</b><small>${esc(ev.start)}–${esc(ev.end)}</small></article>`;
+   const rawColor=String(c.color||'#9aa0a6').trim();
+   const hex=rawColor.match(/^#([0-9a-f]{6})$/i);
+   const rgba=hex?`rgba(${parseInt(hex[1].slice(0,2),16)},${parseInt(hex[1].slice(2,4),16)},${parseInt(hex[1].slice(4,6),16)},0.3)`:'rgba(154,160,166,0.3)';
+   return `<article class="print-week-event" style="grid-column:2;grid-row:${rowStart}/span ${rowSpan};--event-color:${c.color};background-color:${rgba};--print-event-bg:${rgba};-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#111"><b>${esc(ev.plan||'未命名安排')}</b><small>${esc(ev.start)}–${esc(ev.end)}</small></article>`;
   }).join('');
   days.push(`<section class="schedule-print-day"><header><h2>${names[dayIndex]}</h2><strong>${d.getMonth()+1}/${d.getDate()}</strong></header><div class="print-week-times" style="--print-slot-count:${times.length}">${labels}${blocks}</div></section>`);
  }
@@ -1705,19 +1708,7 @@ function printScheduleForMobile(){
   printWin.document.open();
   printWin.document.write(`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${links}${styles}<title>本週時間表</title><style>body{background:#fff!important;color:#111!important;margin:0;padding:12px;font-family:Arial,"Noto Sans TC",sans-serif}.schedule-print-document{display:block!important;position:static!important;width:100%!important}.schedule-print-day{break-inside:avoid;page-break-inside:avoid}@media print{@page{size:A4 landscape;margin:5mm}body{padding:0}.schedule-print-day{break-inside:avoid;page-break-inside:avoid}}</style></head><body><main id="schedulePrintDocument" class="schedule-print-document">${content}</main><script>window.addEventListener('load',function(){setTimeout(function(){try{window.focus();window.print()}catch(e){}},500)});<\/script>
 
-<style id="todo-full-view-modal-style">
-.todo-view-modal{display:flex;flex-direction:column;width:min(100%,560px);height:min(82vh,760px);max-height:82vh;overflow:hidden}
-.todo-view-modal .todo-modal-head{flex:0 0 auto;align-items:flex-start}
-.todo-view-hint{margin:6px 0 0;font-size:13px;line-height:1.5;color:var(--muted,#7a8088)}
-.todo-view-list{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:8px;padding:2px 3px 8px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
-.todo-view-list .todo-item{flex:0 0 auto;min-height:48px;padding:10px;grid-template-columns:22px minmax(0,1fr) auto}
-.todo-view-list .todo-view-text{cursor:default;overflow-wrap:anywhere}
-.todo-view-list .todo-item-main{overflow-wrap:anywhere}
-.todo-view-list .todo-delete{min-width:32px;min-height:32px;touch-action:manipulation}
-.todo-view-empty{padding:16px;text-align:center}
-.todo-view-backdrop{z-index:10010}
-@media(max-width:480px){.todo-view-modal{width:100%;height:82vh;max-height:82vh;padding:16px}.todo-view-modal .todo-modal-head h3{font-size:19px}}
-</style>
+
 
 </body></html>`);
   printWin.document.close();
@@ -2444,6 +2435,19 @@ html body.dark-night #page-target #todoWidget{
 })();
 </script>
 
+<style id="todo-full-view-modal-style">
+.todo-view-modal{display:flex;flex-direction:column;width:min(100%,560px);height:min(82vh,760px);max-height:82vh;overflow:hidden}
+.todo-view-modal .todo-modal-head{flex:0 0 auto;align-items:flex-start}
+.todo-view-hint{margin:6px 0 0;font-size:13px;line-height:1.5;color:var(--muted,#7a8088)}
+.todo-view-list{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:8px;padding:2px 3px 8px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.todo-view-list .todo-item{flex:0 0 auto;min-height:48px;padding:10px;grid-template-columns:22px minmax(0,1fr) auto}
+.todo-view-list .todo-view-text{cursor:default;overflow-wrap:anywhere}
+.todo-view-list .todo-item-main{overflow-wrap:anywhere}
+.todo-view-list .todo-delete{min-width:32px;min-height:32px;touch-action:manipulation}
+.todo-view-empty{padding:16px;text-align:center}
+.todo-view-backdrop{z-index:10010}
+@media(max-width:480px){.todo-view-modal{width:100%;height:82vh;max-height:82vh;padding:16px}.todo-view-modal .todo-modal-head h3{font-size:19px}}
+</style>
 </body>
 </html>
 
@@ -2853,6 +2857,18 @@ body.dark-night .journey-stack-dots span.active{background:var(--green,#8d9f91)!
 </script>
 
 <style>
+/* 列印/PDF 強制保留分類底色與透明度 */
+@media print {
+  html, body, #schedulePrintDocument, #schedulePrintDocument * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .print-week-event {
+    background-color: var(--print-event-bg, transparent) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
 /* 分類名稱與顏色在手機上保持可編輯 */
 #scheduleCategoryModal .dialog, #scheduleCategoryList, .schedule-category-row, .schedule-category-row input, #scheduleCategoryForm { pointer-events:auto; }
 #scheduleCategoryList .schedule-category-name { min-width:0; user-select:text; -webkit-user-select:text; touch-action:manipulation; }
