@@ -918,7 +918,7 @@ const freshState=()=>({
   lifeReading:{completed:{},completedAt:{},plan:{mode:'date',startDate:'',deadline:'',weeklyTarget:''}},
   bible:{completed:{},startDate:'',endDate:'',cycles:[],readCounts:{old:0,new:0},readHistory:[],overview:{},manuscripts:{}}
 });
-let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='',pendingLocalWrite=false;
+let state=freshState(),auth,db,storage,currentUser=null,stopListening=null,saveTimer=null,applyingRemote=false,lastSerialized='',avatarUrl='',avatarStoragePath='',pendingLocalWrite=false,cloudWriteQueue=Promise.resolve(),localMutationVersion=0;
 const editingCareRecords=new Set();
 const managingCareRecords=new Set();
 let homeGroupHideEditMode=false;
@@ -998,17 +998,24 @@ function normalizeState(raw){
 }
 function persist(){
  if(!currentUser||applyingRemote)return;
- // 一旦本機資料有變更，就先保護它；避免雲端舊快照在 debounce／寫入期間覆蓋本機新資料。
+ // 任何本機變更都先保護目前 state，並以序列化寫入避免較舊的雲端寫入晚到、覆蓋新資料。
  pendingLocalWrite=true;
+ const mutationVersion=++localMutationVersion;
  clearTimeout(saveTimer);setCloudStatus('有變更，準備同步…');
- saveTimer=setTimeout(async()=>{
+ saveTimer=setTimeout(()=>{
+  const uid=currentUser?.uid;if(!uid)return;
   const data=normalizeState(state),serialized=serialize(data);
-  if(serialized===lastSerialized){pendingLocalWrite=false;setCloudStatus('已同步至雲端');return}
-  try{
-   await setDoc(doc(db,'users',currentUser.uid,'appData','main'),{...data,updatedAt:serverTimestamp()});
-   lastSerialized=serialized;pendingLocalWrite=false;setCloudStatus('已同步至雲端 ✓');
-  }
-  catch(error){console.error(error);pendingLocalWrite=false;setCloudStatus('同步失敗，請確認網路與 Firebase 設定');setStatus('雲端儲存失敗：'+friendlyError(error),true)}
+  cloudWriteQueue=cloudWriteQueue.catch(()=>{}).then(async()=>{
+   if(!currentUser||currentUser.uid!==uid)return;
+   // 等待佇列期間若又有變更，仍寫入此快照；後續佇列項目會再寫最新狀態。
+   if(serialized===lastSerialized){if(mutationVersion===localMutationVersion){pendingLocalWrite=false;setCloudStatus('已同步至雲端')}return}
+   await setDoc(doc(db,'users',uid,'appData','main'),{...data,updatedAt:serverTimestamp()});
+   lastSerialized=serialized;
+   if(mutationVersion===localMutationVersion){pendingLocalWrite=false;setCloudStatus('已同步至雲端 ✓')}
+  }).catch(error=>{
+   console.error(error);
+   if(mutationVersion===localMutationVersion){pendingLocalWrite=false;setCloudStatus('同步失敗，請確認網路與 Firebase 設定');setStatus('雲端儲存失敗：'+friendlyError(error),true)}
+  });
  },450);
 }
 function pct(g){return Math.min(100,Math.round(g.current/Math.max(1,g.target)*100))}
@@ -1687,7 +1694,7 @@ $('scheduleRepeatInput').addEventListener('change',syncScheduleRepeatEndFields);
 function removeScheduleSeriesItem(found){found.day.slots[found.slot]=found.day.slots[found.slot].filter(x=>String(x.id)!==String(schedulePendingDelete?.id??scheduleEditing?.id));if(!found.day.slots[found.slot].length)delete found.day.slots[found.slot]}
 function closeScheduleDelete(){schedulePendingDelete=null;$('scheduleDeleteModal').classList.remove('open')}
 function confirmScheduleDelete(mode){if(!schedulePendingDelete)return;const {id,origin}=schedulePendingDelete,found=findScheduleEvent(id,origin);if(!found){closeScheduleDelete();closeScheduleEntry();return}
- if(mode==='one'){const selectedDate=scheduleEditing?.occurrenceDate||scheduleSelectedDate;found.item.skipDates=Array.isArray(found.item.skipDates)?found.item.skipDates:[];if(!found.item.skipDates.includes(selectedDate))found.item.skipDates.push(selectedDate)}
+ if(mode==='one'){const selectedDate=scheduleEditing?.occurrenceDate||scheduleSelectedDate;found.item.skipDates=Array.isArray(found.item.skipDates)?found.item.skipDates:[];if(!found.item.skipDates.includes(selectedDate))found.item.skipDates.push(selectedDate);found.item.skipDates.sort()}
  else if(mode==='future'){const today=dateKey(new Date()),yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);const cutoff=dateKey(yesterday);if(origin>=today){removeScheduleSeriesItem(found)}else{found.item.repeatUntil=cutoff;}}
  closeScheduleDelete();closeScheduleEntry();persist();renderSchedule()}
 $('scheduleDeleteOne').addEventListener('click',()=>confirmScheduleDelete('one'));
