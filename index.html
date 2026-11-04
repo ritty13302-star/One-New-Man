@@ -1737,18 +1737,22 @@ function printScheduleForMobile(){
 
 
 
-<style id="church-care-week-history-style">/* 聖徒關心表：姓名／身分欄固定為約七個中文字寬 */
-.church-care-table .care-person{width:7em;min-width:7em;max-width:7em;box-sizing:border-box;white-space:normal}
-.church-care-table .care-person{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.church-care-table .care-person strong,.church-care-table .care-person small{display:inline;overflow-wrap:normal}.church-care-table .care-person small{color:var(--muted);margin:0}
-/* 週次切換：沿用福音牧養家聚會的年度週次與日期區間呈現 */
-.church-care-week-toolbar{display:grid;grid-template-columns:auto minmax(150px,1fr) auto auto;align-items:center;gap:8px;margin:12px 0 16px;padding:10px;border:1px solid var(--line,#ddd);border-radius:16px;background:linear-gradient(135deg,var(--surface,#fff),var(--pale,#f4f1eb));box-shadow:0 3px 12px rgba(35,45,35,.06)}
-.church-care-week-display{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:48px;padding:5px 10px;border-radius:12px;background:var(--card,#fff);border:1px solid var(--line,#ddd);text-align:center}
+<style id="church-care-week-history-style">/* 聖徒關心表：姓名／身分欄寬度與表頭文字等寬（七個全形字元） */
+.church-care-table{table-layout:fixed}
+.church-care-table th.care-person,.church-care-table td.care-person{width:7em;min-width:7em;max-width:7em;box-sizing:border-box;padding-left:3px;padding-right:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.church-care-table .care-person strong,.church-care-table .care-person small{display:inline;font-weight:inherit;overflow-wrap:normal;white-space:nowrap}
+.church-care-table .care-person small{color:var(--muted);margin:0}
+/* 週次列：前一週在左、週次日期置中、下一週在右；回到本週另起一行 */
+.church-care-week-toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);grid-template-rows:auto auto;align-items:center;gap:8px;margin:12px 0 16px;padding:10px;border:1px solid var(--line,#ddd);border-radius:16px;background:linear-gradient(135deg,var(--surface,#fff),var(--pale,#f4f1eb));box-shadow:0 3px 12px rgba(35,45,35,.06)}
+.church-care-week-toolbar #churchCarePrevWeek{grid-column:1;grid-row:1;justify-self:start}
+.church-care-week-display{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:48px;padding:5px 4px;border-radius:12px;background:var(--card,#fff);border:1px solid var(--line,#ddd);text-align:center}
+.church-care-week-toolbar #churchCareNextWeek{grid-column:3;grid-row:1;justify-self:end}
 .church-care-week-toolbar .church-care-week-display strong{display:block;color:var(--ink,#333);font-size:15px;font-weight:850;letter-spacing:.03em;white-space:nowrap}
 .church-care-week-display span{color:var(--muted,#777);font-size:11px;font-weight:650;white-space:nowrap}
+.church-care-week-toolbar #churchCareCurrentWeek{grid-column:1/-1;grid-row:2;justify-self:center;padding:7px 16px;background:var(--green,#607d68);border:1px solid var(--green,#607d68);color:#fff}
 .church-care-week-toolbar button{touch-action:manipulation;min-height:38px;border-radius:11px;font-weight:700}
-.church-care-week-toolbar #churchCarePrevWeek,.church-care-week-toolbar #churchCareNextWeek{padding:7px 10px;background:var(--card,#fff);border:1px solid var(--line,#ddd);color:var(--ink,#333)}
-.church-care-week-toolbar #churchCareCurrentWeek{padding:7px 12px;background:var(--green,#607d68);border:1px solid var(--green,#607d68);color:#fff}
-@media(max-width:600px){.church-care-week-toolbar{grid-template-columns:1fr 1.2fr 1fr;gap:7px;padding:9px}.church-care-week-display{grid-column:1/-1;grid-row:1;min-height:48px}.church-care-week-toolbar .church-care-week-display strong{font-size:15px}.church-care-week-toolbar #churchCarePrevWeek{grid-column:1;grid-row:2}.church-care-week-toolbar #churchCareNextWeek{grid-column:3;grid-row:2}.church-care-week-toolbar #churchCareCurrentWeek{grid-column:2;grid-row:2;padding:7px 5px;font-size:12px}.church-care-week-toolbar button{font-size:12px;padding:7px 5px}}
+.church-care-week-toolbar #churchCarePrevWeek,.church-care-week-toolbar #churchCareNextWeek{padding:7px 9px;background:var(--card,#fff);border:1px solid var(--line,#ddd);color:var(--ink,#333);white-space:nowrap}
+@media(max-width:600px){.church-care-week-toolbar{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) minmax(0,1fr);gap:7px;padding:9px}.church-care-week-display{min-height:48px}.church-care-week-toolbar .church-care-week-display strong{font-size:14px}.church-care-week-display span{font-size:10px}.church-care-week-toolbar button{font-size:12px;padding:7px 5px}}
 @media(prefers-reduced-motion:no-preference){.church-care-week-toolbar button{transition:background .15s ease,transform .15s ease}.church-care-week-toolbar button:active{transform:scale(.97)}}</style>
 </body></html>`);
   printWin.document.close();
