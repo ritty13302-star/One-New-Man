@@ -650,6 +650,28 @@ body.dark-night .todo-count-badge{
 .journey-widget,.todo-widget{border-radius:19px!important;overflow:hidden}
 
 </style>
+<style id="church-care-week-history-style">
+/* 聖徒關心表：姓名／身分欄與表頭固定為七個中文字寬 */
+#churchCareTableWrap .church-care-table{width:100%;min-width:760px;table-layout:fixed}
+#churchCareTableWrap .church-care-table th.care-person,
+#churchCareTableWrap .church-care-table td.care-person{width:7em!important;min-width:7em!important;max-width:7em!important;box-sizing:border-box!important;padding-left:3px!important;padding-right:3px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#churchCareTableWrap .church-care-table th.care-person{font-size:13px!important}
+#churchCareTableWrap .church-care-table td.care-person strong,
+#churchCareTableWrap .church-care-table td.care-person small{display:inline!important;font-size:13px!important;font-weight:inherit!important;line-height:1.4!important;white-space:nowrap!important;overflow-wrap:normal!important;word-break:keep-all!important;vertical-align:baseline!important}
+#churchCareTableWrap .church-care-table td.care-person small{color:var(--muted)!important;margin:0!important}
+/* 週次導覽：左右按鈕與中間週次日期固定同列，回到本週獨立下一列 */
+#church-care-table-wrap{width:100%}
+.church-care-week-toolbar{display:grid!important;grid-template-columns:max-content minmax(0,1fr) max-content!important;grid-template-rows:auto auto!important;align-items:center!important;column-gap:clamp(5px,2vw,14px)!important;row-gap:8px!important;width:100%!important;box-sizing:border-box!important;margin:12px 0 16px!important;padding:10px!important;border:1px solid var(--line,#ddd)!important;border-radius:16px!important;background:linear-gradient(135deg,var(--surface,#fff),var(--pale,#f4f1eb))!important;box-shadow:0 3px 12px rgba(35,45,35,.06)!important}
+.church-care-week-toolbar #churchCarePrevWeek{grid-column:1!important;grid-row:1!important;justify-self:start!important}
+.church-care-week-toolbar .church-care-week-display{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important;min-width:0!important;min-height:48px!important;padding:4px 2px!important;border:0!important;background:transparent!important;text-align:center!important;overflow:hidden!important}
+.church-care-week-toolbar #churchCareNextWeek{grid-column:3!important;grid-row:1!important;justify-self:end!important}
+.church-care-week-toolbar .church-care-week-display strong{display:block!important;max-width:100%!important;color:var(--ink,#333)!important;font-size:clamp(12px,2.8vw,16px)!important;font-weight:850!important;letter-spacing:0!important;white-space:nowrap!important}
+.church-care-week-toolbar .church-care-week-display span{display:block!important;max-width:100%!important;color:var(--muted,#777)!important;font-size:clamp(9px,2.2vw,12px)!important;font-weight:650!important;white-space:nowrap!important}
+.church-care-week-toolbar #churchCareCurrentWeek{grid-column:1/-1!important;grid-row:2!important;justify-self:center!important;padding:7px 16px!important;background:var(--green,#607d68)!important;border:1px solid var(--green,#607d68)!important;color:#fff!important}
+.church-care-week-toolbar button{touch-action:manipulation!important;min-height:38px!important;border-radius:11px!important;font-weight:700!important;white-space:nowrap!important}
+.church-care-week-toolbar #churchCarePrevWeek,.church-care-week-toolbar #churchCareNextWeek{padding:7px 9px!important;background:var(--card,#fff)!important;border:1px solid var(--line,#ddd)!important;color:var(--ink,#333)!important;font-size:clamp(11px,2.5vw,14px)!important}
+@media(max-width:380px){.church-care-week-toolbar{column-gap:4px!important;padding:7px!important}.church-care-week-toolbar #churchCarePrevWeek,.church-care-week-toolbar #churchCareNextWeek{padding:6px 5px!important}.church-care-week-toolbar .church-care-week-display strong{font-size:11px!important}.church-care-week-toolbar .church-care-week-display span{font-size:9px!important}}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -1324,9 +1346,9 @@ function saveChurchGroupsSettings(){const groups=[...new Set($('churchGroupsInpu
 function renderChurchSaints(){const list=$('churchSaintsList'),people=state.churchSaints||[],query=($('churchSaintsSearch')?.value||'').trim().toLocaleLowerCase(),weekKey=currentCareWeekKey();if(!people.length){list.innerHTML='<div class="empty">目前還沒有小區聖徒資料，按「新增聖徒」開始記錄。</div>';return}people.forEach(person=>{if(person.careWeek!==weekKey){person.careChecked=false;person.careWeek=weekKey}});const filtered=people.filter(person=>[person.name,person.smallGroup,person.identity].some(value=>String(value||'').toLocaleLowerCase().includes(query)));if(!filtered.length){list.innerHTML='<div class="empty">找不到符合的聖徒，請試試其他姓名、小排或身分。</div>';return}list.innerHTML=filtered.map(person=>`<div class="church-saint-row" data-church-saint="${Number(person.id)}"><div><button type="button" class="church-saint-name-button" data-edit-church-saint="${Number(person.id)}">${esc(person.name||'（未命名聖徒）')}</button><div class="church-saint-summary"><span>身分：${esc(person.identity||'未設定')}</span><span>小排：${esc(person.smallGroup||'未設定')}</span></div></div><button class="church-saint-delete" type="button" data-delete-church-saint="${Number(person.id)}" aria-label="刪除聖徒" title="刪除">×</button><label class="church-saint-care-check"><input type="checkbox" data-church-saint-field="careChecked" ${person.careChecked?'checked':''}><span>本週已關心</span></label></div>`).join('');persist()}
 const churchCareColumns=[['sunday','主日'],['smallGroup','小排'],['prayerMeeting','禱告聚會'],['homeMeeting','家聚會'],['morningRevival','晨興'],['lifeReading','生命讀經'],['visiting','出訪']];
 let selectedChurchCareWeek=currentCareWeekKey();
-function churchCareWeekLabel(key){const info=homeGroupWeekInfo(key);return key===currentCareWeekKey()?'本週':`第 ${info.week} 週`}
+function churchCareWeekLabel(key){const info=homeGroupWeekInfo(key);return key===currentCareWeekKey()?`本週｜第 ${info.week} 週`:`第 ${info.week} 週`}
 function ensureChurchCareWeek(){if(!state.churchCareWeeklyRecords||typeof state.churchCareWeeklyRecords!=='object')state.churchCareWeeklyRecords={};if(!state.churchCareWeeklyRecords[selectedChurchCareWeek])state.churchCareWeeklyRecords[selectedChurchCareWeek]={};return state.churchCareWeeklyRecords[selectedChurchCareWeek]}
-function renderChurchCareTable(){const select=$('churchCareGroupSelect'),wrap=$('churchCareTableWrap');if(!select||!wrap)return;const groups=getChurchSmallGroups(),selected=select.value;select.innerHTML='<option value="">請選擇小排</option>'+groups.map(g=>`<option value="${esc(g)}" ${g===selected?'selected':''}>${esc(g)}</option>`).join('');const label=$('churchCareWeekLabel'),weekDateRange=$('churchCareWeekDateRange'),weekInfo=homeGroupWeekInfo(selectedChurchCareWeek);if(label)label.textContent=churchCareWeekLabel(selectedChurchCareWeek);if(weekDateRange)weekDateRange.textContent=`${weekInfo.year} 年第 ${weekInfo.week} 週｜${weekInfo.range}`;if(!selected){wrap.innerHTML='<div class="empty">請先選擇小排。</div>';return}const people=(state.churchSaints||[]).filter(p=>String(p.smallGroup||'')===selected);if(!people.length){wrap.innerHTML='<div class="empty">這個小排目前沒有聖徒資料。</div>';return}const records=ensureChurchCareWeek();wrap.innerHTML=`<table class="church-care-table"><thead><tr><th class="care-person">聖徒姓名／身分</th>${churchCareColumns.map(([,label])=>`<th>${label}</th>`).join('')}</tr></thead><tbody>${people.map(person=>{const id=String(person.id),care=records[id]||(records[id]={});return `<tr data-care-saint="${Number(person.id)}"><td class="care-person"><strong>${esc(person.name||'（未命名聖徒）')}</strong> <small>${esc(person.identity||'未設定身分')}</small></td>${churchCareColumns.map(([key,label])=>`<td><input type="checkbox" data-care-field="${key}" aria-label="${esc(person.name||'聖徒')}：${label}" ${care[key]?'checked':''}></td>`).join('')}</tr>`}).join('')}</tbody></table>`;persist()}
+function renderChurchCareTable(){const select=$('churchCareGroupSelect'),wrap=$('churchCareTableWrap');if(!select||!wrap)return;const groups=getChurchSmallGroups(),selected=select.value;select.innerHTML='<option value="">請選擇小排</option>'+groups.map(g=>`<option value="${esc(g)}" ${g===selected?'selected':''}>${esc(g)}</option>`).join('');const label=$('churchCareWeekLabel'),weekDateRange=$('churchCareWeekDateRange'),weekInfo=homeGroupWeekInfo(selectedChurchCareWeek);if(label)label.textContent=churchCareWeekLabel(selectedChurchCareWeek);if(weekDateRange)weekDateRange.textContent=weekInfo.range;if(!selected){wrap.innerHTML='<div class="empty">請先選擇小排。</div>';return}const people=(state.churchSaints||[]).filter(p=>String(p.smallGroup||'')===selected);if(!people.length){wrap.innerHTML='<div class="empty">這個小排目前沒有聖徒資料。</div>';return}const records=ensureChurchCareWeek();wrap.innerHTML=`<table class="church-care-table"><thead><tr><th class="care-person">聖徒姓名／身分</th>${churchCareColumns.map(([,label])=>`<th>${label}</th>`).join('')}</tr></thead><tbody>${people.map(person=>{const id=String(person.id),care=records[id]||(records[id]={});return `<tr data-care-saint="${Number(person.id)}"><td class="care-person"><strong>${esc(person.name||'（未命名聖徒）')}</strong> <small>${esc(person.identity||'未設定身分')}</small></td>${churchCareColumns.map(([key,label])=>`<td><input type="checkbox" data-care-field="${key}" aria-label="${esc(person.name||'聖徒')}：${label}" ${care[key]?'checked':''}></td>`).join('')}</tr>`}).join('')}</tbody></table>`;persist()}
 let editingChurchSaintId=null,creatingChurchSaint=false;
 function openChurchSaintEditor(person=null){editingChurchSaintId=person?Number(person.id):Date.now();creatingChurchSaint=!person;$('churchSaintModalTitle').textContent=person?'編輯聖徒資料':'新增聖徒';const form=$('churchSaintForm');form.elements.name.value=person?.name||'';form.elements.identity.value=person?.identity||'';renderChurchSmallGroupOptions(person?.smallGroup||'');$('churchSaintModal').classList.add('open');setTimeout(()=>$('churchSaintNameInput').focus(),50)}
 function closeChurchSaintEditor(){$('churchSaintModal').classList.remove('open');editingChurchSaintId=null;creatingChurchSaint=false}
@@ -1737,23 +1759,7 @@ function printScheduleForMobile(){
 
 
 
-<style id="church-care-week-history-style">/* 聖徒關心表：姓名／身分欄寬度與表頭文字等寬（七個全形字元） */
-.church-care-table{table-layout:fixed}
-.church-care-table th.care-person,.church-care-table td.care-person{width:7em;min-width:7em;max-width:7em;box-sizing:border-box;padding-left:3px;padding-right:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.church-care-table .care-person strong,.church-care-table .care-person small{display:inline;font-weight:inherit;overflow-wrap:normal;white-space:nowrap}
-.church-care-table .care-person small{color:var(--muted);margin:0}
-/* 週次列：前一週在左、週次日期置中、下一週在右；回到本週另起一行 */
-.church-care-week-toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);grid-template-rows:auto auto;align-items:center;gap:8px;margin:12px 0 16px;padding:10px;border:1px solid var(--line,#ddd);border-radius:16px;background:linear-gradient(135deg,var(--surface,#fff),var(--pale,#f4f1eb));box-shadow:0 3px 12px rgba(35,45,35,.06)}
-.church-care-week-toolbar #churchCarePrevWeek{grid-column:1;grid-row:1;justify-self:start}
-.church-care-week-display{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:48px;padding:5px 4px;border-radius:12px;background:var(--card,#fff);border:1px solid var(--line,#ddd);text-align:center}
-.church-care-week-toolbar #churchCareNextWeek{grid-column:3;grid-row:1;justify-self:end}
-.church-care-week-toolbar .church-care-week-display strong{display:block;color:var(--ink,#333);font-size:15px;font-weight:850;letter-spacing:.03em;white-space:nowrap}
-.church-care-week-display span{color:var(--muted,#777);font-size:11px;font-weight:650;white-space:nowrap}
-.church-care-week-toolbar #churchCareCurrentWeek{grid-column:1/-1;grid-row:2;justify-self:center;padding:7px 16px;background:var(--green,#607d68);border:1px solid var(--green,#607d68);color:#fff}
-.church-care-week-toolbar button{touch-action:manipulation;min-height:38px;border-radius:11px;font-weight:700}
-.church-care-week-toolbar #churchCarePrevWeek,.church-care-week-toolbar #churchCareNextWeek{padding:7px 9px;background:var(--card,#fff);border:1px solid var(--line,#ddd);color:var(--ink,#333);white-space:nowrap}
-@media(max-width:600px){.church-care-week-toolbar{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) minmax(0,1fr);gap:7px;padding:9px}.church-care-week-display{min-height:48px}.church-care-week-toolbar .church-care-week-display strong{font-size:14px}.church-care-week-display span{font-size:10px}.church-care-week-toolbar button{font-size:12px;padding:7px 5px}}
-@media(prefers-reduced-motion:no-preference){.church-care-week-toolbar button{transition:background .15s ease,transform .15s ease}.church-care-week-toolbar button:active{transform:scale(.97)}}</style>
+
 </body></html>`);
   printWin.document.close();
   return;
