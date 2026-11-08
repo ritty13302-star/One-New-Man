@@ -939,6 +939,89 @@ body.is-authenticated .menu-account{
 }
 </style>
 
+\n<style id="v14-divine-life-real-head-fixes">
+/* V14：這組規則放在真正的 head，確保主網頁載入時就會生效。 */
+#page-divine-life .devotion-habit-card{
+  height:116px!important; min-height:116px!important; max-height:116px!important;
+  box-sizing:border-box!important; display:flex!important; align-items:center!important;
+  gap:12px!important; overflow:hidden!important;
+  background:#fff!important; border:1px solid var(--line)!important;
+}
+#page-divine-life .devotion-habit-card:has(.devotion-habit-edit:not([hidden])){
+  height:auto!important; min-height:116px!important; max-height:none!important;
+  overflow:visible!important; align-items:flex-start!important;
+}
+#page-divine-life .devotion-habit-icon{
+  flex:0 0 58px!important; width:58px!important; height:58px!important;
+  display:grid!important; place-items:center!important; align-self:center!important;
+  color:var(--habit-color)!important; background:#fff!important;
+}
+#page-divine-life .devotion-habit-icon svg{
+  display:block!important; width:42px!important; height:42px!important;
+  fill:none!important; stroke:var(--habit-color)!important; stroke-width:2.1!important;
+  stroke-linecap:round!important; stroke-linejoin:round!important;
+}
+#page-divine-life .devotion-habit-main{flex:1 1 0!important; min-width:0!important}
+#page-divine-life .devotion-habit-action{
+  flex:0 0 auto!important; min-width:44px!important; align-self:center!important;
+  display:flex!important; align-items:center!important; justify-content:center!important;
+}
+#page-divine-life .devotion-habit-action input[type="checkbox"]{
+  appearance:none!important; -webkit-appearance:none!important; position:relative!important;
+  display:block!important; width:44px!important; height:44px!important; flex:0 0 44px!important;
+  margin:0!important; border-radius:50%!important;
+  border:2px solid color-mix(in srgb,var(--habit-color) 58%,white)!important;
+  background:color-mix(in srgb,var(--habit-color) 12%,white)!important;
+  cursor:pointer!important;
+}
+#page-divine-life .devotion-habit-action input[type="checkbox"]::after{
+  content:"✓"!important; position:absolute!important; inset:0!important;
+  display:grid!important; place-items:center!important;
+  color:var(--habit-color)!important; font-size:26px!important; font-weight:850!important;
+  opacity:.32!important;
+}
+#page-divine-life .devotion-habit-action input[type="checkbox"]:checked{
+  background:color-mix(in srgb,var(--habit-color) 22%,white)!important;
+  border-color:var(--habit-color)!important;
+}
+#page-divine-life .devotion-habit-action input[type="checkbox"]:checked::after{opacity:1!important}
+#page-divine-life .devotion-timer-inline{
+  display:flex!important; flex-direction:column!important; align-items:center!important;
+  justify-content:center!important; gap:8px!important; min-width:0!important;
+}
+#page-divine-life .devotion-timer-inline .devotion-timer-time{
+  font-size:26px!important; line-height:1.1!important; white-space:nowrap!important;
+}
+#page-divine-life .devotion-timer-inline .devotion-timer-actions{display:flex!important;gap:6px!important;justify-content:center!important}
+#page-divine-life .devotion-timer-inline .btn{min-height:34px!important;padding:6px 12px!important;font-size:13px!important}
+/* 日期圓環：完成段深色，未完成段為清楚可辨的淺色。 */
+#page-divine-life .devotion-date-number{
+  position:relative!important; isolation:isolate!important; overflow:visible!important;
+  width:40px!important; height:40px!important; min-width:40px!important;
+  display:grid!important; place-items:center!important; border:0!important; border-radius:50%!important;
+  color:var(--ink)!important; background:transparent!important;
+  -webkit-mask:none!important; mask:none!important; box-shadow:none!important;
+}
+#page-divine-life .devotion-date-number::before{
+  content:""!important; position:absolute!important; inset:0!important; z-index:-1!important;
+  border-radius:50%!important;
+  background:conic-gradient(var(--green) 0 var(--day-rate,0%),
+    color-mix(in srgb,var(--green) 28%,white) var(--day-rate,0%) 100%)!important;
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 3px))!important;
+  mask:radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 3px))!important;
+}
+#page-divine-life .devotion-date-day.selected .devotion-date-number,
+#page-divine-life .devotion-date-day.selected .devotion-date-number::before{border:0!important}
+@media(max-width:560px){
+  #page-divine-life .devotion-habit-card{height:108px!important;min-height:108px!important;max-height:108px!important;gap:8px!important;padding:10px!important}
+  #page-divine-life .devotion-habit-card:has(.devotion-habit-edit:not([hidden])){height:auto!important;min-height:108px!important;max-height:none!important}
+  #page-divine-life .devotion-habit-icon{width:46px!important;height:46px!important;flex-basis:46px!important}
+  #page-divine-life .devotion-habit-icon svg{width:36px!important;height:36px!important}
+  #page-divine-life .devotion-habit-action input[type="checkbox"]{width:40px!important;height:40px!important;flex-basis:40px!important}
+  #page-divine-life .devotion-timer-inline .devotion-timer-time{font-size:24px!important}
+  #page-divine-life .devotion-date-number{width:36px!important;height:36px!important;min-width:36px!important}
+}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -2012,7 +2095,7 @@ function renderDivineLife(){
  renderDevotionDailyDateNav();
  const host=$('devotionHabitCards');if(host)host.innerHTML=data.habits.map((h,i)=>{
   const date=devotionDailyDate,done=!!data.checks?.[date]?.[h.id],detail=data.details?.[date]?.[h.id]||{},color=h.color||devotionReportColors[i%devotionReportColors.length],mode=h.mode||'check',modeLabel=mode==='duration'?'完成時間':mode==='count'?'完成次數':'標記完成';
-  const lineIcons={morning:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 31h34M11 31a13 13 0 0 1 26 0M24 5v5M8 13l4 4M40 13l-4 4M5 24h5M38 24h5"/></svg>',bible:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 13c-5-5-12-5-17-3v27c6-2 12-1 17 4 5-5 11-6 17-4V10c-5-2-12-2-17 3Z"/><path d="M24 13v28M12 17c3 0 6 1 8 3M36 17c-3 0-6 1-8 3"/></svg>',prayer:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42V20M24 20c-2-8-7-13-13-15-2 8 1 15 13 20M24 20c2-8 7-13 13-15 2 8-1 15-13 20M24 42c-8-6-13-13-13-21 7 1 12 5 13 13M24 42c8-6 13-13 13-21-7 1-12 5-13 13"/></svg>',exercise:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 18v12M13 14v20M7 24h6M35 14v20M41 18v12M35 24h6M13 24h22"/></svg>'};
+  const lineIcons={morning:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 31h34M11 31a13 13 0 0 1 26 0M24 5v5M8 13l4 4M40 13l-4 4M5 24h5M38 24h5"/></svg>',bible:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 13c-5-5-12-5-17-3v27c6-2 12-1 17 4 5-5 11-6 17-4V10c-5-2-12-2-17 3Z"/><path d="M24 13v28M12 17c3 0 6 1 8 3M36 17c-3 0-6 1-8 3"/></svg>',prayer:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42V20M24 20c-2-8-7-13-13-15-2 8 1 15 13 20M24 20c2-8 7-13 13-15 2 8-1 15-13 20M24 42c-8-6-13-13-13-21 7 1 12 5 13 13M24 42c8-6 13-13 13-21-7 1-12 5-13 13"/></svg>',exercise:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M5 17v14M10 13v22M15 18v12M10 24h5M33 18v12M38 13v22M43 17v14M38 24h5M15 24h18"/></svg>'};
   const icon=/晨興|晨更/.test(h.name)?lineIcons.morning:/讀經/.test(h.name)?lineIcons.bible:/禱告/.test(h.name)?lineIcons.prayer:/運動/.test(h.name)?lineIcons.exercise:(h.icon||'✨');
   let action='';
   const timerId=h.id==='bible'?'bible':h.id==='prayer'?'prayer':null;
