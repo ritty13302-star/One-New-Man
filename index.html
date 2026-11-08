@@ -1902,7 +1902,7 @@ function renderDevotionDailyDateNav(){
  const selected=devotionDailyDateObject(devotionDailyDate),weekday=(selected.getDay()+6)%7,monday=new Date(selected);monday.setDate(monday.getDate()-weekday);
  const today=dateKey(new Date()),labels=['一','二','三','四','五','六','日'];
  $('devotionDailyTitle').textContent=devotionDailyDate===today?'今日':`${selected.getMonth()+1}月${selected.getDate()}日`;
- host.innerHTML=`<button class="devotion-date-arrow" type="button" data-devotion-week="-7" aria-label="前一週">‹</button>${labels.map((label,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);const key=dateKey(d);return `<button class="devotion-date-day ${key===devotionDailyDate?'selected':''} ${key===today?'today':''}" type="button" data-devotion-daily-date="${key}" aria-pressed="${key===devotionDailyDate}"><span class="devotion-date-weekday">${label}</span><span class="devotion-date-number">${d.getDate()}</span></button>`}).join('')}<button class="devotion-date-arrow" type="button" data-devotion-week="7" aria-label="下一週">›</button>`;
+ host.innerHTML=`<button class="devotion-date-arrow" type="button" data-devotion-week="-7" aria-label="前一週">‹</button>${labels.map((label,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);const key=dateKey(d),habits=state.divineLife?.habits||[],checks=state.divineLife?.checks?.[key]||{},total=habits.length,done=habits.filter(h=>checks[h.id]).length,rate=total?Math.round(done/total*100):0;return `<button class="devotion-date-day ${key===devotionDailyDate?'selected':''} ${key===today?'today':''}" type="button" data-devotion-daily-date="${key}" aria-pressed="${key===devotionDailyDate}"><span class="devotion-date-weekday">${label}</span><span class="devotion-date-number" style="--day-rate:${rate}%">${d.getDate()}</span></button>`}).join('')}<button class="devotion-date-arrow" type="button" data-devotion-week="7" aria-label="下一週">›</button>`;
 }
 function renderDivineLife(){
  settleDevotionTimers();const data=state.divineLife||{habits:[],checks:{},details:{},timers:{}};data.checks=data.checks||{};data.details=data.details||{};
@@ -1911,7 +1911,8 @@ function renderDivineLife(){
  renderDevotionDailyDateNav();
  const host=$('devotionHabitCards');if(host)host.innerHTML=data.habits.map((h,i)=>{
   const date=devotionDailyDate,done=!!data.checks?.[date]?.[h.id],detail=data.details?.[date]?.[h.id]||{},color=h.color||devotionReportColors[i%devotionReportColors.length],mode=h.mode||'check',modeLabel=mode==='duration'?'完成時間':mode==='count'?'完成次數':'標記完成';
-  const icon=h.icon||(/水|喝水/.test(h.name)?'💧':/晨興/.test(h.name)?'🌅':/讀經/.test(h.name)?'📖':/禱告/.test(h.name)?'🙏':/運動/.test(h.name)?'🏃':'✨');
+  const lineIcons={morning:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 31h34M11 31a13 13 0 0 1 26 0M24 5v5M8 13l4 4M40 13l-4 4M5 24h5M38 24h5"/></svg>',bible:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 13c-5-5-12-5-17-3v27c6-2 12-1 17 4 5-5 11-6 17-4V10c-5-2-12-2-17 3Z"/><path d="M24 13v28M12 17c3 0 6 1 8 3M36 17c-3 0-6 1-8 3"/></svg>',prayer:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 42V20M24 20c-2-8-7-13-13-15-2 8 1 15 13 20M24 20c2-8 7-13 13-15 2 8-1 15-13 20M24 42c-8-6-13-13-13-21 7 1 12 5 13 13M24 42c8-6 13-13 13-21-7 1-12 5-13 13"/></svg>',exercise:'<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="29" cy="7" r="4"/><path d="m24 15-7 8 8 5 5-7 6 4M24 28l-8 11M26 28l8 11M16 23l-7 2M36 16l5 4"/></svg>'};
+  const icon=/晨興|晨更/.test(h.name)?lineIcons.morning:/讀經/.test(h.name)?lineIcons.bible:/禱告/.test(h.name)?lineIcons.prayer:/運動/.test(h.name)?lineIcons.exercise:(h.icon||'✨');
   let action='';
   const timerId=h.id==='bible'?'bible':h.id==='prayer'?'prayer':null;
   if(timerId){
@@ -1958,7 +1959,7 @@ $('devotionReportNext').addEventListener('click',()=>{if(devotionReportMode==='w
 $('devotionHabitSettings').addEventListener('change',e=>{const field=e.target.closest('[data-devotion-target]');if(field){const habit=state.divineLife.habits.find(h=>h.id===field.dataset.devotionTarget);if(!habit)return;habit.weeklyTarget=Math.max(0,Math.min(7,Math.floor(Number(field.value)||0)));persist();renderDivineLife();$('devotionSettingsPanel').hidden=false;return}const nameField=e.target.closest('[data-devotion-name]');if(nameField){const habit=state.divineLife.habits.find(h=>h.id===nameField.dataset.devotionName);if(!habit)return;const name=nameField.value.trim();if(!name){alert('習慣名稱不可空白');nameField.value=habit.name;return}habit.name=name;persist();renderDivineLife();$('devotionSettingsPanel').hidden=false}});
 $('devotionHabitSettings').addEventListener('click',e=>{const del=e.target.closest('[data-devotion-delete]');if(!del)return;const id=del.dataset.devotionDelete;if(!confirm('確定刪除此習慣項目嗎？既有打卡紀錄會保留在資料中，但不再顯示。'))return;state.divineLife.habits=state.divineLife.habits.filter(h=>h.id!==id);persist();renderDivineLife();$('devotionSettingsPanel').hidden=false});
 $('devotionAddHabitForm').addEventListener('submit',e=>{e.preventDefault();const name=$('devotionNewHabitName').value.trim(),target=Math.max(0,Math.min(7,Math.floor(Number($('devotionNewHabitTarget').value)||0)));if(!name){alert('請輸入習慣項目');return}state.divineLife=state.divineLife||{habits:[],checks:{}};state.divineLife.habits=Array.isArray(state.divineLife.habits)?state.divineLife.habits:[];state.divineLife.habits.push({id:`habit-${Date.now()}`,name,weeklyTarget:target});$('devotionNewHabitName').value='';$('devotionNewHabitTarget').value='3';persist();renderDivineLife();$('devotionSettingsPanel').hidden=false});
-$('devotionHabitCards').addEventListener('click',e=>{const start=e.target.closest('[data-devotion-timer]'),reset=e.target.closest('[data-devotion-reset]');if(!start&&!reset)return;const button=start||reset,id=button.dataset.devotionTimer||button.dataset.devotionReset,date=button.dataset.date||devotionDailyDate;state.divineLife=state.divineLife||{habits:[],checks:{},timers:{}};const data=state.divineLife;data.checks=data.checks||{};data.timers=data.timers||{};data.timers[date]=data.timers[date]||{};if(reset){data.timers[date][id]={remainingMs:DEVOTION_TIMER_MS,runningSince:0};}else if(data.checks[date]?.[id]){data.checks[date][id]=false;data.timers[date][id]={remainingMs:DEVOTION_TIMER_MS,runningSince:Date.now()};}else{const t=data.timers[date][id];if(t?.runningSince){t.remainingMs=devotionTimerRemaining(date,id);t.runningSince=0;}else{if(!t)data.timers[date][id]={remainingMs:DEVOTION_TIMER_MS,runningSince:Date.now()};else t.runningSince=Date.now();}}persist();renderDivineLife();});
+$('devotionHabitCards').addEventListener('click',e=>{const start=e.target.closest('[data-devotion-timer]'),reset=e.target.closest('[data-devotion-reset]');if(!start&&!reset)return;const button=start||reset,id=button.dataset.devotionTimer||button.dataset.devotionReset,date=button.dataset.date||devotionDailyDate;state.divineLife=state.divineLife||{habits:[],checks:{},timers:{}};const data=state.divineLife;data.checks=data.checks||{};data.timers=data.timers||{};data.timers[date]=data.timers[date]||{};if(reset){data.timers[date][id]={remainingMs:DEVOTION_TIMER_MS,runningSince:0};}else if(data.checks[date]?.[id]){data.checks[date][id]=false;data.timers[date][id]={remainingMs:DEVOTION_TIMER_MS,runningSince:Date.now()};}else{const t=data.timers[date][id];if(t?.runningSince){t.remainingMs=devotionTimerRemaining(date,id);t.runningSince=0;}else{if(!t)data.timers[date][id]={remainingMs:DEVOTION_TIMER_MS,runningSince:Date.now()};else t.runningSince=Date.now();}}persist();renderDivineLife();renderDevotionDailyDateNav();});
 setInterval(()=>{const completed=settleDevotionTimers();if(completed)renderDivineLife();['bible','prayer'].forEach(id=>{const node=document.querySelector(`[data-devotion-clock="${id}"]`);if(node){const date=node.dataset.date||devotionDailyDate,done=!!state.divineLife?.checks?.[date]?.[id];node.textContent=done?'完成':devotionFormatTime(state.divineLife?.timers?.[date]?.[id]?devotionTimerRemaining(date,id):DEVOTION_TIMER_MS);}});},1000);
 $('devotionDailyDateNav').addEventListener('click',e=>{const day=e.target.closest('[data-devotion-daily-date]'),week=e.target.closest('[data-devotion-week]');if(day){devotionDailyDate=day.dataset.devotionDailyDate;renderDivineLife();return}if(week){devotionDailyDate=shiftDevotionDate(devotionDailyDate,Number(week.dataset.devotionWeek));renderDivineLife();return}});
  $('devotionHabitCards').addEventListener('click',e=>{const toggle=e.target.closest('[data-devotion-edit-toggle]');if(toggle){const panel=$(`devotionEdit-${toggle.dataset.devotionEditToggle}`);if(panel)panel.hidden=!panel.hidden;return}const close=e.target.closest('[data-devotion-edit-close]');if(close){const panel=$(`devotionEdit-${close.dataset.devotionEditClose}`);if(panel)panel.hidden=true;return}const complete=e.target.closest('[data-devotion-complete]');if(complete){const id=complete.dataset.devotionComplete,date=complete.dataset.date,habit=state.divineLife.habits.find(h=>h.id===id);if(!habit)return;const value=state.divineLife.details?.[date]?.[id]||{};const amount=habit.mode==='duration'?Number(value.minutes)||0:Number(value.count)||0;if(amount<=0){alert(habit.mode==='duration'?'請先輸入完成分鐘數':'請先輸入完成次數');return}state.divineLife.checks[date]=state.divineLife.checks[date]||{};state.divineLife.checks[date][id]=true;persist();renderDivineLife();return}});
@@ -2140,7 +2141,28 @@ function printScheduleForMobile(){
 body.is-authenticated .auth-panel,body.is-authenticated #authStatus,body.is-authenticated .menu-account{display:none!important}
 #menuLogout,#menuSwitchAccount,#signOutBtn{display:none!important}
 </style>
-</head><body><main id="schedulePrintDocument" class="schedule-print-document">${content}</main><script>window.addEventListener('load',function(){setTimeout(function(){try{window.focus();window.print()}catch(e){}},500)});<\/script>
+<style id="divine-life-line-icons-progress">
+/* 四項主要習慣卡片統一白底，線條圖示採用主題深色。 */
+#page-divine-life .devotion-habit-card{background:#fff!important;border:1px solid var(--pale-soft)!important;box-shadow:0 2px 10px rgba(0,0,0,.035)!important}
+#page-divine-life .devotion-habit-icon{background:#fff!important;color:var(--green)!important;font-size:0!important}
+#page-divine-life .devotion-habit-icon svg{width:42px;height:42px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#page-divine-life .devotion-date-number{
+  border:0!important;
+  color:var(--green)!important;
+  background:conic-gradient(var(--green) var(--day-rate,0%),var(--pale-soft) 0)!important;
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2.5px))!important;
+  mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2.5px))!important;
+  box-shadow:none!important;
+}
+#page-divine-life .devotion-date-day.selected .devotion-date-number{
+  color:var(--green)!important;
+  background:conic-gradient(var(--green) var(--day-rate,0%),var(--pale-soft) 0)!important;
+}
+</style>\n<style id="main-screen-hide-logout">
+/* 主畫面不顯示登出入口；登入驗證與雲端同步仍保留。 */
+#menuLogout,#menuSwitchAccount,#signOutBtn{display:none!important}
+body.is-authenticated .auth-panel,body.is-authenticated #authStatus,body.is-authenticated .menu-account{display:none!important}
+</style>\n</head><body><main id="schedulePrintDocument" class="schedule-print-document">${content}</main><script>window.addEventListener('load',function(){setTimeout(function(){try{window.focus();window.print()}catch(e){}},500)});<\/script>
 
 
 
