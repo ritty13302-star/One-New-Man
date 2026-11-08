@@ -2162,7 +2162,36 @@ body.is-authenticated .auth-panel,body.is-authenticated #authStatus,body.is-auth
 /* 主畫面不顯示登出入口；登入驗證與雲端同步仍保留。 */
 #menuLogout,#menuSwitchAccount,#signOutBtn{display:none!important}
 body.is-authenticated .auth-panel,body.is-authenticated #authStatus,body.is-authenticated .menu-account{display:none!important}
-</style>\n</head><body><main id="schedulePrintDocument" class="schedule-print-document">${content}</main><script>window.addEventListener('load',function(){setTimeout(function(){try{window.focus();window.print()}catch(e){}},500)});<\/script>
+</style>\n<style id="latest-divine-life-ui-fixes">
+/* 圓形進度條：只顯示外圈進度線，圓心保持透明，不填滿整個圓。 */
+#page-divine-life .devotion-date-number{
+  width:40px!important;height:40px!important;min-width:40px;
+  display:grid!important;place-items:center!important;
+  border:0!important;border-radius:50%!important;
+  color:var(--green)!important;
+  background:conic-gradient(var(--green) var(--day-rate,0%),var(--pale-soft) 0)!important;
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2.5px))!important;
+  mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2.5px))!important;
+  box-shadow:none!important;
+}
+#page-divine-life .devotion-date-day.selected .devotion-date-number{
+  background:conic-gradient(var(--green) var(--day-rate,0%),var(--pale-soft) 0)!important;
+  color:var(--green)!important;
+}
+@media(max-width:560px){
+  #page-divine-life .devotion-date-number{width:36px!important;height:36px!important;min-width:36px}
+}
+/* 主畫面隱藏登出／切換帳號入口，不更動登入及雲端同步程式。 */
+#signOutBtn,#menuLogout,#menuSwitchAccount{display:none!important}
+/* 個人晨興、讀經、個人禱告、運動卡片固定白底，線條圖示保持 SVG 描邊。 */
+#page-divine-life .devotion-habit-card{background:#fff!important}
+#page-divine-life .devotion-habit-icon{background:#fff!important;color:var(--green)!important;font-size:0!important}
+#page-divine-life .devotion-habit-icon svg{
+  display:block;width:42px;height:42px;fill:none;stroke:currentColor;
+  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
+</style>
+</head><body><main id="schedulePrintDocument" class="schedule-print-document">${content}</main><script>window.addEventListener('load',function(){setTimeout(function(){try{window.focus();window.print()}catch(e){}},500)});<\/script>
 
 
 
