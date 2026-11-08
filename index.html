@@ -747,6 +747,21 @@ body.dark-night .todo-count-badge{
 #page-divine-life .devotion-report-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 14px}
 #page-divine-life .devotion-report-nav strong{font-size:16px}
 #page-divine-life .devotion-report-list{display:grid;gap:14px}
+#page-divine-life .devotion-report-list.month-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#page-divine-life .devotion-report-list.month-grid .devotion-report-card{padding:8px;border-radius:12px}
+#page-divine-life .devotion-report-list.month-grid .devotion-report-card h4{font-size:13px;margin-bottom:7px}
+#page-divine-life .devotion-report-list.month-grid .devotion-report-days{gap:2px}
+#page-divine-life .devotion-report-list.month-grid .devotion-report-day{font-size:10px;border-radius:4px}
+#page-divine-life .devotion-report-list.month-grid .devotion-report-meta{font-size:11px;gap:4px}
+#page-divine-life .devotion-report-year-grid .devotion-report-day{background:#f0f0f0;color:#b8b8b8}
+#page-divine-life .devotion-daily-checks{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+#page-divine-life .devotion-daily-checks h3{font-size:15px;margin:0 0 8px}
+#page-divine-life .devotion-daily-row{display:grid;grid-template-columns:minmax(80px,1fr) repeat(7,minmax(0,1fr));gap:5px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+#page-divine-life .devotion-daily-row:last-child{border-bottom:0}
+#page-divine-life .devotion-daily-row .day-label{text-align:center;font-size:11px;color:var(--muted)}
+#page-divine-life .devotion-daily-row .habit-label{font-weight:650;font-size:13px}
+#page-divine-life .devotion-daily-row input{width:19px;height:19px;accent-color:var(--green);display:block;margin:auto}
+@media(max-width:560px){#page-divine-life .devotion-report-list.month-grid{gap:8px}#page-divine-life .devotion-report-list.month-grid .devotion-report-card{padding:7px}#page-divine-life .devotion-report-list.month-grid .devotion-report-day{font-size:9px}#page-divine-life .devotion-daily-row{gap:2px;grid-template-columns:minmax(72px,1fr) repeat(7,minmax(0,1fr))}}
 #page-divine-life .devotion-report-card{border:1px solid var(--line);border-radius:16px;padding:12px;background:var(--card);min-width:0}
 #page-divine-life .devotion-report-card h4{margin:0 0 10px;font-size:15px}
 #page-divine-life .devotion-report-meta{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:9px;font-size:13px;color:var(--muted)}
@@ -916,12 +931,12 @@ body.dark-night .todo-count-badge{
    <div id="devotionReportContent"></div>
   </section>
   <div id="devotionTimerPanel" class="devotion-timers" aria-label="讀經與個人禱告計時器"></div>
-  <div class="panel week" style="margin-top:12px">
+  <section class="devotion-daily-checks" aria-label="個人晨興與運動每日打卡">
+   <h3>每日操練打卡</h3>
    <div class="schedule-week-actions"><button class="mini" type="button" id="devotionWeekPrev" aria-label="上一週">‹</button><button class="btn secondary" type="button" id="devotionWeekCurrent">本週</button><button class="mini" type="button" id="devotionWeekNext" aria-label="下一週">›</button></div>
    <div class="muted" id="devotionWeekLabel" style="text-align:center;margin:8px 0 4px"></div>
-   <div id="devotionWeekGrid" class="devotion-week-grid"></div>
-   <div id="devotionWeekSummary" class="notice" style="margin-top:12px"></div>
-  </div>
+   <div id="devotionWeekGrid" class="devotion-daily-grid"></div>
+  </section>
  </div>
 </section>
 <section id="page-prayer-book" class="page-panel subpage" role="tabpanel" hidden>
@@ -1832,8 +1847,7 @@ function renderDivineLife(){
  settleDevotionTimers();const data=state.divineLife||{habits:[],checks:{},timers:{}};const key=selectedDevotionWeek||currentCareWeekKey(),info=homeGroupWeekInfo(key),days=Array.from({length:7},(_,i)=>devotionDateAdd(key,i));
  $('devotionWeekLabel').textContent=`${key===currentCareWeekKey()?'本週':`第 ${info.week} 週`}｜${info.year} 年 ${info.range}`;
  $('devotionHabitSettings').innerHTML=data.habits.map(h=>`<div class="devotion-settings-row"><input type="text" maxlength="40" value="${esc(h.name)}" data-devotion-name="${esc(h.id)}" aria-label="習慣名稱"><label style="font-size:12px">每週<input type="number" min="0" max="7" step="1" value="${h.weeklyTarget}" data-devotion-target="${esc(h.id)}" aria-label="每週目標次數">次</label><button class="btn secondary" type="button" data-devotion-delete="${esc(h.id)}">刪除</button></div>`).join('')||'<p class="muted">尚未設定習慣，請新增項目。</p>';
- renderDevotionTimers();$('devotionWeekGrid').innerHTML=`<table class="devotion-week-table"><thead><tr><th>操練項目</th>${days.map((d,i)=>`<th>${['一','二','三','四','五','六','日'][i]}<br>${Number(d.slice(8,10))}日</th>`).join('')}</tr></thead><tbody>${data.habits.map(h=>`<tr><td>${esc(h.name)}</td>${days.map(d=>`<td>${['bible','prayer'].includes(h.id)?(data.checks?.[d]?.[h.id]?'✓':(data.timers?.[d]?.[h.id]?.runningSince?'計時中':'—')):`<label class="devotion-check"><input type="checkbox" data-devotion-date="${d}" data-devotion-habit="${esc(h.id)}" ${data.checks?.[d]?.[h.id]?'checked':''} aria-label="${d} ${esc(h.name)}"></label>`}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="8" style="text-align:center;color:var(--muted)">請先到設定新增習慣項目。</td></tr>`}</tbody></table>`;
- const totals=data.habits.reduce((a,h)=>a+days.filter(d=>data.checks?.[d]?.[h.id]).length,0),targets=data.habits.reduce((a,h)=>a+h.weeklyTarget,0);$('devotionWeekSummary').textContent=`本週累計完成 ${totals} 次；設定目標合計 ${targets} 次。`;
+ renderDevotionTimers();const manualHabits=data.habits.filter(h=>!['bible','prayer'].includes(h.id));$('devotionWeekGrid').innerHTML=`<div class="devotion-daily-row"><span></span>${days.map((d,i)=>`<span class="day-label">${'一二三四五六日'[i]}<br>${Number(d.slice(8,10))}</span>`).join('')}</div>${manualHabits.map(h=>`<div class="devotion-daily-row"><span class="habit-label">${esc(h.name)}</span>${days.map(d=>`<label><input type="checkbox" data-devotion-date="${d}" data-devotion-habit="${esc(h.id)}" ${data.checks?.[d]?.[h.id]?'checked':''} aria-label="${d} ${esc(h.name)}"></label>`).join('')}</div>`).join('')||'<p class="muted">請到設定新增手動打卡項目。</p>'}`;
  renderDevotionMonthlyData();
 }
 let devotionReportMode='week',devotionReportDate=new Date();
@@ -1851,10 +1865,10 @@ function renderDevotionMonthlyData(){
   host.innerHTML=`<div class="devotion-report-list"><div class="devotion-report-card"><div class="devotion-report-week"><span></span>${dates.map((k,i)=>`<span class="day-head">${'一二三四五六日'[i]}<br>${Number(k.slice(8,10))}</span>`).join('')}${habits.map((h,i)=>`<span class="habit-name">${esc(h.name)}</span>${dates.map(k=>`<span class="devotion-report-day ${devotionReportDone(checks,k,h.id)?'done':''}" style="${devotionReportDone(checks,k,h.id)?`background:${color(i)}`:''}">${devotionReportDone(checks,k,h.id)?'✓':'·'}</span>`).join('')}`).join('')}</div></div>${habits.map((h,i)=>{const n=dates.filter(k=>devotionReportDone(checks,k,h.id)).length;return `<div class="devotion-report-meta"><strong>${esc(h.name)}</strong><span>${Math.round(n/7*100)}%　${n}/7 天</span></div>`}).join('')}</div>`;
  }else if(devotionReportMode==='month'){
   const count=new Date(y,m+1,0).getDate(),first=new Date(y,m,1).getDay(),offset=(first+6)%7;
-  host.innerHTML=`<div class="devotion-report-list">${habits.map((h,i)=>{const n=Array.from({length:count},(_,j)=>devotionReportDone(checks,devotionReportDateKey(y,m,j+1),h.id)?1:0).reduce((a,b)=>a+b,0),cells=Array.from({length:offset},()=>'<span></span>').join('')+Array.from({length:count},(_,j)=>{const done=devotionReportDone(checks,devotionReportDateKey(y,m,j+1),h.id);return `<span class="devotion-report-day ${done?'done':''}" style="${done?`background:${color(i)}`:''}">${j+1}</span>`}).join('');return `<article class="devotion-report-card"><h4>${esc(h.name)}</h4><div class="devotion-report-days">${cells}</div><div class="devotion-report-meta"><span>${Math.round(n/count*100)}%</span><strong style="color:${color(i)}">${n} 天</strong></div></article>`}).join('')}</div>`;
+  host.innerHTML=`<div class="devotion-report-list month-grid">${habits.map((h,i)=>{const n=Array.from({length:count},(_,j)=>devotionReportDone(checks,devotionReportDateKey(y,m,j+1),h.id)?1:0).reduce((a,b)=>a+b,0),cells=Array.from({length:offset},()=>'<span></span>').join('')+Array.from({length:count},(_,j)=>{const done=devotionReportDone(checks,devotionReportDateKey(y,m,j+1),h.id);return `<span class="devotion-report-day ${done?'done':''}" style="${done?`background:${color(i)}`:''}">${j+1}</span>`}).join('');return `<article class="devotion-report-card"><h4>${esc(h.name)}</h4><div class="devotion-report-days">${cells}</div><div class="devotion-report-meta"><span>${Math.round(n/count*100)}%</span><strong style="color:${color(i)}">${n} 天</strong></div></article>`}).join('')}</div>`;
  }else{
   const count=(new Date(y,1,29).getMonth()===1)?366:365;
-  host.innerHTML=`<div class="devotion-report-list">${habits.map((h,i)=>{const cells=Array.from({length:count},(_,j)=>{const x=new Date(y,0,j+1),key=dateKey(x),done=devotionReportDone(checks,key,h.id);return `<span class="devotion-report-day ${done?'done':''}" title="${key}" style="${done?`background:${color(i)}`:''}"></span>`}).join(''),n=Array.from({length:count},(_,j)=>devotionReportDone(checks,dateKey(new Date(y,0,j+1)),h.id)?1:0).reduce((a,b)=>a+b,0);return `<article class="devotion-report-card"><h4>${esc(h.name)}</h4><div class="devotion-report-year-grid">${cells}</div><div class="devotion-report-meta"><span>${Math.round(n/count*100)}%</span><strong style="color:${color(i)}">${n} 天</strong></div></article>`}).join('')}</div>`;
+  host.innerHTML=`<div class="devotion-report-list">${habits.map((h,i)=>{const cells=Array.from({length:count},(_,j)=>{const x=new Date(y,0,j+1),key=dateKey(x),done=devotionReportDone(checks,key,h.id);return `<span class="devotion-report-day ${done?'done':''}" title="${key}" style="${done?`background:${color(i)}`:'background:#f0f0f0'}"></span>`}).join(''),n=Array.from({length:count},(_,j)=>devotionReportDone(checks,dateKey(new Date(y,0,j+1)),h.id)?1:0).reduce((a,b)=>a+b,0);return `<article class="devotion-report-card"><h4>${esc(h.name)}</h4><div class="devotion-report-year-grid">${cells}</div><div class="devotion-report-meta"><span>${Math.round(n/count*100)}%</span><strong style="color:${color(i)}">${n} 天</strong></div></article>`}).join('')}</div>`;
  }
 }
 function openPersonalPage(id){$('serviceQuickFab').hidden=true;$('newIdeaFab').hidden=true;document.querySelectorAll('#appContent > .page-panel').forEach(p=>p.hidden=p.id!==id);document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false')});$('mainNavTabs').hidden=true;$('pageEditToolbar').hidden=true;closeMenu();if(id==='page-divine-life')renderDivineLife();if(id==='page-prayer-book')renderPrayerBook();window.scrollTo({top:0,behavior:'smooth'})}
