@@ -701,6 +701,24 @@ body.dark-night .todo-count-badge{
 .week-review-open-action{font-size:.9rem;color:var(--accent);font-weight:700}
 .spiritual-records-editor{margin-top:12px}
 .spiritual-records-editor textarea{width:100%;min-height:150px;margin:7px 0 16px}
+
+#page-divine-life .devotion-week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:12px}
+#page-divine-life .devotion-day{border:1px solid var(--line);border-radius:12px;padding:7px 3px;text-align:center;min-width:0;background:var(--card)}
+#page-divine-life .devotion-day strong{display:block;font-size:12px;margin-bottom:7px}
+#page-divine-life .devotion-check{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;margin:8px 0;line-height:1.25}
+#page-divine-life .devotion-check input{width:18px;height:18px;margin:0;accent-color:var(--accent)}
+#page-divine-life .devotion-habit-settings{display:grid;gap:9px;margin-top:12px}
+#page-divine-life .devotion-habit-row{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--card)}
+#page-divine-life .devotion-habit-row input{width:70px;max-width:28%;padding:8px;text-align:center}
+#page-divine-life .devotion-progress{font-size:12px;color:var(--muted);margin-top:3px}
+#page-prayer-book .prayer-entry{border:1px solid var(--line);border-radius:14px;padding:13px;margin:10px 0;background:var(--card)}
+#page-prayer-book .prayer-entry h3{margin:0 0 8px;font-size:1rem}
+#page-prayer-book .prayer-entry p{margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+#page-prayer-book .prayer-entry-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+#prayerBookEditor{display:grid;gap:9px;margin-top:12px}
+#prayerBookEditor label{display:grid;gap:5px;font-weight:650}
+#prayerBookEditor textarea{width:100%;min-height:70px}
+@media(max-width:560px){#page-divine-life .devotion-week-grid{gap:3px}#page-divine-life .devotion-day{padding:6px 1px;border-radius:9px}#page-divine-life .devotion-check{font-size:10px}}
 </style>
 </head>
 <body>
@@ -716,6 +734,8 @@ body.dark-night .todo-count-badge{
  <button class="menu-item" id="menuLifeReading" type="button"><span>📖</span>生命讀經</button>
  <button class="menu-item" id="menuSchedule" type="button"><span>🗓️</span>時間表</button>
  <button class="menu-item" id="menuSpiritualRecords" type="button"><span>📝</span>屬靈記錄</button>
+ <button class="menu-item" id="menuDivineLife" type="button"><span>🌱</span>神人生活</button>
+ <button class="menu-item" id="menuPrayerBook" type="button"><span>🙏</span>禱告簿</button>
  <div class="menu-divider"></div>
  <button class="menu-item" id="settingsToggle" type="button" aria-expanded="true"><span>⚙️</span><span style="flex:1">設定</span><span id="settingsChevron">⌄</span></button>
  <div id="settingsPanel">
@@ -820,6 +840,36 @@ body.dark-night .todo-count-badge{
    <label for="nextWeek">下週想做的事</label><textarea id="nextWeek" style="min-height:120px" placeholder="寫下下一步的小行動"></textarea>
    <button class="btn" id="saveWeek" type="button">儲存本週紀錄</button><div id="savedMsg" class="notice" aria-live="polite"></div>
   </div>
+ </div>
+</section>
+<section id="page-divine-life" class="page-panel subpage" role="tabpanel" hidden>
+ <div class="schedule-card">
+  <div class="schedule-card-head"><div><h2>🌱 神人生活</h2><p class="muted">以每日打卡記錄操練，並按一週目標頻率追蹤。</p></div><button class="btn secondary" type="button" data-personal-page-back>返回主頁</button></div>
+  <div class="panel week" style="margin-top:12px">
+   <div class="schedule-week-actions"><button class="mini" type="button" id="devotionWeekPrev" aria-label="上一週">‹</button><button class="btn secondary" type="button" id="devotionWeekCurrent">本週</button><button class="mini" type="button" id="devotionWeekNext" aria-label="下一週">›</button></div>
+   <div class="muted" id="devotionWeekLabel" style="text-align:center;margin:8px 0 4px"></div>
+   <div id="devotionHabitSettings" class="devotion-habit-settings"></div>
+   <div id="devotionWeekGrid" class="devotion-week-grid"></div>
+   <div id="devotionWeekSummary" class="notice" style="margin-top:12px"></div>
+  </div>
+ </div>
+</section>
+<section id="page-prayer-book" class="page-panel subpage" role="tabpanel" hidden>
+ <div class="schedule-card">
+  <div class="schedule-card-head"><div><h2>🙏 禱告簿</h2><p class="muted">記下禱告中的光照、引導與答應，隨時回顧主的帶領。</p></div><button class="btn secondary" type="button" data-personal-page-back>返回主頁</button></div>
+  <button class="btn" id="prayerBookAdd" type="button" style="margin-top:12px">＋ 新增禱告紀錄</button>
+  <div id="prayerBookList" style="margin-top:10px"></div>
+  <form id="prayerBookEditor" class="panel week" hidden>
+   <h3 id="prayerBookEditorTitle">新增禱告紀錄</h3>
+   <label>項目<input id="prayerItem" maxlength="200" placeholder="為什麼事禱告？" required></label>
+   <label>光照<textarea id="prayerLight" placeholder="禱告中所得的光照"></textarea></label>
+   <label>珍賞<textarea id="prayerAppreciation" placeholder="在這件事上對主的珍賞"></textarea></label>
+   <label>引導<textarea id="prayerGuidance" placeholder="主的引導"></textarea></label>
+   <label>實行結果<textarea id="prayerPractice" placeholder="實際採取的行動與結果"></textarea></label>
+   <label>得答應的方式與情形<textarea id="prayerAnswer" placeholder="主如何答應禱告"></textarea></label>
+   <label>得答應日期<input id="prayerAnswerDate" type="date"></label>
+   <div class="dialog-actions"><button class="btn secondary" type="button" id="prayerBookCancel">取消</button><button class="btn" type="submit">儲存紀錄</button></div>
+  </form>
  </div>
 </section>
 <section id="page-life-reading" class="page-panel subpage life-reading-page" role="tabpanel" hidden>
@@ -969,6 +1019,8 @@ const freshState=()=>({
   weekNote:'',
   nextWeek:'',
   weeklySpiritualRecords:{},
+  divineLife:{habits:[{id:'morning',name:'個人晨興',weeklyTarget:7},{id:'bible',name:'讀經',weeklyTarget:7},{id:'prayer',name:'個人禱告',weeklyTarget:7},{id:'exercise',name:'運動',weeklyTarget:3}],checks:{}},
+  prayerBook:[],
   newIdeas:[],
   tabRecords:emptyTabRecords(),
   churchSaints:[],
@@ -1005,6 +1057,8 @@ const serialize=value=>JSON.stringify({
   weekNote:value.weekNote||'',
   nextWeek:value.nextWeek||'',
   weeklySpiritualRecords:value.weeklySpiritualRecords&&typeof value.weeklySpiritualRecords==='object'?value.weeklySpiritualRecords:{},
+  divineLife:value.divineLife&&typeof value.divineLife==='object'?value.divineLife:{habits:[],checks:{}},
+  prayerBook:Array.isArray(value.prayerBook)?value.prayerBook:[],
   newIdeas:Array.isArray(value.newIdeas)?value.newIdeas:[],
   tabRecords:value.tabRecords||emptyTabRecords(),
   churchSaints:value.churchSaints||[],
@@ -1058,7 +1112,7 @@ function normalizeState(raw){
   goals:goals.map((g,i)=>({id:g.id??i+1,name:String(g.name||''),category:String(g.category||'其他'),target:Math.max(1,Number(g.target)||1),current:Math.max(0,Number(g.current)||0)})),
   baptismGoalPeopleCount,baptismGoalAudience,bookGoalTarget,sistersConferenceCount,sistersConferenceAudience,sistersConferenceEvent,
   books:books.map((b,i)=>{const chapters=Math.max(0,Math.min(9999,Math.floor(Number(b.chapters)||0)));const readChapters=Array.isArray(b.readChapters)?[...new Set(b.readChapters.map(Number).filter(n=>Number.isInteger(n)&&n>=1&&n<=chapters))].sort((a,c)=>a-c):Array.from({length:Math.min(chapters,Math.max(0,Math.floor(Number(b.read)||0)))},(_,j)=>j+1);return {id:b.id??i+1,name:String(b.name||''),chapters,read:readChapters.length,readChapters,done:chapters>0?readChapters.length>=chapters:!!b.done,expanded:!!b.expanded}}),
-  weekNote:String(base.weekNote||''),nextWeek:String(base.nextWeek||''),weeklySpiritualRecords:(()=>{const src=base.weeklySpiritualRecords&&typeof base.weeklySpiritualRecords==='object'?base.weeklySpiritualRecords:{};const out={};Object.entries(src).forEach(([key,value])=>{if(/^\d{4}-\d{2}-\d{2}$/.test(key)&&value&&typeof value==='object')out[key]={weekNote:String(value.weekNote||''),nextWeek:String(value.nextWeek||'')}});if(!Object.keys(out).length&&(base.weekNote||base.nextWeek))out[currentCareWeekKey()]={weekNote:String(base.weekNote||''),nextWeek:String(base.nextWeek||'')};return out})(),newIdeas:Array.isArray(base.newIdeas)?base.newIdeas.map((item,i)=>({id:item.id??`${Date.now()}-${i}`,text:String(item.text||'').slice(0,3000),createdAt:String(item.createdAt||'')})).filter(item=>item.text.trim()):[],tabRecords,churchSmallGroups:Array.isArray(base.churchSmallGroups)&&base.churchSmallGroups.length?base.churchSmallGroups.map(x=>String(x||'').trim()).filter(Boolean):['明日博排','復興排','學生排'],churchCareTable:base.churchCareTable&&typeof base.churchCareTable==='object'?base.churchCareTable:{},churchCareWeeklyRecords:(()=>{const records=base.churchCareWeeklyRecords&&typeof base.churchCareWeeklyRecords==='object'?base.churchCareWeeklyRecords:{};if(!records[currentCareWeekKey()]&&base.churchCareTable&&typeof base.churchCareTable==='object')records[currentCareWeekKey()]=base.churchCareTable;return records})(),churchSaints:Array.isArray(base.churchSaints)?base.churchSaints.map((p,i)=>({id:p.id??Date.now()+i,name:String(p.name||''),identity:['B','S','M','F'].includes(String(p.identity||''))?String(p.identity):'',smallGroup:String(p.smallGroup||''),careChecked:String(p.careWeek||'')===currentCareWeekKey()?!!p.careChecked:false,careWeek:currentCareWeekKey()})):[],weeklyPrayerStudy,
+  weekNote:String(base.weekNote||''),nextWeek:String(base.nextWeek||''),weeklySpiritualRecords:(()=>{const src=base.weeklySpiritualRecords&&typeof base.weeklySpiritualRecords==='object'?base.weeklySpiritualRecords:{};const out={};Object.entries(src).forEach(([key,value])=>{if(/^\d{4}-\d{2}-\d{2}$/.test(key)&&value&&typeof value==='object')out[key]={weekNote:String(value.weekNote||''),nextWeek:String(value.nextWeek||'')}});if(!Object.keys(out).length&&(base.weekNote||base.nextWeek))out[currentCareWeekKey()]={weekNote:String(base.weekNote||''),nextWeek:String(base.nextWeek||'')};return out})(),divineLife:(()=>{const src=base.divineLife&&typeof base.divineLife==='object'?base.divineLife:{},defaults=[{id:'morning',name:'個人晨興',weeklyTarget:7},{id:'bible',name:'讀經',weeklyTarget:7},{id:'prayer',name:'個人禱告',weeklyTarget:7},{id:'exercise',name:'運動',weeklyTarget:3}],habits=Array.isArray(src.habits)&&src.habits.length?src.habits:defaults,checks=src.checks&&typeof src.checks==='object'?src.checks:{};return {habits:habits.map((h,i)=>({id:String(h.id??defaults[i]?.id??`habit-${i+1}`),name:String(h.name||defaults[i]?.name||'習慣').slice(0,40),weeklyTarget:Math.max(0,Math.min(7,Math.floor(Number(h.weeklyTarget??7)||0)))})),checks:Object.fromEntries(Object.entries(checks).filter(([date])=>/^\d{4}-\d{2}-\d{2}$/.test(date)).map(([date,values])=>[date,values&&typeof values==='object'?Object.fromEntries(Object.entries(values).map(([id,v])=>[String(id),!!v])):{}]))}})(),prayerBook:Array.isArray(base.prayerBook)?base.prayerBook.map((r,i)=>({id:String(r.id??`prayer-${i}`),item:String(r.item||''),light:String(r.light||''),appreciation:String(r.appreciation||''),guidance:String(r.guidance||''),practice:String(r.practice||''),answer:String(r.answer||''),answerDate:/^\d{4}-\d{2}-\d{2}$/.test(String(r.answerDate||''))?String(r.answerDate):'',createdAt:String(r.createdAt||'')})):[],newIdeas:Array.isArray(base.newIdeas)?base.newIdeas.map((item,i)=>({id:item.id??`${Date.now()}-${i}`,text:String(item.text||'').slice(0,3000),createdAt:String(item.createdAt||'')})).filter(item=>item.text.trim()):[],tabRecords,churchSmallGroups:Array.isArray(base.churchSmallGroups)&&base.churchSmallGroups.length?base.churchSmallGroups.map(x=>String(x||'').trim()).filter(Boolean):['明日博排','復興排','學生排'],churchCareTable:base.churchCareTable&&typeof base.churchCareTable==='object'?base.churchCareTable:{},churchCareWeeklyRecords:(()=>{const records=base.churchCareWeeklyRecords&&typeof base.churchCareWeeklyRecords==='object'?base.churchCareWeeklyRecords:{};if(!records[currentCareWeekKey()]&&base.churchCareTable&&typeof base.churchCareTable==='object')records[currentCareWeekKey()]=base.churchCareTable;return records})(),churchSaints:Array.isArray(base.churchSaints)?base.churchSaints.map((p,i)=>({id:p.id??Date.now()+i,name:String(p.name||''),identity:['B','S','M','F'].includes(String(p.identity||''))?String(p.identity):'',smallGroup:String(p.smallGroup||''),careChecked:String(p.careWeek||'')===currentCareWeekKey()?!!p.careChecked:false,careWeek:currentCareWeekKey()})):[],weeklyPrayerStudy,
   shepherds:Array.isArray(base.shepherds)?base.shepherds.map((s,i)=>({id:s.id??i+1,name:String(s.name||''),records:Array.isArray(s.records)?s.records.map((r,j)=>({id:r.id??(Date.now()+j),shepherdName:String(r.shepherdName||''),identity:String(r.identity||''),homeTime:String(r.homeTime||''),material:String(r.material||'')})):[{id:Date.now()+i,shepherdName:String(s.shepherdName||''),identity:String(s.identity||''),homeTime:String(s.homeTime||''),material:String(s.material||'')}],expanded:!!s.expanded})): [],
   baptizedPeople:Array.isArray(base.baptizedPeople)?base.baptizedPeople.map((p,i)=>({id:p.id??Date.now()+i,name:String(p.name||''),date:String(p.date||''),department:String(p.department||''),shepherd:String(p.shepherd||''),expanded:!!p.expanded})): [],
   serviceEvangelismRecords:Array.isArray(base.serviceEvangelismRecords)?base.serviceEvangelismRecords.map((r,i)=>({id:r.id??Date.now()+i,date:String(r.date||''),time:String(r.time||''),school:String(r.school||''),names:Math.max(0,Number(r.names)||0),people:Math.max(0,Number(r.people)||0),note:String(r.note||''),createdAt:String(r.createdAt||'')})):[],
@@ -1088,8 +1142,16 @@ function persist(){
    if(!currentUser||currentUser.uid!==uid)return;
    // 等待佇列期間若又有變更，仍寫入此快照；後續佇列項目會再寫最新狀態。
    if(serialized===lastSerialized){if(mutationVersion===localMutationVersion){pendingLocalWrite=false;setCloudStatus('已同步至雲端')}return}
-   await setDoc(doc(db,'users',uid,'appData','main'),{...data,updatedAt:serverTimestamp()});
-   lastSerialized=serialized;
+   const mainRef=doc(db,'users',uid,'appData','main');
+   // 安全保護：若本機 newIdeas 為空，先讀取雲端；雲端仍有想法時保留原值，避免其他功能儲存時把它們清空。
+   let safeData=data;
+   if(!Array.isArray(data.newIdeas)||data.newIdeas.length===0){
+    try{const existing=await getDoc(mainRef);const remoteIdeas=existing.exists()&&Array.isArray(existing.data()?.newIdeas)?existing.data().newIdeas:[];if(remoteIdeas.length){safeData={...data,newIdeas:remoteIdeas};}}
+    catch(readError){console.warn('寫入前無法確認 New Idea，為保護雲端資料，本次同步暫停。',readError);throw readError;}
+   }
+   await setDoc(mainRef,{...safeData,updatedAt:serverTimestamp()});
+   if(safeData!==data){state.newIdeas=safeData.newIdeas;}
+   lastSerialized=serialize(safeData);
    if(mutationVersion===localMutationVersion){pendingLocalWrite=false;setCloudStatus('已同步至雲端 ✓')}
   }).catch(error=>{
    console.error(error);
@@ -1687,6 +1749,31 @@ $('spiritualWeekPrev').onclick=()=>{selectedSpiritualWeek=shiftWeekKey(selectedS
 function openSpiritualRecords(){$('serviceQuickFab').hidden=true;$('newIdeaFab').hidden=true;document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-spiritual-records');document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false')});$('mainNavTabs').hidden=true;$('pageEditToolbar').hidden=true;closeMenu();renderSpiritualWeek();window.scrollTo({top:0,behavior:'smooth'})}
 $('menuSpiritualRecords').addEventListener('click',openSpiritualRecords);$('openSpiritualRecords').addEventListener('click',openSpiritualRecords);
 $('spiritualRecordsBack').addEventListener('click',()=>{$('mainNavTabs').hidden=false;$('pageEditToolbar').hidden=false;$('newIdeaFab').hidden=false;document.querySelectorAll('#appContent > .page-panel').forEach(panel=>panel.hidden=panel.id!=='page-target');document.querySelector('.nav-tab[data-page="target"]')?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'})});
+
+// 神人生活：以週一為一週起點，每天逐項打卡，頻率目標可設為每週 0–7 次。
+let selectedDevotionWeek=currentCareWeekKey(),editingPrayerId=null;
+function devotionDateAdd(key,days){const d=new Date(`${key}T00:00:00`);d.setDate(d.getDate()+days);return dateKey(d)}
+function renderDivineLife(){
+ const data=state.divineLife||{habits:[],checks:{}};const key=selectedDevotionWeek||currentCareWeekKey(),info=homeGroupWeekInfo(key),days=Array.from({length:7},(_,i)=>devotionDateAdd(key,i));
+ $('devotionWeekLabel').textContent=`${key===currentCareWeekKey()?'本週':`第 ${info.week} 週`}｜${info.year} 年 ${info.range}`;
+ $('devotionHabitSettings').innerHTML=data.habits.map(h=>{const count=days.filter(d=>data.checks?.[d]?.[h.id]).length;return `<div class="devotion-habit-row"><div><strong>${esc(h.name)}</strong><div class="devotion-progress">本週完成 ${count} / 目標 ${h.weeklyTarget} 次</div></div><label style="display:flex;align-items:center;gap:6px;font-size:13px">每週<input type="number" min="0" max="7" step="1" value="${h.weeklyTarget}" data-devotion-target="${esc(h.id)}" aria-label="${esc(h.name)}每週目標次數">次</label></div>`}).join('');
+ $('devotionWeekGrid').innerHTML=days.map((d,i)=>`<div class="devotion-day"><strong>${['一','二','三','四','五','六','日'][i]}<br>${Number(d.slice(8,10))}日</strong>${data.habits.map(h=>`<label class="devotion-check"><input type="checkbox" data-devotion-date="${d}" data-devotion-habit="${esc(h.id)}" ${data.checks?.[d]?.[h.id]?'checked':''} aria-label="${d} ${esc(h.name)}">${esc(h.name.replace('個人',''))}</label>`).join('')}</div>`).join('');
+ const totals=data.habits.reduce((a,h)=>a+days.filter(d=>data.checks?.[d]?.[h.id]).length,0),targets=data.habits.reduce((a,h)=>a+h.weeklyTarget,0);$('devotionWeekSummary').textContent=`本週累計完成 ${totals} 次；設定目標合計 ${targets} 次。`;
+}
+function openPersonalPage(id){$('serviceQuickFab').hidden=true;$('newIdeaFab').hidden=true;document.querySelectorAll('#appContent > .page-panel').forEach(p=>p.hidden=p.id!==id);document.querySelectorAll('.nav-tab[data-page]').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false')});$('mainNavTabs').hidden=true;$('pageEditToolbar').hidden=true;closeMenu();if(id==='page-divine-life')renderDivineLife();if(id==='page-prayer-book')renderPrayerBook();window.scrollTo({top:0,behavior:'smooth'})}
+$('menuDivineLife').addEventListener('click',()=>openPersonalPage('page-divine-life'));
+$('menuPrayerBook').addEventListener('click',()=>openPersonalPage('page-prayer-book'));
+document.querySelectorAll('[data-personal-page-back]').forEach(btn=>btn.addEventListener('click',()=>{$('mainNavTabs').hidden=false;$('pageEditToolbar').hidden=false;$('newIdeaFab').hidden=false;document.querySelectorAll('#appContent > .page-panel').forEach(p=>p.hidden=p.id!=='page-target');document.querySelector('.nav-tab[data-page="target"]')?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}));
+$('devotionWeekPrev').addEventListener('click',()=>{selectedDevotionWeek=shiftWeekKey(selectedDevotionWeek,-1);renderDivineLife()});$('devotionWeekNext').addEventListener('click',()=>{selectedDevotionWeek=shiftWeekKey(selectedDevotionWeek,1);renderDivineLife()});$('devotionWeekCurrent').addEventListener('click',()=>{selectedDevotionWeek=currentCareWeekKey();renderDivineLife()});
+$('devotionHabitSettings').addEventListener('change',e=>{const field=e.target.closest('[data-devotion-target]');if(!field)return;const habit=state.divineLife.habits.find(h=>h.id===field.dataset.devotionTarget);if(!habit)return;habit.weeklyTarget=Math.max(0,Math.min(7,Math.floor(Number(field.value)||0)));persist();renderDivineLife()});
+$('devotionWeekGrid').addEventListener('change',e=>{const field=e.target.closest('[data-devotion-date][data-devotion-habit]');if(!field)return;state.divineLife=state.divineLife||{habits:[],checks:{}};state.divineLife.checks=state.divineLife.checks||{};state.divineLife.checks[field.dataset.devotionDate]=state.divineLife.checks[field.dataset.devotionDate]||{};state.divineLife.checks[field.dataset.devotionDate][field.dataset.devotionHabit]=field.checked;persist();renderDivineLife()});
+function renderPrayerBook(){const list=$('prayerBookList'),items=Array.isArray(state.prayerBook)?state.prayerBook:[];list.innerHTML=items.length?items.slice().sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')).map(r=>`<article class="prayer-entry"><h3>${esc(r.item||'未命名項目')}</h3>${[['光照',r.light],['珍賞',r.appreciation],['引導',r.guidance],['實行結果',r.practice],['得答應的方式與情形',r.answer],['得答應日期',r.answerDate]].map(([k,v])=>v?`<p><strong>${k}：</strong>${esc(v)}</p>`:'').join('')}<div class="prayer-entry-actions"><button class="btn secondary" type="button" data-prayer-edit="${esc(r.id)}">編輯</button><button class="btn secondary" type="button" data-prayer-delete="${esc(r.id)}">刪除</button></div></article>`).join(''):'<p class="muted">目前還沒有禱告紀錄，按「新增禱告紀錄」開始記下。</p>';}
+function resetPrayerEditor(){editingPrayerId=null;$('prayerBookEditor').reset();$('prayerBookEditor').hidden=true;$('prayerBookEditorTitle').textContent='新增禱告紀錄'}
+function fillPrayerEditor(r){editingPrayerId=r?.id??null;$('prayerBookEditorTitle').textContent=r?'編輯禱告紀錄':'新增禱告紀錄';$('prayerItem').value=r?.item||'';$('prayerLight').value=r?.light||'';$('prayerAppreciation').value=r?.appreciation||'';$('prayerGuidance').value=r?.guidance||'';$('prayerPractice').value=r?.practice||'';$('prayerAnswer').value=r?.answer||'';$('prayerAnswerDate').value=r?.answerDate||'';$('prayerBookEditor').hidden=false;$('prayerItem').focus();}
+$('prayerBookAdd').addEventListener('click',()=>fillPrayerEditor(null));$('prayerBookCancel').addEventListener('click',resetPrayerEditor);
+$('prayerBookEditor').addEventListener('submit',e=>{e.preventDefault();const item=$('prayerItem').value.trim();if(!item){alert('請填寫項目');return}const record={id:editingPrayerId||`prayer-${Date.now()}`,item,light:$('prayerLight').value,appreciation:$('prayerAppreciation').value,guidance:$('prayerGuidance').value,practice:$('prayerPractice').value,answer:$('prayerAnswer').value,answerDate:$('prayerAnswerDate').value,createdAt:new Date().toISOString()};state.prayerBook=Array.isArray(state.prayerBook)?state.prayerBook:[];const index=state.prayerBook.findIndex(r=>String(r.id)===String(editingPrayerId));if(index>=0){record.createdAt=state.prayerBook[index].createdAt||record.createdAt;state.prayerBook[index]=record}else state.prayerBook.unshift(record);persist();resetPrayerEditor();renderPrayerBook()});
+$('prayerBookList').addEventListener('click',e=>{const edit=e.target.closest('[data-prayer-edit]');if(edit){const record=state.prayerBook.find(r=>String(r.id)===edit.dataset.prayerEdit);if(record)fillPrayerEditor(record);return}const del=e.target.closest('[data-prayer-delete]');if(del){if(!confirm('確定刪除這筆禱告紀錄嗎？'))return;state.prayerBook=state.prayerBook.filter(r=>String(r.id)!==del.dataset.prayerDelete);persist();renderPrayerBook()}});
+
 function renderNewIdeas(){
  const host=$('newIdeaMessages');if(!host)return;
  const items=Array.isArray(state.newIdeas)?state.newIdeas:[];
