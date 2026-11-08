@@ -838,6 +838,107 @@ body.dark-night .todo-count-badge{
 #prayerBookEditor textarea{width:100%;min-height:70px}
 @media(max-width:560px){#page-divine-life .devotion-week-grid{gap:3px}#page-divine-life .devotion-day{padding:6px 1px;border-radius:9px}#page-divine-life .devotion-check{font-size:10px}}
 </style>
+
+<style id="v11-main-screen-fixes">
+/* V11：這些樣式放在主頁 head，確保實際網站畫面會套用，而非只套用於列印頁。 */
+
+/* 1. 每日習慣圖案：顯示 SVG 線條圖示，避免瀏覽器預設黑色實心填滿。 */
+#page-divine-life .devotion-habit-icon{
+  background:#fff!important;
+  color:var(--green)!important;
+  font-size:0!important;
+}
+#page-divine-life .devotion-habit-icon svg{
+  display:block!important;
+  width:42px!important;
+  height:42px!important;
+  overflow:visible;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+#page-divine-life .devotion-habit-icon svg *{
+  fill:none!important;
+  stroke:currentColor!important;
+}
+
+/* 2. 四個每日項目卡片固定白底。 */
+#page-divine-life .devotion-habit-card{
+  background:#fff!important;
+  border:1px solid var(--line)!important;
+  box-shadow:0 2px 10px rgba(0,0,0,.035)!important;
+}
+
+/* 3. 日期圓圈：進度環放在 ::before，不遮住日期數字。 */
+#page-divine-life .devotion-date-number{
+  position:relative!important;
+  isolation:isolate;
+  display:grid!important;
+  place-items:center!important;
+  width:40px!important;
+  height:40px!important;
+  min-width:40px!important;
+  border:0!important;
+  border-radius:50%!important;
+  background:transparent!important;
+  color:var(--ink)!important;
+  z-index:0;
+}
+#page-divine-life .devotion-date-number::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  border-radius:50%;
+  background:conic-gradient(
+    var(--green) var(--day-rate,0%),
+    var(--pale-soft) 0
+  );
+  -webkit-mask:radial-gradient(
+    farthest-side,
+    transparent calc(100% - 3px),
+    #000 calc(100% - 2.5px)
+  );
+  mask:radial-gradient(
+    farthest-side,
+    transparent calc(100% - 3px),
+    #000 calc(100% - 2.5px)
+  );
+}
+#page-divine-life .devotion-date-day.selected .devotion-date-number{
+  background:transparent!important;
+  color:var(--ink)!important;
+  border:0!important;
+}
+#page-divine-life .devotion-date-day.selected .devotion-date-number::before{
+  background:conic-gradient(
+    var(--green) var(--day-rate,0%),
+    var(--pale-soft) 0
+  );
+}
+@media(max-width:560px){
+  #page-divine-life .devotion-date-number{
+    width:36px!important;
+    height:36px!important;
+    min-width:36px!important;
+  }
+}
+
+/* 4. 隱藏所有登出／切換帳號按鈕，但保留登入及同步功能。 */
+#signOutBtn,
+#menuLogout,
+#menuSwitchAccount{
+  display:none!important;
+}
+body.is-authenticated .auth-panel,
+body.is-authenticated #authStatus,
+body.is-authenticated .menu-account{
+  display:none!important;
+}
+</style>
+
 </head>
 <body>
 <div class="wrap">
